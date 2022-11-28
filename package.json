@@ -11,6 +11,7 @@
     "@react-navigation/native": "^6.0.14",
     "@react-navigation/native-stack": "^6.9.2",
     "@shopify/react-native-skia": "0.1.157",
+    "class-variance-authority": "^0.3.0",
     "expo": "~47.0.8",
     "expo-font": "~11.0.1",
     "expo-splash-screen": "~0.17.5",

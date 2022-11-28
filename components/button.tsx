@@ -1,66 +1,37 @@
+import { cva, VariantProps } from 'class-variance-authority';
 import React from 'react';
-import {
-  StyleProp,
-  Text,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
-import { COLORS } from '../utils/colors';
+import { Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 
-type ButtonProps = {
+const buttonStyle = cva('py-3 px-5 rounded-full flex-1 my-2', {
+  variants: {
+    variant: {
+      primary: 'bg-primaryWhite text-primaryDark',
+      secondary: 'bg-secondaryDark border-1 border-tertiaryDark',
+    },
+  },
+});
+
+const buttonTextStyle = cva('font-[MontserratBold] text-xl text-center', {
+  variants: {
+    variant: {
+      primary: 'text-primaryDark',
+      secondary: 'text-primaryWhite',
+    },
+  },
+});
+
+interface ButtonProps
+  extends TouchableOpacityProps,
+    VariantProps<typeof buttonStyle>,
+    VariantProps<typeof buttonTextStyle> {
   children: React.ReactNode;
-  type: 'primary' | 'secondary';
-};
+  variant: 'primary' | 'secondary';
+}
 
-export default function Button({ children, type }: ButtonProps) {
-  function getButtonStyleBg(): ViewStyle {
-    const defaultStyle: ViewStyle = {
-      paddingHorizontal: 16,
-      paddingVertical: 16,
-      borderRadius: 999,
-      display: 'flex',
-      alignItems: 'center',
-      marginVertical: 4,
-      flex: 1,
-    };
-    switch (type) {
-      case 'primary':
-        return {
-          backgroundColor: COLORS.mainWhite,
-          ...defaultStyle,
-        };
-      case 'secondary':
-        return {
-          backgroundColor: COLORS.secondaryDark,
-          borderWidth: 1,
-          borderColor: COLORS.tertiaryDark,
-          ...defaultStyle,
-        };
-    }
-  }
-  function getButtonTextColor(): StyleProp<TextStyle> {
-    const defaultStyle: StyleProp<TextStyle> = {
-      fontFamily: 'MontserratBold',
-      fontSize: 16,
-    };
-    switch (type) {
-      case 'primary':
-        return {
-          color: COLORS.primaryDark,
-          ...defaultStyle,
-        };
-      case 'secondary':
-        return {
-          color: COLORS.mainWhite,
-          ...defaultStyle,
-        };
-    }
-  }
+export default function Button({ children, variant }: ButtonProps) {
   return (
-    <TouchableOpacity style={getButtonStyleBg()}>
-      <Text style={getButtonTextColor()}>{children}</Text>
+    <TouchableOpacity className={buttonStyle({ variant })}>
+      <Text className={buttonTextStyle({ variant })}>{children}</Text>
     </TouchableOpacity>
   );
 }

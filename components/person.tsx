@@ -108,8 +108,8 @@ export default function Person({ user }: { user: Partial<User> }) {
         </BackdropBlur>
       </Canvas>
       <View className={`absolute bottom-0 left-0 flex flex-row z-20 p-2`}>
-        <Button type='secondary'>Go Next</Button>
-        <Button type='primary'>Go Gym</Button>
+        <Button variant='secondary'>Go Next</Button>
+        <Button variant='primary'>Go Gym</Button>
       </View>
     </View>
   );

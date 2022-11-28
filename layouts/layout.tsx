@@ -1,4 +1,11 @@
-import { ScrollView, View } from 'react-native';
+import { ReactElement, JSXElementConstructor } from 'react';
+import {
+  Animated,
+  FlatList,
+  ListRenderItemInfo,
+  ScrollView,
+  View,
+} from 'react-native';
 import {
   SafeAreaInsetsContext,
   SafeAreaView,
@@ -9,13 +16,7 @@ import Navbar from './navbar';
 export default function Layout({ children }) {
   return (
     <>
-      <ScrollView
-        className='bg-primaryDark'
-        contentInsetAdjustmentBehavior='automatic'
-        style={{ paddingHorizontal: 16 }}
-      >
-        {children}
-      </ScrollView>
+      <>{children}</>
       <SafeAreaView className='flex-1 bg-primaryDark text-primaryWhite flex flex-col justify-between relative'>
         <Navbar />
       </SafeAreaView>

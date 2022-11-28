@@ -23,6 +23,7 @@ export default function Button({ children, type }: ButtonProps) {
       display: 'flex',
       alignItems: 'center',
       marginVertical: 4,
+      flex: 1,
     };
     switch (type) {
       case 'primary':
@@ -33,6 +34,8 @@ export default function Button({ children, type }: ButtonProps) {
       case 'secondary':
         return {
           backgroundColor: COLORS.secondaryDark,
+          borderWidth: 1,
+          borderColor: COLORS.tertiaryDark,
           ...defaultStyle,
         };
     }

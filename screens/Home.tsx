@@ -1,32 +1,9 @@
-import {
-  BackdropBlur,
-  Canvas,
-  Fill,
-  Group,
-  useFont,
-  useImage,
-  Image,
-  Skia,
-  useRawData,
-  vec,
-} from '@shopify/react-native-skia';
-import {
-  Animated,
-  Dimensions,
-  FlatList,
-  ListRenderItemInfo,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
-import { Text as SkiaText } from '@shopify/react-native-skia';
+import { Dimensions, FlatList } from 'react-native';
 import Person from '../components/person';
 import Layout from '../layouts/layout';
 import { User } from '../utils/users';
-import { COLORS } from '../utils/colors';
 import React from 'react';
-import Button from '../components/button';
-import { NAVBAR_HEIGHT } from '../utils/sizes';
+import { calculateCardHeight, calculateSnapInterval } from '../utils/ui';
 
 const users: Partial<User>[] = [
   {
@@ -86,22 +63,14 @@ const users: Partial<User>[] = [
 ];
 
 export default function HomeScreen({ navigation }) {
-  const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+  const { height } = Dimensions.get('window');
 
-  const y = new Animated.Value(0);
-  const onScroll = Animated.event([{ nativeEvent: { contentOffset: { y } } }], {
-    useNativeDriver: true,
-  });
-
-  const { width, height } = Dimensions.get('window');
-
-  // card
-  const CARD_HEIGHT = height * 0.7 + NAVBAR_HEIGHT;
+  const snapToInterval = calculateSnapInterval(calculateCardHeight(height));
 
   return (
     <Layout>
       <FlatList
-        snapToInterval={CARD_HEIGHT}
+        snapToInterval={snapToInterval}
         decelerationRate='fast'
         snapToAlignment='center'
         showsVerticalScrollIndicator={false}
@@ -109,10 +78,9 @@ export default function HomeScreen({ navigation }) {
         className='bg-primaryDark'
         contentInsetAdjustmentBehavior='automatic'
         style={{ paddingHorizontal: 16 }}
-        contentContainerStyle={{ justifyContent: 'space-evenly' }}
+        contentContainerStyle={{ justifyContent: 'space-between' }}
         data={users}
         renderItem={(item) => <Person user={item.item} key={item.index} />}
-        // {...{ onScroll }}
       />
     </Layout>
   );

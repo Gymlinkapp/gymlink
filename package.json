@@ -8,6 +8,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^6.4.1",
     "@react-navigation/native": "^6.0.14",
     "@react-navigation/native-stack": "^6.9.2",
     "@shopify/react-native-skia": "0.1.157",
@@ -18,10 +19,13 @@
     "expo-status-bar": "~1.4.2",
     "expo-updates": "~0.15.6",
     "nativewind": "^2.0.11",
+    "phosphor-icons": "^1.4.2",
+    "phosphor-react-native": "^1.1.2",
     "react": "18.1.0",
     "react-native": "0.70.5",
     "react-native-safe-area-context": "4.4.1",
-    "react-native-screens": "~3.18.0"
+    "react-native-screens": "~3.18.0",
+    "react-native-svg": "13.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -15,6 +15,7 @@ import {
   useComputedValue,
   Path,
 } from '@shopify/react-native-skia';
+import { Barbell, X } from 'phosphor-react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { Dimensions, Text, View, Image as RNImage } from 'react-native';
 import { COLORS } from '../utils/colors';
@@ -108,8 +109,15 @@ export default function Person({ user }: { user: Partial<User> }) {
         </BackdropBlur>
       </Canvas>
       <View className={`absolute bottom-0 left-0 flex flex-row z-20 p-2`}>
-        <Button variant='secondary'>Go Next</Button>
-        <Button variant='primary'>Go Gym</Button>
+        <Button
+          variant='secondary'
+          icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}
+        >
+          Go Next
+        </Button>
+        <Button variant='primary' icon={<Barbell weight='fill' />}>
+          Go Gym
+        </Button>
       </View>
     </View>
   );

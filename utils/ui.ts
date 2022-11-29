@@ -1,4 +1,4 @@
-import { NAVBAR_HEIGHT, SPACING } from './sizes';
+import { HEADER_HEIGHT, NAVBAR_HEIGHT, SPACING } from './sizes';
 
 // gets the height of the card based on the remaining space from the navbar and header.
 export const calculateCardHeight = (height: number) => {

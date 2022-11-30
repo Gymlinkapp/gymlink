@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useQuery } from 'react-query';
 import api from '../utils/axiosStore';
 import { User } from '../utils/users';
@@ -8,7 +9,7 @@ const fetchUser = async (token: string) => {
 };
 
 const useUser = (token: string) => {
-  return useQuery<User, Error>('user', () => fetchUser(token));
+  return useQuery<User, Error>(['user', token], () => fetchUser(token));
 };
 
 export { fetchUser, useUser };

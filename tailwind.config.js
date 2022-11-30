@@ -17,6 +17,11 @@ module.exports = {
         secondaryWhite: '#CCC9C9',
         accent: '#724CF9',
       },
+      fontFamily: {
+        MontserratBold: ['MontserratBold'],
+        MontserratMedium: ['MontserratMedium'],
+        MontserratRegular: ['MontserratRegular'],
+      },
     },
   },
   plugins: [],

@@ -15,11 +15,30 @@ import NotificationScreen from './screens/Notifications';
 import AccountScreen from './screens/Account';
 import UserAccountScreen from './screens/UserAccount';
 import SettingsScreen from './screens/Settings';
+import RegisterScreen from './screens/auth/Register';
+import { useEffect, useState } from 'react';
+import { getValueFor } from './utils/secureStore';
+import OTPScreen from './screens/auth/OTP';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import UserAuthDetailsScreen from './screens/auth/Details';
+import * as SecureStore from 'expo-secure-store';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function Root() {
+const queryClient = new QueryClient();
+
+function SignupFlow() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name='Register' component={RegisterScreen} />
+      <Stack.Screen name='OTPScreen' component={OTPScreen} />
+      <Stack.Screen name='UserAuthDetails' component={UserAuthDetailsScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function Home() {
   const glowEffect = (focused: boolean) => {
     return {
       shadowColor: focused ? COLORS.accent : COLORS.secondaryWhite,
@@ -100,6 +119,19 @@ function Root() {
 }
 
 export default function App() {
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    SecureStore.getItemAsync('token')
+      .then((token) => {
+        console.log('token: ', token);
+
+        setToken(token);
+      })
+      .catch((err) => {
+        console.log('error: ', err);
+      });
+  }, []);
   const [fontsLoaded] = useFonts({
     MontserratRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/fonts/Montserrat-Medium.ttf'),
@@ -109,49 +141,65 @@ export default function App() {
     return null;
   }
   return (
-    <NavigationContainer
-      theme={{
-        colors: {
-          background: COLORS.primaryDark,
-          text: COLORS.mainWhite,
-          primary: COLORS.mainWhite,
-          card: COLORS.primaryDark,
-          border: COLORS.primaryDark,
-          notification: COLORS.mainWhite,
-        },
-        dark: true,
-      }}
-    >
-      <Stack.Navigator>
-        <Stack.Screen
-          name='Root'
-          component={Root}
-          options={{
-            headerShown: false,
-            animation: 'slide_from_right',
-          }}
-        />
-        <Stack.Screen name='Notifications' component={NotificationScreen} />
-        <Stack.Screen name='UserAccountScreen' component={UserAccountScreen} />
-        {/* "swipe up" drawer modal thing */}
-        <Stack.Group
-          screenOptions={{
-            headerBlurEffect: 'dark',
-            presentation: 'modal',
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen
-            name='Settings'
-            component={SettingsScreen}
-            options={{
-              contentStyle: {
-                backgroundColor: COLORS.secondaryDark,
-              },
-            }}
-          />
-        </Stack.Group>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer
+        theme={{
+          colors: {
+            background: COLORS.primaryDark,
+            text: COLORS.mainWhite,
+            primary: COLORS.mainWhite,
+            card: COLORS.primaryDark,
+            border: COLORS.primaryDark,
+            notification: COLORS.mainWhite,
+          },
+          dark: true,
+        }}
+      >
+        <Stack.Navigator>
+          {!token && (
+            <>
+              <Stack.Screen name='Register' component={RegisterScreen} />
+              <Stack.Screen name='OTPScreen' component={OTPScreen} />
+              <Stack.Screen
+                name='UserAuthDetails'
+                component={UserAuthDetailsScreen}
+              />
+            </>
+          )}
+          <>
+            <Stack.Screen
+              name='Root'
+              component={Home}
+              options={{
+                headerShown: false,
+                animation: 'slide_from_right',
+              }}
+            />
+            <Stack.Screen name='Notifications' component={NotificationScreen} />
+            <Stack.Screen
+              name='UserAccountScreen'
+              component={UserAccountScreen}
+            />
+            <Stack.Group
+              screenOptions={{
+                headerBlurEffect: 'dark',
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen
+                name='Settings'
+                component={SettingsScreen}
+                options={{
+                  contentStyle: {
+                    backgroundColor: COLORS.secondaryDark,
+                  },
+                }}
+              />
+            </Stack.Group>
+          </>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }

@@ -74,13 +74,7 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
       onSuccess: async (data) => {
         if (data) {
           console.log(data.data);
-          await save('token', data.data.token);
-          // im not sure how to navigate to the home screen
-          // I have a root tab navigator which has a home screen
-          // navigate to the home screen
-          console.log(route);
-          navigation.navigate('Root', {
-            screen: 'Home',
+          navigation.navigate('UserBaseAccount', {
             params: { token: data.data.token },
           });
         }

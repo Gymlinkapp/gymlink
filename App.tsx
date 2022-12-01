@@ -22,6 +22,7 @@ import OTPScreen from './screens/auth/OTP';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import UserAuthDetailsScreen from './screens/auth/Details';
 import * as SecureStore from 'expo-secure-store';
+import FinishUserBaseAccountScreen from './screens/auth/FinishUserBaseAccount';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -164,6 +165,10 @@ export default function App() {
                 name='UserAuthDetails'
                 component={UserAuthDetailsScreen}
               />
+              <Stack.Screen
+                name='UserBaseAccount'
+                component={FinishUserBaseAccountScreen}
+              />
             </>
           )}
           <>
@@ -180,6 +185,7 @@ export default function App() {
               name='UserAccountScreen'
               component={UserAccountScreen}
             />
+
             <Stack.Group
               screenOptions={{
                 headerBlurEffect: 'dark',

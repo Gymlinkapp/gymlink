@@ -35,14 +35,12 @@ export default function SettingsScreen({ navigation }) {
     },
     {
       onSuccess: async () => {
-        console.log('clock');
         try {
           await SecureStore.deleteItemAsync('token');
         } catch (error) {
           console.log(error);
         }
 
-        navigation.popToTop();
         navigation.navigate('Register');
       },
     }

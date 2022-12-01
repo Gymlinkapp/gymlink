@@ -1,6 +1,6 @@
 import { getItemAsync } from 'expo-secure-store';
 import { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useUser } from '../hooks/useUser';
 import * as Progress from 'react-native-progress';
 import { COLORS } from '../utils/colors';
@@ -26,7 +26,13 @@ export default function AccountScreen({ navigation }) {
   }
 
   return (
-    <View>
+    <View className='px-6'>
+      <View className='w-full h-2/3 overflow-hidden mb-6'>
+        <Image
+          source={{ uri: user.images[0] }}
+          className='w-full h-full rounded-2xl'
+        />
+      </View>
       <Text className='text-white text-2xl font-MontserratBold'>
         {user.firstName} {user.lastName}
       </Text>

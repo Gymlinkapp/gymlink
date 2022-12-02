@@ -36,7 +36,6 @@ export default function SettingsScreen({ navigation }) {
     {
       onSuccess: async () => {
         try {
-          await SecureStore.deleteItemAsync('token');
         } catch (error) {
           console.log(error);
         }
@@ -48,7 +47,11 @@ export default function SettingsScreen({ navigation }) {
   return (
     <SafeAreaView className='w-full h-full items-center flex-col-reverse'>
       <Button
-        onPress={() => signOut.mutate()}
+        onPress={() => {
+          SecureStore.deleteItemAsync('token');
+
+          signOut.mutate();
+        }}
         variant='menu'
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
       >

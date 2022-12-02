@@ -23,6 +23,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import UserAuthDetailsScreen from './screens/auth/Details';
 import * as SecureStore from 'expo-secure-store';
 import FinishUserBaseAccountScreen from './screens/auth/FinishUserBaseAccount';
+import UserAccountPrompts from './screens/auth/UserAccountPrompts';
+import UserFavoriteMovements from './screens/auth/UserFavoriteMovements';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -97,6 +99,7 @@ function Home() {
         }}
         component={HomeScreen}
       />
+
       <Tab.Screen
         name='Account'
         options={{
@@ -168,6 +171,11 @@ export default function App() {
               <Stack.Screen
                 name='UserBaseAccount'
                 component={FinishUserBaseAccountScreen}
+              />
+              <Stack.Screen name='UserPrompts' component={UserAccountPrompts} />
+              <Tab.Screen
+                name='UserFavoriteMovements'
+                component={UserFavoriteMovements}
               />
             </>
           )}

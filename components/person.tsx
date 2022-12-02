@@ -111,11 +111,16 @@ export default function Person({ user }: { user: Partial<User> }) {
       <View className={`absolute bottom-0 left-0 flex flex-row z-20 p-2`}>
         <Button
           variant='secondary'
+          className='flex-[0.5]'
           icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}
         >
           Go Next
         </Button>
-        <Button variant='primary' icon={<Barbell weight='fill' />}>
+        <Button
+          variant='primary'
+          className='flex-[0.5]'
+          icon={<Barbell weight='fill' />}
+        >
           Go Gym
         </Button>
       </View>

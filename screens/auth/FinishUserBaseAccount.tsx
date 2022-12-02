@@ -117,8 +117,7 @@ export default function FinishUserBaseAccountScreen({ navigation, route }) {
             onPress={async () => {
               await setItemAsync('token', token);
 
-              navigation.popToTop();
-              navigation.navigate('Root');
+              navigation.navigate('UserPrompts');
             }}
           >
             Continue

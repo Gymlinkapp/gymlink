@@ -6,44 +6,18 @@ import { COLORS } from '../utils/colors';
 import api from '../utils/axiosStore';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import useSignout from '../hooks/useSignout';
 
 export default function SettingsScreen({ navigation }) {
   const [token, setToken] = useState(null);
+  const signout = useSignout(token, navigation);
   useEffect(() => {
     (async () => {
       const t = await SecureStore.getItemAsync('token');
       setToken(t);
     })();
   });
-  const signOut = useMutation(
-    async () => {
-      try {
-        return await api.post(
-          '/auth/signout',
-          {
-            token: token,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    {
-      onSuccess: async () => {
-        try {
-        } catch (error) {
-          console.log(error);
-        }
 
-        navigation.navigate('Register');
-      },
-    }
-  );
   return (
     <SafeAreaView className='w-full h-full items-center flex-col-reverse'>
       <Button
@@ -62,7 +36,7 @@ export default function SettingsScreen({ navigation }) {
         onPress={() => {
           SecureStore.deleteItemAsync('token');
 
-          signOut.mutate();
+          signout.mutate();
         }}
         variant='menu'
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}

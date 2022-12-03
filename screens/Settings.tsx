@@ -1,4 +1,4 @@
-import { SignOut } from 'phosphor-react-native';
+import { SignOut, User } from 'phosphor-react-native';
 import { SafeAreaView, Text, View } from 'react-native';
 import { useMutation } from 'react-query';
 import Button from '../components/button';
@@ -46,6 +46,18 @@ export default function SettingsScreen({ navigation }) {
   );
   return (
     <SafeAreaView className='w-full h-full items-center flex-col-reverse'>
+      <Button
+        onPress={() => {
+          SecureStore.deleteItemAsync('token');
+
+          api.delete(`/users/${token}`);
+          navigation.navigate('Register');
+        }}
+        variant='danger'
+        icon={<User weight='fill' color='rgb(239, 68, 68)' />}
+      >
+        Delete
+      </Button>
       <Button
         onPress={() => {
           SecureStore.deleteItemAsync('token');

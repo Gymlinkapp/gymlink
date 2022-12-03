@@ -10,6 +10,7 @@ const buttonStyle = cva(
         primary: 'bg-primaryWhite text-primaryDark',
         secondary: 'bg-secondaryDark border-1 border-tertiaryDark',
         menu: 'bg-transparent rounded-none border-t-2 border-tertiaryDark',
+        danger: 'bg-transparent rounded-none border-t-2 border-tertiaryDark',
       },
     },
   }
@@ -21,6 +22,7 @@ const buttonTextStyle = cva('font-[MontserratBold] text-xl text-center', {
       primary: 'text-primaryDark',
       secondary: 'text-primaryWhite',
       menu: 'text-primaryWhite',
+      danger: 'text-red-500',
     },
   },
 });
@@ -30,7 +32,7 @@ interface ButtonProps
     VariantProps<typeof buttonStyle>,
     VariantProps<typeof buttonTextStyle> {
   children: React.ReactNode;
-  variant: 'primary' | 'secondary' | 'menu';
+  variant: 'primary' | 'secondary' | 'menu' | 'danger';
   icon?: React.ReactNode;
 }
 

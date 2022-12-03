@@ -18,19 +18,36 @@ import { COLORS } from '../../utils/colors';
 import api from '../../utils/axiosStore';
 import { useEffect, useState } from 'react';
 import { getItemAsync } from 'expo-secure-store';
+import axios from 'axios';
 
 const userDetailsSchema = z.object({
   // experience: z.string().min(1).max(20),
-  gymLocation: z.string(),
+  enteredGymLocation: z.string().min(1).max(100),
+  gymLocation: z.object({
+    name: z.string().min(1).max(100),
+    latitude: z.number(),
+    longitude: z.number(),
+  }),
   bio: z.string(),
 });
 
 export default function UserAccountPrompts({ navigation }) {
   const [token, setToken] = useState('');
+  const [longitude, setLongitude] = useState(0);
+  const [latitude, setLatitude] = useState(0);
+  const [nearGyms, setNearGyms] = useState([]);
   useEffect(() => {
     getItemAsync('token').then((token) => {
       setToken(token);
     });
+    getItemAsync('long').then((long) => {
+      setLongitude(parseFloat(long));
+    });
+    getItemAsync('lat').then((lat) => {
+      setLatitude(parseFloat(lat));
+    });
+    console.log('long: ', longitude);
+    console.log('lat: ', latitude);
   }, []);
   const {
     handleSubmit,
@@ -42,26 +59,51 @@ export default function UserAccountPrompts({ navigation }) {
     resolver: zodResolver(userDetailsSchema),
     defaultValues: {
       // experience: '',
-      gymLocation: '',
+      enteredGymLocation: '',
+      gymLocation: null,
       bio: '',
     },
   });
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
   const bottomOfScreen = Dimensions.get('window').height - 100;
 
-  const onSubmit = () => {
-    (data: z.infer<typeof userDetailsSchema>) => {
-      api.post(`/users/${token}`, {
-        bio: data.bio,
-        // experience: data.experience,
-        // gymLocation: data.gymLocation,
-        tempJWT: token,
-      });
-    };
-    navigation.navigate('UserFavoriteMovements');
+  const autoCompleteGymLocations = async (input: string) => {
+    // const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = 'AIzaSyBeVNaKylQx0vKkZ4zW8T_J01s2rUK7KQA&';
+    // https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${longitude}%2C${latitude}&radius=500&key=${apiKey}
+    const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${latitude}%2C${longitude}&radius=500&key=${apiKey}`;
+    try {
+      const res = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${latitude}%2C${longitude}&radius=500&key=${apiKey}`
+      );
+      setNearGyms(res.data.predictions);
+      // console.log(nearGyms);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  // console.log(Object.keys(errors).length);
+  const onSubmit = async (data: z.infer<typeof userDetailsSchema>) => {
+    try {
+      const res = await api.post(`/users/${token}`, {
+        bio: data.bio,
+        // experience: data.experience,
+        gym: data.gymLocation,
+        longitude: longitude,
+        latitude: latitude,
+        tempJWT: token,
+      });
+
+      if (res.status === 200) {
+        navigation.navigate('UserFavoriteMovements');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(getValues('gymLocation'));
+  console.log(errors);
 
   return (
     <SafeAreaView className='w-full h-full flex-1 relative '>
@@ -103,6 +145,9 @@ export default function UserAccountPrompts({ navigation }) {
                       multiline
                       numberOfLines={10}
                       onChangeText={onChange}
+                      returnKeyType='done'
+                      returnKeyLabel='done'
+                      enablesReturnKeyAutomatically
                     />
                     {error && (
                       <Text className='text-red-500 font-MontserratRegular'>
@@ -116,7 +161,7 @@ export default function UserAccountPrompts({ navigation }) {
               <View className='flex-row'>
                 <Controller
                   control={control}
-                  name='gymLocation'
+                  name='enteredGymLocation'
                   render={({
                     field: { onChange, onBlur, value },
                     fieldState: { isTouched, error },
@@ -125,15 +170,48 @@ export default function UserAccountPrompts({ navigation }) {
                       <Text className='text-white py-2 text-l font-MontserratMedium'>
                         What gym you at?
                       </Text>
-                      <TextInput
-                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                          isTouched && 'border-2 border-tertiaryDark'
-                        }`}
-                        cursorColor={COLORS.mainWhite}
-                        value={value}
-                        onBlur={onBlur}
-                        onChangeText={(value) => onChange(value)}
-                      />
+                      <View className='flex-1'>
+                        <TextInput
+                          className={`bg-secondaryDark rounded-t-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                            isTouched && 'border-2 border-tertiaryDark'
+                          }`}
+                          cursorColor={COLORS.mainWhite}
+                          value={value}
+                          onBlur={onBlur}
+                          onChangeText={(value) => {
+                            onChange(value);
+                            autoCompleteGymLocations(value);
+                          }}
+                        />
+                        {nearGyms.length > 0 && (
+                          <View className='bg-secondaryDark rounded-b-md'>
+                            <FlatList
+                              data={nearGyms}
+                              renderItem={({ item }) => (
+                                <TouchableOpacity
+                                  className='px-2 py-6 border-b-2 border-tertiaryDark'
+                                  onPress={() => {
+                                    setValue('gymLocation', {
+                                      name: item.description,
+                                      longitude: longitude,
+                                      latitude: latitude,
+                                    });
+                                    setValue(
+                                      'enteredGymLocation',
+                                      getValues('gymLocation').name
+                                    );
+                                    setNearGyms([]);
+                                  }}
+                                >
+                                  <Text className='text-white font-MontserratMedium'>
+                                    {item.description}
+                                  </Text>
+                                </TouchableOpacity>
+                              )}
+                            />
+                          </View>
+                        )}
+                      </View>
                       {error && (
                         <Text className='text-red-500 font-MontserratRegular'>
                           {error.message}
@@ -177,13 +255,13 @@ export default function UserAccountPrompts({ navigation }) {
         />
       </KeyboardAvoidingView>
 
-      {Object.keys(errors).length === 0 && (
-        <View className='flex-1 justify-end'>
-          <Button variant='primary' onPress={handleSubmit(onSubmit)}>
-            Continue
-          </Button>
-        </View>
-      )}
+      {/* {Object.keys(errors).length === 0 && ( */}
+      <View className='flex-1 justify-end'>
+        <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+          Continue
+        </Button>
+      </View>
+      {/* )} */}
     </SafeAreaView>
   );
 }

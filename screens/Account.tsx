@@ -40,6 +40,9 @@ export default function AccountScreen({ navigation }) {
         <Text className='text-white text-xl font-MontserratMedium'>
           {user.age}
         </Text>
+        <Text className='text-white text-xl font-MontserratMedium'>
+          {user.bio}
+        </Text>
         <View>
           <Text className='text-lg font-MontserratBold text-white pt-12 pb-4'>
             Favorite Movements

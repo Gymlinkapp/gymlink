@@ -25,6 +25,8 @@ import * as SecureStore from 'expo-secure-store';
 import FinishUserBaseAccountScreen from './screens/auth/FinishUserBaseAccount';
 import UserAccountPrompts from './screens/auth/UserAccountPrompts';
 import UserFavoriteMovements from './screens/auth/UserFavoriteMovements';
+import { useLocation } from './hooks/useLocation';
+import * as Location from 'expo-location';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -124,7 +126,10 @@ function Home() {
 
 export default function App() {
   const [token, setToken] = useState(null);
+  const [location, setLocation] = useState<Location.LocationObject>(null);
+  const [error, setError] = useState<boolean>(false);
 
+  // SEEME: this is quite ugly and needs to be refactored into a hook
   useEffect(() => {
     SecureStore.getItemAsync('token')
       .then((token) => {
@@ -135,7 +140,33 @@ export default function App() {
       .catch((err) => {
         console.log('error: ', err);
       });
+
+    (async () => {
+      // getting perimission to access location
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError(true);
+        return;
+      }
+
+      // getting location
+      let location = await Location.getCurrentPositionAsync({});
+
+      // setting location to state
+      setLocation(location);
+    })();
+
+    if (error) {
+      console.log('error: ', error);
+      return null;
+    } else if (location) {
+      // saving the longitude and latitude to secure store
+      SecureStore.setItemAsync('long', location.coords.longitude.toString());
+      SecureStore.setItemAsync('lat', location.coords.latitude.toString());
+    }
+    console.log('location: ', location);
   }, []);
+  // const location = useLocation();
   const [fontsLoaded] = useFonts({
     MontserratRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/fonts/Montserrat-Medium.ttf'),

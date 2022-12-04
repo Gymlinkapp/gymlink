@@ -27,23 +27,15 @@ import UserAccountPrompts from './screens/auth/UserAccountPrompts';
 import UserFavoriteMovements from './screens/auth/UserFavoriteMovements';
 import { useLocation } from './hooks/useLocation';
 import * as Location from 'expo-location';
+import { io } from 'socket.io-client';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const queryClient = new QueryClient();
 
-function SignupFlow() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name='Register' component={RegisterScreen} />
-      <Stack.Screen name='OTPScreen' component={OTPScreen} />
-      <Stack.Screen name='UserAuthDetails' component={UserAuthDetailsScreen} />
-    </Stack.Navigator>
-  );
-}
-
-function Home() {
+function Home({ route }: any) {
+  const { socket } = route.params;
   const glowEffect = (focused: boolean) => {
     return {
       shadowColor: focused ? COLORS.accent : COLORS.secondaryWhite,
@@ -68,6 +60,7 @@ function Home() {
     >
       <Tab.Screen
         name='Chats'
+        initialParams={{ socket }}
         options={{
           tabBarIcon: ({ focused }) => (
             <ChatsIcon
@@ -128,6 +121,7 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [location, setLocation] = useState<Location.LocationObject>(null);
   const [error, setError] = useState<boolean>(false);
+  const [socket, setSocket] = useState(null);
 
   // SEEME: this is quite ugly and needs to be refactored into a hook
   useEffect(() => {
@@ -165,6 +159,9 @@ export default function App() {
       SecureStore.setItemAsync('lat', location.coords.latitude.toString());
     }
     console.log('location: ', location);
+
+    const newSocket = io('http://localhost:3000');
+    setSocket(newSocket);
   }, []);
   // const location = useLocation();
   const [fontsLoaded] = useFonts({
@@ -214,6 +211,7 @@ export default function App() {
             <Stack.Screen
               name='Root'
               component={Home}
+              initialParams={{ socket }}
               options={{
                 headerShown: false,
                 animation: 'slide_from_right',

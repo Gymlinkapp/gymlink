@@ -29,17 +29,17 @@ import { useLocation } from './hooks/useLocation';
 import * as Location from 'expo-location';
 import { io } from 'socket.io-client';
 import EmailLoginScreen from './screens/auth/EmailLoginScreen';
+import useToken from './hooks/useToken';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const queryClient = new QueryClient();
 
+// needs to be this for ios not localhost
+const socket = io('http://10.0.1.198:3000');
+
 function Home() {
-  // const [socket, setSocket] = useState(null);
-  // useEffect(() => {
-  //   setSocket(io('http://localhost:3000', { autoConnect: true }));
-  // }, []);
   const glowEffect = (focused: boolean) => {
     return {
       shadowColor: focused ? COLORS.accent : COLORS.secondaryWhite,
@@ -64,7 +64,7 @@ function Home() {
     >
       <Tab.Screen
         name='Chats'
-        // initialParams={{ socket }}
+        initialParams={{ socket }}
         options={{
           tabBarIcon: ({ focused }) => (
             <ChatsIcon
@@ -122,49 +122,9 @@ function Home() {
 }
 
 export default function App() {
-  const [token, setToken] = useState(null);
-  const [location, setLocation] = useState<Location.LocationObject>(null);
-  const [error, setError] = useState<boolean>(false);
-  const [socket, setSocket] = useState(null);
+  const token = useToken();
+  const location = useLocation();
 
-  // SEEME: this is quite ugly and needs to be refactored into a hook
-  useEffect(() => {
-    SecureStore.getItemAsync('token')
-      .then((token) => {
-        console.log('token: ', token);
-
-        setToken(token);
-      })
-      .catch((err) => {
-        console.log('error: ', err);
-      });
-
-    (async () => {
-      // getting perimission to access location
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError(true);
-        return;
-      }
-
-      // getting location
-      let location = await Location.getCurrentPositionAsync({});
-
-      // setting location to state
-      setLocation(location);
-    })();
-
-    if (error) {
-      console.log('error: ', error);
-      return null;
-    } else if (location) {
-      // saving the longitude and latitude to secure store
-      SecureStore.setItemAsync('long', location.coords.longitude.toString());
-      SecureStore.setItemAsync('lat', location.coords.latitude.toString());
-    }
-    console.log('location: ', location);
-  }, []);
-  // const location = useLocation();
   const [fontsLoaded] = useFonts({
     MontserratRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/fonts/Montserrat-Medium.ttf'),

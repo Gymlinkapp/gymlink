@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { HEADER_HEIGHT, NAVBAR_HEIGHT, SPACING } from './sizes';
 
 // gets the height of the card based on the remaining space from the navbar and header.
@@ -9,3 +10,5 @@ export const calculateCardHeight = (height: number) => {
 export const calculateSnapInterval = (cardHeight: number) => {
   return cardHeight + SPACING * 2;
 };
+
+export const keyboardVerticalOffset = Platform.OS === 'ios' ? 125 : 0;

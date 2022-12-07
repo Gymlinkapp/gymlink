@@ -24,6 +24,17 @@ const buttonTextStyle = cva('font-[MontserratBold] text-xl text-center', {
       menu: 'text-primaryWhite',
       danger: 'text-red-500',
     },
+    textSize: {
+      xs: 'text-xs',
+      sm: 'text-sm',
+      base: 'text-base',
+      lg: 'text-lg',
+      xl: 'text-xl',
+      '2xl': 'text-2xl',
+      '3xl': 'text-3xl',
+      '4xl': 'text-4xl',
+      '5xl': 'text-5xl',
+    },
   },
 });
 
@@ -34,18 +45,20 @@ interface ButtonProps
   children: React.ReactNode;
   variant: 'primary' | 'secondary' | 'menu' | 'danger';
   icon?: React.ReactNode;
+  textSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
 }
 
 export default function Button({
   children,
   variant,
   icon,
+  textSize,
   ...props
 }: ButtonProps) {
   return (
     <TouchableOpacity {...props} className={buttonStyle({ variant })}>
       {icon && icon}
-      <Text className={buttonTextStyle({ variant })}>{children}</Text>
+      <Text className={buttonTextStyle({ variant, textSize })}>{children}</Text>
     </TouchableOpacity>
   );
 }

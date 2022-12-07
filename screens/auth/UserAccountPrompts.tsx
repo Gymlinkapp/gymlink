@@ -35,6 +35,7 @@ export default function UserAccountPrompts({ navigation }) {
   const [token, setToken] = useState('');
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
+  const [placesURL, setPlacesURL] = useState('');
   const [nearGyms, setNearGyms] = useState([]);
   useEffect(() => {
     getItemAsync('token').then((token) => {
@@ -46,9 +47,7 @@ export default function UserAccountPrompts({ navigation }) {
     getItemAsync('lat').then((lat) => {
       setLatitude(parseFloat(lat));
     });
-    console.log('long: ', longitude);
-    console.log('lat: ', latitude);
-  }, []);
+  }, [longitude, latitude]);
   const {
     handleSubmit,
     control,
@@ -70,12 +69,10 @@ export default function UserAccountPrompts({ navigation }) {
   const autoCompleteGymLocations = async (input: string) => {
     // const apiKey = process.env.GOOGLE_API_KEY;
     const apiKey = 'AIzaSyBeVNaKylQx0vKkZ4zW8T_J01s2rUK7KQA&';
-    // https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${longitude}%2C${latitude}&radius=500&key=${apiKey}
     const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${latitude}%2C${longitude}&radius=500&key=${apiKey}`;
+    console.log(URL);
     try {
-      const res = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${latitude}%2C${longitude}&radius=500&key=${apiKey}`
-      );
+      const res = await axios.get(URL);
       setNearGyms(res.data.predictions);
       // console.log(nearGyms);
     } catch (error) {
@@ -89,8 +86,8 @@ export default function UserAccountPrompts({ navigation }) {
         bio: data.bio,
         // experience: data.experience,
         gym: data.gymLocation,
-        longitude: longitude,
-        latitude: latitude,
+        // longitude: longitude,
+        // latitude: latitude,
         tempJWT: token,
       });
 

@@ -94,8 +94,6 @@ export default function OTPScreen({ navigation, route }) {
               pinCount={6}
               code={value}
               onCodeChanged={onChange}
-              // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
-              // onCodeChanged = {code => { this.setState({code})}}
               autoFocusOnLoad
               codeInputFieldStyle={styles.underlineStyleBase}
               codeInputHighlightStyle={styles.borderStyleHighLighted}

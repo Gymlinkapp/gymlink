@@ -15,6 +15,8 @@ import Button from '../../components/button';
 import { COLORS } from '../../utils/colors';
 import api from '../../utils/axiosStore';
 import { save, getValueFor } from '../../utils/secureStore';
+import { useEffect, useState } from 'react';
+import { getItemAsync } from 'expo-secure-store';
 
 const userDetailsSchema = z.object({
   firstName: z.string().min(1).max(20),
@@ -25,6 +27,16 @@ const userDetailsSchema = z.object({
 });
 
 export default function UserAuthDetailsScreen({ route, navigation }) {
+  const [longitude, setLongitude] = useState(0);
+  const [latitude, setLatitude] = useState(0);
+  useEffect(() => {
+    getItemAsync('long').then((long) => {
+      setLongitude(parseFloat(long));
+    });
+    getItemAsync('lat').then((lat) => {
+      setLatitude(parseFloat(lat));
+    });
+  }, [latitude, longitude]);
   const {
     handleSubmit,
     control,
@@ -59,6 +71,8 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
             email: data.email,
             age: data.age,
             password: data.password,
+            longitude: longitude,
+            latitude: latitude,
           },
           {
             headers: {

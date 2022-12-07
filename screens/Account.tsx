@@ -29,7 +29,7 @@ export default function AccountScreen({ navigation }) {
     <ScrollView className='px-6 flex-1'>
       <View className='w-full h-2/3 overflow-hidden mb-6'>
         <Image
-          source={{ uri: user.images[0] }}
+          source={{ uri: user?.images[0] }}
           className='w-full h-full rounded-2xl'
         />
       </View>

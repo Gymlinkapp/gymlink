@@ -126,6 +126,14 @@ export default function RegisterScreen({ navigation }) {
           <Button variant='primary' onPress={handleSubmit(onSubmit)}>
             Send code
           </Button>
+          <Button
+            variant='secondary'
+            onPress={() => {
+              navigation.navigate('EmailLoginScreen');
+            }}
+          >
+            Signin with Email
+          </Button>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>

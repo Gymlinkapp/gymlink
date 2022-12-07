@@ -28,14 +28,18 @@ import UserFavoriteMovements from './screens/auth/UserFavoriteMovements';
 import { useLocation } from './hooks/useLocation';
 import * as Location from 'expo-location';
 import { io } from 'socket.io-client';
+import EmailLoginScreen from './screens/auth/EmailLoginScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const queryClient = new QueryClient();
 
-function Home({ route }: any) {
-  const { socket } = route.params;
+function Home() {
+  // const [socket, setSocket] = useState(null);
+  // useEffect(() => {
+  //   setSocket(io('http://localhost:3000', { autoConnect: true }));
+  // }, []);
   const glowEffect = (focused: boolean) => {
     return {
       shadowColor: focused ? COLORS.accent : COLORS.secondaryWhite,
@@ -60,7 +64,7 @@ function Home({ route }: any) {
     >
       <Tab.Screen
         name='Chats'
-        initialParams={{ socket }}
+        // initialParams={{ socket }}
         options={{
           tabBarIcon: ({ focused }) => (
             <ChatsIcon
@@ -159,9 +163,6 @@ export default function App() {
       SecureStore.setItemAsync('lat', location.coords.latitude.toString());
     }
     console.log('location: ', location);
-
-    const newSocket = io('http://localhost:3000');
-    setSocket(newSocket);
   }, []);
   // const location = useLocation();
   const [fontsLoaded] = useFonts({
@@ -201,9 +202,13 @@ export default function App() {
                 component={FinishUserBaseAccountScreen}
               />
               <Stack.Screen name='UserPrompts' component={UserAccountPrompts} />
-              <Tab.Screen
+              <Stack.Screen
                 name='UserFavoriteMovements'
                 component={UserFavoriteMovements}
+              />
+              <Stack.Screen
+                name='EmailLoginScreen'
+                component={EmailLoginScreen}
               />
             </>
           )}

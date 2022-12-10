@@ -22,12 +22,22 @@ import Layout from '../layouts/layout';
 import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
 
+export type Message = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  chatId: string;
+  senderId: string;
+  content: string;
+};
+
 export interface Chat {
   name: string;
   id: string;
   createdAt: string;
   updatedAt: string;
   participants: User[];
+  messages: Message[];
 }
 
 export default function Chats({ navigation, route }: any) {
@@ -79,7 +89,8 @@ export default function Chats({ navigation, route }: any) {
                 navigation.navigate('Chat', {
                   socket: socket,
                   user: user,
-                  room: item.name,
+                  roomName: item.name,
+                  roomId: item.id,
                 })
               }
             >

@@ -18,17 +18,17 @@ interface Message {
   time: string;
 }
 
-export default function ChatScreen({ route }) {
+export default function ChatScreen({ route, navigation }) {
   const { socket, user, room } = route.params;
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
+    navigation.setOptions({ title: room });
     socket.emit('join-chat', room);
     socket.on('recieve-message', (data: Message) => {
       setMessages((messages) => [...messages, data]);
     });
-    console.log(messages);
   }, [socket]);
 
   const messageData: Message = {
@@ -54,26 +54,26 @@ export default function ChatScreen({ route }) {
 
   return (
     <SafeAreaView className='flex-1 bg-primaryDark px-4'>
-      {messages.length > 0 && (
-        <FlatList
-          className='p-4'
-          data={messages}
-          renderItem={({ item }) => (
-            <View className={`${amIAuthor(item)} my-2`}>
-              <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
-                {item.user.id !== user.id && (
-                  <Text className='text-secondaryWhite'>
-                    {item.user.firstName} {item.user.lastName}
-                  </Text>
-                )}
-                <Text className='text-white'>{item.message}</Text>
-              </View>
+      <FlatList
+        className='p-4 flex-1'
+        data={messages}
+        renderItem={({ item }) => (
+          <View className={`${amIAuthor(item)} my-2`}>
+            <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
+              {item.user.id !== user.id && (
+                <Text className='text-secondaryWhite'>
+                  {item.user.firstName} {item.user.lastName}
+                </Text>
+              )}
+              <Text className='text-white'>{item.message}</Text>
             </View>
-          )}
-        />
-      )}
+          </View>
+        )}
+      />
+
       {socket && (
         <KeyboardAvoidingView
+          className='px-4'
           behavior='position'
           keyboardVerticalOffset={keyboardVerticalOffset}
         >

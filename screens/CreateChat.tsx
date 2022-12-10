@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { z } from 'zod';
 import Button from '../components/button';
 import { COLORS } from '../utils/colors';
@@ -20,6 +20,7 @@ const createChatSchema = z.object({
 });
 
 export default function CreateChatScreen({ navigation, route }) {
+  const queryClient = useQueryClient();
   const { user } = route.params;
   const {
     handleSubmit,
@@ -50,6 +51,7 @@ export default function CreateChatScreen({ navigation, route }) {
     {
       onSuccess: (data) => {
         if (data) {
+          queryClient.invalidateQueries('chats');
           navigation.popToTop();
           navigation.navigate('Chats');
         }

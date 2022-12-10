@@ -30,6 +30,8 @@ import * as Location from 'expo-location';
 import { io } from 'socket.io-client';
 import EmailLoginScreen from './screens/auth/EmailLoginScreen';
 import useToken from './hooks/useToken';
+import CreateChatScreen from './screens/CreateChat';
+import ChatScreen from './screens/Chat';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -187,7 +189,15 @@ export default function App() {
               name='UserAccountScreen'
               component={UserAccountScreen}
             />
-
+            <Stack.Screen
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+              name='CreateChat'
+              component={CreateChatScreen}
+            />
+            <Stack.Screen name='Chat' component={ChatScreen} />
             <Stack.Group
               screenOptions={{
                 headerBlurEffect: 'dark',

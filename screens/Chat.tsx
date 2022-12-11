@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   Text,
   TextInput,
@@ -13,45 +14,45 @@ import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
 import { Message } from './Chats';
 
-interface MessageData {
+interface MessageData extends Message {
   roomName: string;
   roomId: string;
-  user: Partial<User>;
-  message: string;
-  time: string;
+  content: string;
 }
 
 export default function ChatScreen({ route, navigation }) {
   const { socket, user, roomId, roomName } = route.params;
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<MessageData[]>([]);
-
   const {
     data: chat,
     isLoading: isChatLoading,
     error: isChatError,
   } = useChat(roomId);
-  console.log(chat.messages);
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
 
+  console.log('messages', messages);
   useEffect(() => {
     navigation.setOptions({ title: roomName });
-    socket.emit('join-chat', roomName);
+
+    if (chat) setMessages(chat.messages);
+
+    socket.emit('join-chat', { roomName, roomId });
     socket.on('recieve-message', (data: MessageData) => {
+      console.log('data', data);
       setMessages((messages) => [...messages, data]);
     });
-  }, [socket]);
+  }, [socket, chat]);
 
   const messageData: MessageData = {
     roomName: roomName,
     roomId: roomId,
-    user: {
+    sender: {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
+      ...user,
     },
-    message: message,
-    time:
-      new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes(),
+    content: message,
   };
 
   const sendMessage = async () => {
@@ -61,21 +62,25 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   const amIAuthor = (message: Message) =>
-    message.senderId === user.id ? 'flex-row-reverse' : 'flex-row';
+    message.sender.id === user.id ? 'flex-row-reverse' : 'flex-row';
 
   return (
     <SafeAreaView className='flex-1 bg-primaryDark px-4'>
       <FlatList
+        maintainVisibleContentPosition={
+          Platform.OS === 'ios' ? { minIndexForVisible: 1 } : undefined
+        }
+        keyExtractor={(item) => item.id}
         className='p-4 flex-1'
-        data={chat.messages}
+        data={messages}
         renderItem={({ item }) => (
           <View className={`${amIAuthor(item)} my-2`}>
             <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
-              {/* {item.senderId !== user.id && (
+              {item.senderId !== user.id && (
                 <Text className='text-secondaryWhite'>
-                  {item.user.firstName} {item.user.lastName}
+                  {item.sender?.firstName} {item.sender?.lastName}
                 </Text>
-              )} */}
+              )}
               <Text className='text-white'>{item.content}</Text>
             </View>
           </View>

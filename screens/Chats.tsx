@@ -23,11 +23,12 @@ import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
 
 export type Message = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  chatId: string;
-  senderId: string;
+  id?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  chatId?: string;
+  senderId?: string;
+  sender?: User;
   content: string;
 };
 

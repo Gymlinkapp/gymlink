@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -29,6 +29,8 @@ export default function ChatScreen({ route, navigation }) {
   } = useChat(roomId);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
+  // flatlistref
+  const flatListRef = useRef(null);
 
   console.log('messages', messages);
   useEffect(() => {
@@ -66,27 +68,45 @@ export default function ChatScreen({ route, navigation }) {
 
   return (
     <SafeAreaView className='flex-1 bg-primaryDark px-4'>
-      <FlatList
-        maintainVisibleContentPosition={
-          Platform.OS === 'ios' ? { minIndexForVisible: 1 } : undefined
-        }
-        keyExtractor={(item) => item.id}
-        className='p-4 flex-1'
-        data={messages}
-        renderItem={({ item }) => (
-          <View className={`${amIAuthor(item)} my-2`}>
-            <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
-              {item.senderId !== user.id && (
-                <Text className='text-secondaryWhite'>
-                  {item.sender?.firstName} {item.sender?.lastName}
-                </Text>
-              )}
-              <Text className='text-white'>{item.content}</Text>
+      <KeyboardAvoidingView
+        className='px-4 h-[95%]'
+        behavior='position'
+        keyboardVerticalOffset={keyboardVerticalOffset * 1.65}
+      >
+        <FlatList
+          maintainVisibleContentPosition={
+            Platform.OS === 'ios' ? { minIndexForVisible: 1 } : undefined
+          }
+          keyExtractor={(item) => item.id}
+          className='px-4 h-full'
+          data={messages}
+          initialScrollIndex={messages.length - 1}
+          // when a new message is sent, scroll to the bottom
+          onContentSizeChange={() => {
+            flatListRef.current.scrollToEnd({ animated: true });
+          }}
+          ref={flatListRef}
+          getItemLayout={(data, index) => ({
+            length: 100,
+            offset: 100 * index,
+            index,
+          })}
+          // hides the scroll bar
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View className={`${amIAuthor(item)} my-2`}>
+              <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
+                {item.senderId !== user.id && (
+                  <Text className='text-secondaryWhite'>
+                    {item.sender?.firstName} {item.sender?.lastName}
+                  </Text>
+                )}
+                <Text className='text-white'>{item.content}</Text>
+              </View>
             </View>
-          </View>
-        )}
-      />
-
+          )}
+        />
+      </KeyboardAvoidingView>
       {socket && (
         <KeyboardAvoidingView
           className='px-4'

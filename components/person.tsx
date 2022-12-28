@@ -59,8 +59,16 @@ export default function Person({ user }: { user: Partial<User> }) {
     outputRange: [1, 0],
   });
   return (
-    <>
-      <View className={`absolute top-0 left-0 w-full h-full flex-row z-50`}>
+    <Animated.View
+      className='overflow-hidden rounded-2xl relative'
+      style={{
+        width: '100%',
+        height: CARD_HEIGHT,
+        marginVertical: SPACING,
+        position: 'relative',
+      }}
+    >
+      <View className={`absolute top-0 left-0 w-full h-full flex-row z-40`}>
         {/* back photo side */}
         <TouchableOpacity
           className='flex-1'
@@ -87,53 +95,108 @@ export default function Person({ user }: { user: Partial<User> }) {
         ></TouchableOpacity>
       </View>
       <Animated.View
-        className='overflow-hidden rounded-2xl relative'
         style={{
+          borderWidth: 15,
+          // transform: [{ scale: fade }],
+          // use the scale transform but make it bigger than 1
+          // so that the border is outside the image
+          transform: [
+            {
+              scale: fade.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1.1, 1],
+              }),
+            },
+          ],
+          borderColor: gold,
+          zIndex: 10,
+          opacity: fade,
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: '100%',
-          height: CARD_HEIGHT,
-          marginVertical: SPACING,
-          position: 'relative',
+          height: '100%',
         }}
       >
+        <LinearGradient
+          colors={[gold, transparentGold]}
+          className='w-full h-full absolute top-0 left-0'
+          start={[0, 0]}
+          end={[0, 1]}
+        />
+      </Animated.View>
+      <RNImage
+        source={{ uri: user.images[currentImageIndex] }}
+        className='w-full h-full'
+      />
+      <View className={`absolute bottom-0 left-0 w-full z-50 p-2`}>
         <Animated.View
           style={{
-            borderWidth: 15,
-            // transform: [{ scale: fade }],
-            // use the scale transform but make it bigger than 1
-            // so that the border is outside the image
             transform: [
               {
-                scale: fade.interpolate({
+                translateY: fade.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [1.1, 1],
+                  outputRange: [0, -20],
                 }),
               },
             ],
-            borderColor: gold,
-            zIndex: 10,
-            opacity: fade,
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
           }}
+          className='rounded-2xl overflow-hidden w-full'
         >
-          <LinearGradient
-            colors={[gold, transparentGold]}
-            className='w-full h-full absolute top-0 left-0'
-            start={[0, 0]}
-            end={[0, 1]}
-          />
+          <BlurView className='w-full p-4' intensity={20}>
+            <Text className='text-white pb-2 text-xl font-bold'>
+              {user.firstName} {user.lastName}
+            </Text>
+            <Text className='text-secondaryWhite text-sm leading-4'>
+              {/* show the user's bio but if it is more than 30 characters truncate it */}
+              {user.bio.length > 100
+                ? user.bio.substring(0, 100) + '...'
+                : user.bio}
+            </Text>
+          </BlurView>
         </Animated.View>
-        <RNImage
-          source={{ uri: user.images[currentImageIndex] }}
-          className='w-full h-full'
-        />
-        <View className={`absolute bottom-0 left-0 w-full z-20 p-2`}>
+        <View className='flex-row z-50'>
           <Animated.View
             style={{
               transform: [
+                {
+                  scale: fade.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.9, 1],
+                  }),
+                },
+                {
+                  translateY: fade.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 20],
+                  }),
+                },
+              ],
+              width: sendFriendRequest ? '0%' : '100%',
+              flex: sentFriendRequest ? 0 : 1,
+              opacity: fade.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0],
+              }),
+            }}
+          >
+            <Button
+              variant='secondary'
+              icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}
+            >
+              Go Next
+            </Button>
+          </Animated.View>
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  scale: fade.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.9, 1],
+                  }),
+                },
+
                 {
                   translateY: fade.interpolate({
                     inputRange: [0, 1],
@@ -141,99 +204,32 @@ export default function Person({ user }: { user: Partial<User> }) {
                   }),
                 },
               ],
+              flex: 1,
             }}
-            className='rounded-2xl overflow-hidden w-full'
           >
-            <BlurView className='w-full p-4' intensity={20}>
-              <Text className='text-white pb-2 text-xl font-bold'>
-                {user.firstName} {user.lastName}
-              </Text>
-              <Text className='text-secondaryWhite text-sm leading-4'>
-                {/* show the user's bio but if it is more than 30 characters truncate it */}
-                {user.bio.length > 100
-                  ? user.bio.substring(0, 100) + '...'
-                  : user.bio}
-              </Text>
-            </BlurView>
+            <Button
+              onPress={() => setSentFriendRequest(!sentFriendRequest)}
+              variant='primary'
+              icon={<Barbell weight='fill' />}
+            >
+              Go Gym
+            </Button>
           </Animated.View>
-          <View className='flex-row'>
-            <Animated.View
-              style={{
-                transform: [
-                  {
-                    scale: fade.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.9, 1],
-                    }),
-                  },
-                  {
-                    translateY: fade.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 20],
-                    }),
-                  },
-                ],
-                width: sendFriendRequest ? '0%' : '100%',
-                flex: sentFriendRequest ? 0 : 1,
-                opacity: fade.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [1, 0],
-                }),
-              }}
-            >
-              <Button
-                variant='secondary'
-                icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}
-              >
-                Go Next
-              </Button>
-            </Animated.View>
-            <Animated.View
-              style={{
-                transform: [
-                  {
-                    scale: fade.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.9, 1],
-                    }),
-                  },
-
-                  {
-                    translateY: fade.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -20],
-                    }),
-                  },
-                ],
-                flex: 1,
-              }}
-            >
-              <Button
-                onPress={() => setSentFriendRequest(!sentFriendRequest)}
-                variant='primary'
-                icon={<Barbell weight='fill' />}
-              >
-                Go Gym
-              </Button>
-            </Animated.View>
-          </View>
         </View>
-        {/* image indicator of the amount of images and the current index of the image */}
-        <View className='absolute bottom-[0.5] left-0 w-full flex-row justify-center items-center'>
-          <View className='flex-row'>
-            {user.images.map((image, index) => (
-              <View
-                key={image}
-                className={`w-12 h-2 rounded-full ${
-                  index === currentImageIndex
-                    ? 'bg-primaryWhite'
-                    : 'bg-white/40'
-                } mx-1`}
-              />
-            ))}
-          </View>
+      </View>
+      {/* image indicator of the amount of images and the current index of the image */}
+      <View className='absolute bottom-[0.5] left-0 w-full flex-row justify-center items-center'>
+        <View className='flex-row'>
+          {user.images.map((image, index) => (
+            <View
+              key={image}
+              className={`w-12 h-2 rounded-full ${
+                index === currentImageIndex ? 'bg-primaryWhite' : 'bg-white/40'
+              } mx-1`}
+            />
+          ))}
         </View>
-      </Animated.View>
-    </>
+      </View>
+    </Animated.View>
   );
 }

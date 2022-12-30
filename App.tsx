@@ -178,7 +178,7 @@ export default function App() {
             <Stack.Screen
               name='Root'
               component={Home}
-              initialParams={{ socket }}
+              initialParams={{ socket, token }}
               options={{
                 headerShown: false,
                 animation: 'slide_from_right',

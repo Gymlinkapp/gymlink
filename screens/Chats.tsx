@@ -1,6 +1,6 @@
 import { NavigationState } from '@react-navigation/native';
 import { getItemAsync } from 'expo-secure-store';
-import { Plus } from 'phosphor-react-native';
+import { ChatsTeardrop, Plus } from 'phosphor-react-native';
 import { useEffect, useState } from 'react';
 import {
   FlatList,
@@ -79,39 +79,48 @@ export default function Chats({ navigation, route }: any) {
       >
         <Plus weight='bold' />
       </TouchableOpacity>
-      <View>
-        <FlatList
-          className='p-4'
-          data={chats}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              className='flex-row items-center my-2 bg-secondaryDark p-4 rounded-md'
-              onPress={() =>
-                navigation.navigate('Chat', {
-                  socket: socket,
-                  user: user,
-                  roomName: item.name,
-                  roomId: item.id,
-                })
-              }
-            >
-              <View className='bg-primaryDark mr-4 w-12 h-12 rounded-full' />
-              <View className='flex-col'>
-                <Text className='text-white text-xl'>{item.name}</Text>
-                <Text className='text-secondaryWhite'>
-                  {new Date(item.createdAt).toLocaleDateString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
+      {chats?.length ? (
+        <View>
+          <FlatList
+            className='p-4'
+            data={chats}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                className='flex-row items-center my-2 bg-secondaryDark p-4 rounded-md'
+                onPress={() =>
+                  navigation.navigate('Chat', {
+                    socket: socket,
+                    user: user,
+                    roomName: item.name,
+                    roomId: item.id,
+                  })
+                }
+              >
+                <View className='bg-primaryDark mr-4 w-12 h-12 rounded-full' />
+                <View className='flex-col'>
+                  <Text className='text-white text-xl'>{item.name}</Text>
+                  <Text className='text-secondaryWhite'>
+                    {new Date(item.createdAt).toLocaleDateString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
+      ) : (
+        <View className='items-center p-10'>
+          <Text className='text-secondaryWhite text-2xl'>
+            You have no chats yet
+          </Text>
+          <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
+        </View>
+      )}
     </View>
   );
 }

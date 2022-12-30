@@ -1,6 +1,6 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Barbell, X } from 'phosphor-react-native';
+import { Barbell, MapPin, X } from 'phosphor-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -10,18 +10,123 @@ import {
   Animated,
   Easing,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import { COLORS } from '../utils/colors';
 import { NAVBAR_HEIGHT, SPACING } from '../utils/sizes';
 import { calculateCardHeight } from '../utils/ui';
 import { User } from '../utils/users';
 import Button from './button';
+import { useGym } from '../hooks/useGym';
+import { Gym } from '../utils/types/gym';
+import { useLocation } from '../hooks/useLocation';
+import { useGetLocationById } from '../hooks/useGetLocationById';
+
+// reusable component to wrap the user's info with animations
+function Info({
+  swipe,
+  children,
+  row,
+}: {
+  swipe: Animated.Value;
+  children: React.ReactNode;
+  row?: boolean;
+}) {
+  return (
+    <Animated.View
+      style={{
+        flex: 1,
+        flexDirection: row ? 'row' : 'column',
+        alignItems: 'center',
+        // the info will slide down, then animate back up
+        opacity: swipe.interpolate({
+          inputRange: [0, 100],
+          outputRange: [1, 0],
+        }),
+        transform: [
+          {
+            translateY: swipe.interpolate({
+              inputRange: [0, 100],
+              outputRange: [0, 100],
+            }),
+          },
+        ],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
+function UserInfo({
+  user,
+  slide,
+  swipe,
+  gym,
+}: {
+  user: Partial<User>;
+  slide: number;
+  swipe: Animated.Value;
+  gym?: Gym;
+}) {
+  switch (slide) {
+    case 0:
+      return (
+        <Info swipe={swipe}>
+          <Text className='text-secondaryWhite text-sm leading-4'>
+            {user.bio?.length > 100
+              ? user.bio.substring(0, 100) + '...'
+              : user.bio}
+          </Text>
+        </Info>
+      );
+    case 1:
+      return (
+        <Info row swipe={swipe}>
+          <MapPin color='#fff' weight='fill' />
+          <Text className='text-white font-MontserratMedium text-lg leading-4'>
+            {gym?.name}
+          </Text>
+        </Info>
+      );
+    case 2:
+      return (
+        <Info row swipe={swipe}>
+          <FlatList
+            data={user.tags}
+            keyExtractor={(item, index) => index.toString()}
+            numColumns={3}
+            renderItem={({ index }) => (
+              <View className='flex-row items-center justify-center bg-primaryDark rounded-full px-4 py-1 m-1'>
+                <Text className='text-primaryWhite font-MontserratMedium text-sm leading-4'>
+                  {user.tags[index]}
+                </Text>
+              </View>
+            )}
+          />
+        </Info>
+      );
+    default:
+      return (
+        <Info swipe={swipe}>
+          <Text className='text-secondaryWhite text-sm leading-4'>
+            {user.bio?.length > 100
+              ? user.bio.substring(0, 100) + '...'
+              : user.bio}
+          </Text>
+        </Info>
+      );
+  }
+}
 
 export default function Person({ user }: { user: Partial<User> }) {
   const { width, height } = Dimensions.get('window');
   const [sentFriendRequest, setSentFriendRequest] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const fade = useRef(new Animated.Value(0)).current;
+  const swipe = useRef(new Animated.Value(0)).current;
+
+  const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
   useEffect(() => {
     if (sentFriendRequest) {
@@ -44,6 +149,10 @@ export default function Person({ user }: { user: Partial<User> }) {
   const transparentWhite = 'rgba(255, 255, 255, 0.05)';
   const gold = 'rgb(255, 215, 0)';
   const transparentGold = 'rgba(255, 215, 0, 0.25)';
+
+  const SWIPE_ANIMATION_DURATION = 150;
+  const SWIPE_ANIMIATION_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
+  const SWIPE_ANIMATION_VALUE = 100;
 
   const sendFriendRequest = (user: User) => {
     setSentFriendRequest(true);
@@ -68,30 +177,79 @@ export default function Person({ user }: { user: Partial<User> }) {
         position: 'relative',
       }}
     >
+      <Animated.View
+        style={{
+          zIndex: 10,
+          opacity: fade.interpolate({
+            // opposite of the fade animation
+            inputRange: [0, 1],
+            outputRange: [1, 0],
+          }),
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        <LinearGradient
+          colors={['rgba(0,0,0,0.5)', transparentWhite]}
+          className='w-full h-full absolute top-0 left-0 z-30'
+          start={[0, 1]}
+          end={[0, 0]}
+        />
+      </Animated.View>
+
       <View className={`absolute top-0 left-0 w-full h-full flex-row z-40`}>
         {/* back photo side */}
         <TouchableOpacity
           className='flex-1'
-          onPress={() =>
+          onPress={() => {
             setCurrentImageIndex((prev) => {
               if (prev === 0) {
                 return user.images.length - 1;
               }
               return prev - 1;
-            })
-          }
+            });
+
+            // when pressed, the users info will slide down then animate back up
+            Animated.timing(swipe, {
+              toValue: SWIPE_ANIMATION_VALUE,
+              duration: SWIPE_ANIMATION_DURATION,
+              easing: SWIPE_ANIMIATION_EASING,
+              useNativeDriver: true,
+            }).start(() => {
+              Animated.timing(swipe, {
+                toValue: 0,
+                duration: 150,
+                useNativeDriver: true,
+              }).start();
+            });
+          }}
         ></TouchableOpacity>
         {/* forward photo side */}
         <TouchableOpacity
           className='flex-1 h-full'
-          onPress={() =>
+          onPress={() => {
             setCurrentImageIndex((prev) => {
               if (prev === user.images.length - 1) {
                 return 0;
               }
               return prev + 1;
-            })
-          }
+            });
+            Animated.timing(swipe, {
+              toValue: SWIPE_ANIMATION_VALUE,
+              duration: SWIPE_ANIMATION_DURATION,
+              easing: SWIPE_ANIMIATION_EASING,
+              useNativeDriver: true,
+            }).start(() => {
+              Animated.timing(swipe, {
+                toValue: 0,
+                duration: SWIPE_ANIMATION_DURATION,
+                useNativeDriver: true,
+              }).start();
+            });
+          }}
         ></TouchableOpacity>
       </View>
       <Animated.View
@@ -125,6 +283,7 @@ export default function Person({ user }: { user: Partial<User> }) {
           end={[0, 1]}
         />
       </Animated.View>
+
       <RNImage
         source={{ uri: user.images[currentImageIndex] }}
         className='w-full h-full'
@@ -144,15 +303,17 @@ export default function Person({ user }: { user: Partial<User> }) {
           className='rounded-2xl overflow-hidden w-full'
         >
           <BlurView className='w-full p-4' intensity={20}>
-            <Text className='text-white pb-2 text-xl font-bold'>
+            {/* user's name */}
+            <Text className='text-white pb-2 text-2xl font-bold'>
               {user.firstName} {user.lastName}
             </Text>
-            <Text className='text-secondaryWhite text-sm leading-4'>
-              {/* show the user's bio but if it is more than 30 characters truncate it */}
-              {user.bio.length > 100
-                ? user.bio.substring(0, 100) + '...'
-                : user.bio}
-            </Text>
+            {/* user's information: */}
+            <UserInfo
+              gym={gym}
+              swipe={swipe}
+              user={user}
+              slide={currentImageIndex}
+            />
           </BlurView>
         </Animated.View>
         <View className='flex-row z-50'>
@@ -218,18 +379,40 @@ export default function Person({ user }: { user: Partial<User> }) {
         </View>
       </View>
       {/* image indicator of the amount of images and the current index of the image */}
-      <View className='absolute bottom-[0.5] left-0 w-full flex-row justify-center items-center'>
-        <View className='flex-row'>
-          {user.images.map((image, index) => (
-            <View
-              key={image}
-              className={`w-12 h-2 rounded-full ${
-                index === currentImageIndex ? 'bg-primaryWhite' : 'bg-white/40'
-              } mx-1`}
-            />
-          ))}
+      {user.images.length > 1 && !sentFriendRequest && (
+        <View className='absolute bottom-[2.5] left-0 w-full flex-row justify-center items-center z-10'>
+          <View className='flex-row px-4'>
+            {user.images.map((image, index) => (
+              <Animated.View
+                key={image}
+                style={{
+                  // using the swipe animation touch the scale of the indicator
+                  transform: [
+                    {
+                      scaleX: swipe.interpolate({
+                        inputRange: [
+                          -SWIPE_ANIMATION_VALUE,
+                          0,
+                          SWIPE_ANIMATION_VALUE,
+                        ],
+                        outputRange: [0.95, 1, 0.95],
+                      }),
+                    },
+                    {
+                      scaleY: index === currentImageIndex ? 1.5 : 1,
+                    },
+                  ],
+                }}
+                className={`flex-1 h-1 rounded-full ${
+                  index === currentImageIndex
+                    ? 'bg-primaryWhite'
+                    : 'bg-white/40'
+                } mx-1`}
+              />
+            ))}
+          </View>
         </View>
-      </View>
+      )}
     </Animated.View>
   );
 }

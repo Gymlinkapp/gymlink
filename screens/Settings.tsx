@@ -25,7 +25,7 @@ export default function SettingsScreen({ navigation }) {
           SecureStore.deleteItemAsync('token');
 
           api.delete(`/users/${token}`);
-          navigation.toTop();
+          navigation.popToTop();
 
           navigation.navigate('Register');
         }}

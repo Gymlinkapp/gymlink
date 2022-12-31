@@ -184,7 +184,11 @@ export default function App() {
                 animation: 'slide_from_right',
               }}
             />
-            <Stack.Screen name='Notifications' component={NotificationScreen} />
+            <Stack.Screen
+              name='Notifications'
+              component={NotificationScreen}
+              initialParams={{ token }}
+            />
             <Stack.Screen
               name='UserAccountScreen'
               component={UserAccountScreen}

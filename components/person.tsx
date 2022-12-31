@@ -14,13 +14,17 @@ import {
 } from 'react-native';
 import { COLORS } from '../utils/colors';
 import { NAVBAR_HEIGHT, SPACING } from '../utils/sizes';
-import { calculateCardHeight } from '../utils/ui';
+import { calculateCardHeight, truncate } from '../utils/ui';
 import { User } from '../utils/users';
 import Button from './button';
 import { useGym } from '../hooks/useGym';
 import { Gym } from '../utils/types/gym';
 import { useLocation } from '../hooks/useLocation';
 import { useGetLocationById } from '../hooks/useGetLocationById';
+import useToken from '../hooks/useToken';
+import { useUser } from '../hooks/useUser';
+import { useMutation } from 'react-query';
+import api from '../utils/axiosStore';
 
 // reusable component to wrap the user's info with animations
 function Info({
@@ -74,17 +78,15 @@ function UserInfo({
       return (
         <Info swipe={swipe}>
           <Text className='text-secondaryWhite text-sm leading-4'>
-            {user.bio?.length > 100
-              ? user.bio.substring(0, 100) + '...'
-              : user.bio}
+            {user.bio?.length > 100 ? truncate(user.bio, 100) : user.bio}
           </Text>
         </Info>
       );
     case 1:
       return (
         <Info row swipe={swipe}>
-          <MapPin color='#fff' weight='fill' />
-          <Text className='text-white font-MontserratMedium text-lg leading-4'>
+          <MapPin color='#fff' weight='fill' size={18} />
+          <Text className='text-white font-MontserratMedium text-lg'>
             {gym?.name}
           </Text>
         </Info>
@@ -110,9 +112,7 @@ function UserInfo({
       return (
         <Info swipe={swipe}>
           <Text className='text-secondaryWhite text-sm leading-4'>
-            {user.bio?.length > 100
-              ? user.bio.substring(0, 100) + '...'
-              : user.bio}
+            {user.bio?.length > 100 ? truncate(user.bio, 100) : user.bio}
           </Text>
         </Info>
       );
@@ -120,6 +120,8 @@ function UserInfo({
 }
 
 export default function Person({ user }: { user: Partial<User> }) {
+  const token = useToken();
+  const { data: currUser } = useUser(token);
   const { width, height } = Dimensions.get('window');
   const [sentFriendRequest, setSentFriendRequest] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -154,19 +156,28 @@ export default function Person({ user }: { user: Partial<User> }) {
   const SWIPE_ANIMIATION_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
   const SWIPE_ANIMATION_VALUE = 100;
 
-  const sendFriendRequest = (user: User) => {
-    setSentFriendRequest(true);
-  };
+  // const sendFriendRequest = (fromUser: User, toUser: User) => {};
+  const useSendFriendRequest = useMutation(
+    async ({
+      fromUserId,
+      toUserId,
+    }: {
+      toUserId: string;
+      fromUserId: string;
+    }) => {
+      const { data } = await api.post(`/social/sendFriendRequest`, {
+        toUserId,
+        fromUserId,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+    }
+  );
 
-  const gradientStartPos = fade.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
-
-  const gradientEndPos = fade.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0],
-  });
   return (
     <Animated.View
       className='overflow-hidden rounded-2xl relative'
@@ -333,7 +344,7 @@ export default function Person({ user }: { user: Partial<User> }) {
                   }),
                 },
               ],
-              width: sendFriendRequest ? '0%' : '100%',
+              width: sentFriendRequest ? '0%' : '100%',
               flex: sentFriendRequest ? 0 : 1,
               opacity: fade.interpolate({
                 inputRange: [0, 1],
@@ -369,7 +380,16 @@ export default function Person({ user }: { user: Partial<User> }) {
             }}
           >
             <Button
-              onPress={() => setSentFriendRequest(!sentFriendRequest)}
+              onPress={() => {
+                setSentFriendRequest(true);
+
+                if (!sentFriendRequest) {
+                  useSendFriendRequest.mutate({
+                    toUserId: user.id,
+                    fromUserId: currUser.id,
+                  });
+                }
+              }}
               variant='primary'
               icon={<Barbell weight='fill' />}
             >

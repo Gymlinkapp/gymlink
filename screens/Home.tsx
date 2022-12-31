@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { calculateCardHeight, calculateSnapInterval } from '../utils/ui';
 import { useUsers } from '../hooks/useUsers';
 import useToken from '../hooks/useToken';
+import Loading from '../components/Loading';
 
 export default function HomeScreen({ navigation, route }) {
   const token = useToken();
@@ -15,6 +16,8 @@ export default function HomeScreen({ navigation, route }) {
 
   const { data: users, isLoading, error } = useUsers(token);
   console.log(users);
+
+  if (isLoading) return <Loading />;
 
   return (
     <Layout navigation={navigation}>

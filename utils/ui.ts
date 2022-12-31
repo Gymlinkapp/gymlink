@@ -12,3 +12,7 @@ export const calculateSnapInterval = (cardHeight: number) => {
 };
 
 export const keyboardVerticalOffset = Platform.OS === 'ios' ? 125 : 0;
+
+export const truncate = (str: string, n: number) => {
+  return str?.substring(0, n) + '...';
+};

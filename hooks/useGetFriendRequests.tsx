@@ -4,14 +4,14 @@ import api from '../utils/axiosStore';
 import { User } from '../utils/users';
 import { FriendRequest } from '../utils/types/friendRequest';
 
-const fetchFriendRequests = async (userId: string) => {
-  const { data } = await api.get(`/social/getFriendRequests/${userId}`);
+const fetchFriendRequests = async (token: string) => {
+  const { data } = await api.get(`/social/getFriendRequests/${token}`);
   return data;
 };
 
-const useGetFriendRequests = (userId: string) => {
-  return useQuery<FriendRequest[], Error>(['friendRequests', userId], () =>
-    fetchFriendRequests(userId)
+const useGetFriendRequests = (token: string) => {
+  return useQuery<FriendRequest[], Error>(['friendRequests', token], () =>
+    fetchFriendRequests(token)
   );
 };
 

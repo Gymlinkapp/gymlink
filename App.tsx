@@ -32,6 +32,8 @@ import EmailLoginScreen from './screens/auth/EmailLoginScreen';
 import useToken from './hooks/useToken';
 import CreateChatScreen from './screens/CreateChat';
 import ChatScreen from './screens/Chat';
+import FriendsScreen from './screens/Friends';
+import { useUser } from './hooks/useUser';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -81,6 +83,24 @@ function Home() {
           },
         }}
         component={Chats}
+      />
+      <Tab.Screen
+        name='Friends'
+        initialParams={{ socket }}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <ChatsIcon
+              style={glowEffect(focused)}
+              color={focused ? COLORS.accent : COLORS.secondaryWhite}
+              size={32}
+              weight={focused ? 'fill' : 'bold'}
+            />
+          ),
+          headerStyle: {
+            backgroundColor: COLORS.primaryDark,
+          },
+        }}
+        component={FriendsScreen}
       />
       <Tab.Screen
         name='Home'

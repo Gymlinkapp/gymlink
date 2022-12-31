@@ -15,7 +15,6 @@ export default function HomeScreen({ navigation, route }) {
   const snapToInterval = calculateSnapInterval(calculateCardHeight(height));
 
   const { data: users, isLoading, error } = useUsers(token);
-  console.log(users);
 
   if (isLoading) return <Loading />;
 

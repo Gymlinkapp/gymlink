@@ -21,6 +21,7 @@ import { useUser } from '../hooks/useUser';
 import Layout from '../layouts/layout';
 import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
+import EmptyScreen from '../components/EmptyScreen';
 
 export type Message = {
   id?: string;
@@ -114,12 +115,12 @@ export default function Chats({ navigation, route }: any) {
           />
         </View>
       ) : (
-        <View className='items-center p-10'>
-          <Text className='text-secondaryWhite text-2xl'>
-            You have no chats yet
-          </Text>
-          <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
-        </View>
+        <EmptyScreen
+          icon={
+            <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
+          }
+          text='You have no chats yet'
+        />
       )}
     </View>
   );

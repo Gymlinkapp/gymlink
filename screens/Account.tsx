@@ -1,11 +1,20 @@
 import { getItemAsync } from 'expo-secure-store';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Loading from '../components/Loading';
 import { useUser } from '../hooks/useUser';
 import { COLORS } from '../utils/colors';
 
 export default function AccountScreen({ navigation }) {
+  const { height } = Dimensions.get('window');
+
   const [token, setToken] = useState(null);
   useEffect(() => {
     getItemAsync('token').then((t) => setToken(t));
@@ -17,7 +26,11 @@ export default function AccountScreen({ navigation }) {
   }
 
   return (
-    <ScrollView className='px-6 flex-1'>
+    <ScrollView
+      className='px-6 flex-1'
+      scrollEnabled
+      contentContainerStyle={{ height: height, paddingBottom: 500 }}
+    >
       <View className='w-full h-2/3 overflow-hidden mb-6'>
         <Image
           source={{ uri: user?.images[0] }}

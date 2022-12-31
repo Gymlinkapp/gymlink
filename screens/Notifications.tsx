@@ -14,51 +14,29 @@ import Loading from '../components/Loading';
 import { useEffect, useState } from 'react';
 import { FriendRequest } from '../utils/types/friendRequest';
 import { useUserById } from '../hooks/useUserById';
-import { Check, X } from 'phosphor-react-native';
+import { Bell, Check, X } from 'phosphor-react-native';
 import { truncate } from '../utils/ui';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
+import EmptyScreen from '../components/EmptyScreen';
 
-function Notification({ friendRequest }: { friendRequest: FriendRequest }) {
-  const queryClient = useQueryClient();
-
+function Notification({
+  friendRequest,
+  acceptFriendRequest,
+  declineFriendRequest,
+}: {
+  friendRequest: FriendRequest;
+  acceptFriendRequest: any;
+  declineFriendRequest: any;
+}) {
   const {
     data: fromUser,
     isError: isFromUserError,
     isLoading: isFromUserLoading,
   } = useUserById(friendRequest.fromUserId);
-  console.log(fromUser);
+
   if (isFromUserLoading) return <Loading />;
 
-  const declineFriendRequest = useMutation(
-    async ({ friendRequestId }: { friendRequestId: string }) => {
-      const { data } = await api.post(`/social/declineFriendRequest`, {
-        friendRequestId,
-      });
-      return data;
-    },
-    {
-      onSuccess: (data) => {
-        console.log(data);
-        queryClient.invalidateQueries('friendRequests');
-      },
-    }
-  );
-
-  const acceptFriendRequest = useMutation(
-    async ({ friendRequestId }: { friendRequestId: string }) => {
-      const { data } = await api.post(`/social/acceptFriendRequest`, {
-        friendRequestId,
-      });
-      return data;
-    },
-    {
-      onSuccess: (data) => {
-        console.log(data);
-        queryClient.invalidateQueries('friendRequests');
-      },
-    }
-  );
   return (
     <View className='w-full bg-secondaryDark p-6 rounded-2xl'>
       <Image
@@ -104,37 +82,71 @@ function Notification({ friendRequest }: { friendRequest: FriendRequest }) {
 }
 
 export default function NotificationScreen({ navigation, route }) {
-  const screenHeight = Dimensions.get('window').height;
+  const queryClient = useQueryClient();
 
+  const { height } = Dimensions.get('window');
   const { token } = route.params;
 
-  const {
-    data: user,
-    isLoading: isUserLoading,
-    error: userError,
-  } = useUser(token);
+  const declineFriendRequest = useMutation(
+    async ({ friendRequestId }: { friendRequestId: string }) => {
+      const { data } = await api.post(`/social/declineFriendRequest`, {
+        friendRequestId,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        queryClient.invalidateQueries('friendRequests');
+      },
+    }
+  );
 
-  if (isUserLoading) return <Loading />;
+  const acceptFriendRequest = useMutation(
+    async ({ friendRequestId }: { friendRequestId: string }) => {
+      const { data } = await api.post(`/social/acceptFriendRequest`, {
+        friendRequestId,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        queryClient.invalidateQueries('friendRequests');
+        queryClient.invalidateQueries('users');
+      },
+    }
+  );
+
   const {
     data: friendRequests,
     isLoading: isFriendRequestsLoading,
     error: friendRequestsError,
-  } = useGetFriendRequests(user.id);
+  } = useGetFriendRequests(token);
+
   if (isFriendRequestsLoading) return <Loading />;
 
+  if (friendRequests?.length === 0) {
+    return (
+      <EmptyScreen
+        icon={<Bell color='rgb(204,201,201)' weight='fill' />}
+        text='No notifications right now!'
+      />
+    );
+  }
+
   return (
-    // <ScrollView className='h-full'>
-    //   {friendRequests.map((request) => (
-    //     <Notification friendRequest={request} />
-    //   ))}
-    // </ScrollView>
-    <FlatList
-      className=' relative h-full'
-      contentInsetAdjustmentBehavior='automatic'
-      style={{ paddingHorizontal: 16 }}
-      data={friendRequests}
-      renderItem={({ item }) => <Notification friendRequest={item} />}
-      keyExtractor={(item) => item.id}
-    />
+    <ScrollView
+      className='h-full'
+      contentContainerStyle={{ height: height, paddingBottom: 500 }}
+    >
+      {friendRequests?.map((request) => (
+        <Notification
+          friendRequest={request}
+          acceptFriendRequest={acceptFriendRequest}
+          declineFriendRequest={declineFriendRequest}
+        />
+      ))}
+    </ScrollView>
   );
 }

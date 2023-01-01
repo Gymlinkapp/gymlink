@@ -23,6 +23,20 @@ export default function SettingsScreen({ navigation }) {
       <Button
         onPress={() => {
           SecureStore.deleteItemAsync('token');
+          signout.mutate();
+
+          navigation.popToTop();
+
+          navigation.navigate('Register');
+        }}
+        variant='menu'
+        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
+      >
+        Reset
+      </Button>
+      <Button
+        onPress={() => {
+          SecureStore.deleteItemAsync('token');
 
           api.delete(`/users/${token}`);
           navigation.popToTop();

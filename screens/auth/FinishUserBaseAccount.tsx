@@ -17,6 +17,7 @@ import Button from '../../components/button';
 import { Camera, X } from 'phosphor-react-native';
 import { COLORS } from '../../utils/colors';
 import { useMutation } from 'react-query';
+import useToken from '../../hooks/useToken';
 
 const getPermissionAsync = async () => {
   if (Platform.OS !== 'web') {
@@ -29,8 +30,17 @@ const getPermissionAsync = async () => {
 
 export default function FinishUserBaseAccountScreen({ navigation, route }) {
   const [image, setImage] = useState<string[] | []>([]);
+  const [token, setToken] = useState<string | null>(null);
   // get token from route params
-  const { token } = route.params.params;
+  useEffect(() => {
+    if (route.params) {
+      setToken(route.params.token);
+    } else {
+      const t = getItemAsync('token').then((t) => {
+        setToken(t);
+      });
+    }
+  }, []);
   console.log('token', token);
 
   const addImage = async () => {
@@ -117,6 +127,7 @@ export default function FinishUserBaseAccountScreen({ navigation, route }) {
             onPress={async () => {
               await setItemAsync('token', token);
 
+              navigation.popToTop();
               navigation.navigate('UserPrompts');
             }}
           >

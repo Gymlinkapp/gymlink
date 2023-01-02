@@ -50,6 +50,7 @@ export default function UserFavoriteMovements({ route, navigation }) {
     console.log(data);
     api.post(`/users/${token}`, {
       tags: data.favoriteMovments,
+      authSteps: 6,
       tempJWT: token,
     });
     navigation.popToTop();

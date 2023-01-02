@@ -18,4 +18,5 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   chatId: string | null;
+  authSteps: number;
 };

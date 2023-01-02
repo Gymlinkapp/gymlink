@@ -16,7 +16,7 @@ import { COLORS } from '../../utils/colors';
 import api from '../../utils/axiosStore';
 import { save, getValueFor } from '../../utils/secureStore';
 import { useEffect, useState } from 'react';
-import { getItemAsync } from 'expo-secure-store';
+import { getItemAsync, setItemAsync } from 'expo-secure-store';
 
 const userDetailsSchema = z.object({
   firstName: z.string().min(1).max(20),
@@ -88,6 +88,9 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
       onSuccess: async (data) => {
         if (data) {
           console.log(data.data);
+          await setItemAsync('token', data.data.token).then((res) => {
+            console.log('token saved', res);
+          });
           navigation.navigate('UserBaseAccount', {
             params: { token: data.data.token },
           });

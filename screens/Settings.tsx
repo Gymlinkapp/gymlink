@@ -24,10 +24,6 @@ export default function SettingsScreen({ navigation }) {
         onPress={() => {
           SecureStore.deleteItemAsync('token');
           signout.mutate();
-
-          navigation.popToTop();
-
-          navigation.navigate('Register');
         }}
         variant='menu'
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
@@ -53,6 +49,9 @@ export default function SettingsScreen({ navigation }) {
           SecureStore.deleteItemAsync('token');
 
           signout.mutate();
+
+          navigation.popToTop();
+          navigation.navigate('Auth', { screen: 'Register' });
         }}
         variant='menu'
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}

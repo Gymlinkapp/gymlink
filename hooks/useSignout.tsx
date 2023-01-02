@@ -26,8 +26,6 @@ export default function useSignout(token: string, navigation: any) {
         } catch (error) {
           console.log(error);
         }
-
-        navigation.navigate('Register');
       },
     }
   );

@@ -54,7 +54,8 @@ export default function OTPScreen({ navigation, route }) {
         if (data) {
           if (data.data.token) {
             setItemAsync('token', data.data.token);
-            navigation.navigate('Root', { screen: 'Home' });
+
+            navigation.replace('Root');
           } else {
             navigation.navigate('UserAuthDetails', {
               phoneNumber: phoneNumber,

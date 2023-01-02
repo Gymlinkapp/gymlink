@@ -84,10 +84,8 @@ export default function UserAccountPrompts({ navigation }) {
     try {
       const res = await api.post(`/users/${token}`, {
         bio: data.bio,
-        // experience: data.experience,
+        authSteps: 5,
         gym: data.gymLocation,
-        // longitude: longitude,
-        // latitude: latitude,
         tempJWT: token,
       });
 

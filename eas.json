@@ -3,6 +3,7 @@
     "version": ">= 2.7.1"
   },
   "build": {
+    "production": {},
     "development": {
       "distribution": "internal",
       "android": {
@@ -10,10 +11,23 @@
       },
       "ios": {
         "buildConfiguration": "Debug"
-      }
+      },
+      "channel": "development"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Debug"
+      },
+      "channel": "preview"
+    },
+    "preview-simulator": {
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": true
+      },
+      "channel": "preview-simulator"
     }
   },
   "submit": {

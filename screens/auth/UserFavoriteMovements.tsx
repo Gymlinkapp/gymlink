@@ -53,8 +53,7 @@ export default function UserFavoriteMovements({ route, navigation }) {
       authSteps: 6,
       tempJWT: token,
     });
-    navigation.popToTop();
-    navigation.navigate('Root');
+    navigation.navigate('Root', { screen: 'Home' });
   };
   const [items, setItems] = useState<Movement[]>([
     { label: 'Bench Press', value: 'bench-press', selected: false },

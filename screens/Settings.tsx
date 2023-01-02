@@ -23,21 +23,10 @@ export default function SettingsScreen({ navigation }) {
       <Button
         onPress={() => {
           SecureStore.deleteItemAsync('token');
-          signout.mutate();
-        }}
-        variant='menu'
-        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
-      >
-        Reset
-      </Button>
-      <Button
-        onPress={() => {
-          SecureStore.deleteItemAsync('token');
 
           api.delete(`/users/${token}`);
           navigation.popToTop();
-
-          navigation.navigate('Register');
+          navigation.navigate('Auth', { screen: 'Register' });
         }}
         variant='danger'
         icon={<User weight='fill' color='rgb(239, 68, 68)' />}
@@ -57,6 +46,16 @@ export default function SettingsScreen({ navigation }) {
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
       >
         Signout
+      </Button>
+      <Button
+        onPress={() => {
+          SecureStore.deleteItemAsync('token');
+          signout.mutate();
+        }}
+        variant='menu'
+        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
+      >
+        Reset
       </Button>
     </SafeAreaView>
   );

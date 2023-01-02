@@ -232,9 +232,9 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
                           isTouched && 'border-2 border-tertiaryDark'
                         }`}
                         cursorColor={COLORS.mainWhite}
-                        value={value.toString()}
+                        value={value.toString() || ''}
                         onBlur={onBlur}
-                        onChangeText={(value) => onChange(parseInt(value))}
+                        onChangeText={(value) => onChange(parseInt(value) || 0)}
                         keyboardType='numeric'
                       />
                       {error && (

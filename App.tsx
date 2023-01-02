@@ -79,24 +79,54 @@ function AuthStackScreen({ navigation, route }) {
     <AuthStack.Navigator>
       {notAUserOrNotFinishedAuth && (
         <>
-          <AuthStack.Screen name='Register' component={RegisterScreen} />
-          <AuthStack.Screen name='OTPScreen' component={OTPScreen} />
+          <AuthStack.Screen
+            name='Register'
+            component={RegisterScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <AuthStack.Screen
+            name='OTPScreen'
+            component={OTPScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
           <AuthStack.Screen
             name='UserAuthDetails'
             component={UserAuthDetailsScreen}
+            options={{
+              headerShown: false,
+            }}
           />
           <AuthStack.Screen
             name='UserBaseAccount'
             component={FinishUserBaseAccountScreen}
+            options={{
+              headerShown: false,
+            }}
           />
-          <AuthStack.Screen name='UserPrompts' component={UserAccountPrompts} />
+          <AuthStack.Screen
+            name='UserPrompts'
+            component={UserAccountPrompts}
+            options={{
+              headerShown: false,
+            }}
+          />
           <AuthStack.Screen
             name='UserFavoriteMovements'
             component={UserFavoriteMovements}
+            options={{
+              headerShown: false,
+            }}
           />
           <AuthStack.Screen
             name='EmailLoginScreen'
             component={EmailLoginScreen}
+            options={{
+              headerShown: false,
+            }}
           />
         </>
       )}

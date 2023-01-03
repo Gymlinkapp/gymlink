@@ -29,7 +29,7 @@ const UserFavoriteMovementSchema = z.object({
 });
 
 export default function UserFavoriteMovements({ route, navigation }) {
-  const { token } = useAuth();
+  const { token, setIsVerified } = useAuth();
   const {
     handleSubmit,
     control,
@@ -49,7 +49,7 @@ export default function UserFavoriteMovements({ route, navigation }) {
       authSteps: 6,
       tempJWT: token,
     });
-    navigation.navigate('Root', { screen: 'Home' });
+    setIsVerified(true);
   };
   const [items, setItems] = useState<Movement[]>([
     { label: 'Bench Press', value: 'bench-press', selected: false },

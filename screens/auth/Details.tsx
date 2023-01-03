@@ -17,6 +17,7 @@ import api from '../../utils/axiosStore';
 import { save, getValueFor } from '../../utils/secureStore';
 import { useEffect, useState } from 'react';
 import { getItemAsync, setItemAsync } from 'expo-secure-store';
+import { useAuth } from '../../utils/context';
 
 const userDetailsSchema = z.object({
   firstName: z.string().min(1).max(20),
@@ -29,6 +30,7 @@ const userDetailsSchema = z.object({
 export default function UserAuthDetailsScreen({ route, navigation }) {
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
+  const { token, setToken } = useAuth();
   useEffect(() => {
     getItemAsync('long').then((long) => {
       setLongitude(parseFloat(long));
@@ -91,6 +93,7 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
           await setItemAsync('token', data.data.token).then((res) => {
             console.log('token saved', res);
           });
+          setToken(data.data.token);
           navigation.navigate('UserBaseAccount', {
             token: data.data.token,
           });

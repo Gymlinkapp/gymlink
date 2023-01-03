@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
-import { getItemAsync, setItemAsync } from 'expo-secure-store';
+import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
 import AuthStackScreen from './AuthScreenStack';
 import Home from './RootHomeScreen';
 import NotificationScreen from './Notifications';
@@ -22,6 +22,7 @@ export default function Routes({ socket }: { socket: any }) {
   const { data: user, isLoading } = useUser(token);
 
   useEffect(() => {
+    // deleteItemAsync('token');
     getItemAsync('token').then((res) => {
       setToken(res);
       console.log('token', res);

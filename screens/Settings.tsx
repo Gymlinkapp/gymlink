@@ -20,6 +20,8 @@ export default function SettingsScreen({ navigation }) {
           SecureStore.deleteItemAsync('token');
 
           api.delete(`/users/${token}`);
+
+          navigation.popToTop();
           setIsVerified(false);
         }}
         variant='danger'
@@ -44,6 +46,8 @@ export default function SettingsScreen({ navigation }) {
         onPress={() => {
           SecureStore.deleteItemAsync('token');
           signout.mutate();
+
+          navigation.popToTop();
           setIsVerified(false);
         }}
         variant='menu'

@@ -8,6 +8,7 @@ import FinishUserBaseAccountScreen from './auth/FinishUserBaseAccount';
 import UserAccountPrompts from './auth/UserAccountPrompts';
 import UserFavoriteMovements from './auth/UserFavoriteMovements';
 import EmailLoginScreen from './auth/EmailLoginScreen';
+import { useAuth } from '../utils/context';
 
 export const stepToScreen = {
   0: 'Register',
@@ -24,7 +25,7 @@ const AuthStack = createNativeStackNavigator();
 export default function AuthStackScreen({ navigation, route }) {
   const { isVerified, setIsVerified } = route.params;
   const [step, setStep] = useState('Register');
-  const [token, setToken] = useState('');
+  const { token } = useAuth();
   const { data: user, isLoading } = useUser(token);
 
   useEffect(() => {

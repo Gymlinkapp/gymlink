@@ -10,15 +10,8 @@ import useSignout from '../hooks/useSignout';
 import { useAuth } from '../utils/context';
 
 export default function SettingsScreen({ navigation }) {
-  const [token, setToken] = useState(null);
-  const { setIsVerified } = useAuth();
+  const { setIsVerified, token } = useAuth();
   const signout = useSignout(token);
-  useEffect(() => {
-    (async () => {
-      const t = await SecureStore.getItemAsync('token');
-      setToken(t);
-    })();
-  });
 
   return (
     <SafeAreaView className='w-full h-full items-center flex-col-reverse'>

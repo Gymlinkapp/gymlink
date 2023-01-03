@@ -16,6 +16,7 @@ import Button from '../../components/button';
 import { COLORS } from '../../utils/colors';
 import api from '../../utils/axiosStore';
 import { getItemAsync } from 'expo-secure-store';
+import { useAuth } from '../../utils/context';
 
 type Movement = {
   label: string;
@@ -28,12 +29,7 @@ const UserFavoriteMovementSchema = z.object({
 });
 
 export default function UserFavoriteMovements({ route, navigation }) {
-  const [token, setToken] = useState('');
-  useEffect(() => {
-    getItemAsync('token').then((token) => {
-      setToken(token);
-    });
-  }, []);
+  const { token } = useAuth();
   const {
     handleSubmit,
     control,

@@ -19,6 +19,7 @@ import api from '../../utils/axiosStore';
 import { useEffect, useState } from 'react';
 import { getItemAsync } from 'expo-secure-store';
 import axios from 'axios';
+import { useAuth } from '../../utils/context';
 
 const userDetailsSchema = z.object({
   // experience: z.string().min(1).max(20),
@@ -32,15 +33,12 @@ const userDetailsSchema = z.object({
 });
 
 export default function UserAccountPrompts({ navigation }) {
-  const [token, setToken] = useState('');
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
   const [placesURL, setPlacesURL] = useState('');
   const [nearGyms, setNearGyms] = useState([]);
+  const { token } = useAuth();
   useEffect(() => {
-    getItemAsync('token').then((token) => {
-      setToken(token);
-    });
     getItemAsync('long').then((long) => {
       setLongitude(parseFloat(long));
     });

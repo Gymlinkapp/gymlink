@@ -92,7 +92,7 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
             console.log('token saved', res);
           });
           navigation.navigate('UserBaseAccount', {
-            params: { token: data.data.token },
+            token: data.data.token,
           });
         }
       },

@@ -1,7 +1,8 @@
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 
-export default function useSignout(token: string, navigation: any) {
+export default function useSignout(token: string) {
+  const queryClient = useQueryClient();
   return useMutation(
     async () => {
       try {
@@ -23,6 +24,7 @@ export default function useSignout(token: string, navigation: any) {
     {
       onSuccess: async () => {
         try {
+          queryClient.invalidateQueries('user');
         } catch (error) {
           console.log(error);
         }

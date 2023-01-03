@@ -7,10 +7,12 @@ import api from '../utils/axiosStore';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import useSignout from '../hooks/useSignout';
+import { useAuth } from '../utils/context';
 
 export default function SettingsScreen({ navigation }) {
   const [token, setToken] = useState(null);
-  const signout = useSignout(token, navigation);
+  const { setIsVerified } = useAuth();
+  const signout = useSignout(token);
   useEffect(() => {
     (async () => {
       const t = await SecureStore.getItemAsync('token');
@@ -25,8 +27,7 @@ export default function SettingsScreen({ navigation }) {
           SecureStore.deleteItemAsync('token');
 
           api.delete(`/users/${token}`);
-          navigation.popToTop();
-          navigation.navigate('Auth', { screen: 'Register' });
+          setIsVerified(false);
         }}
         variant='danger'
         icon={<User weight='fill' color='rgb(239, 68, 68)' />}
@@ -38,9 +39,8 @@ export default function SettingsScreen({ navigation }) {
           SecureStore.deleteItemAsync('token');
 
           signout.mutate();
-
           navigation.popToTop();
-          navigation.navigate('Auth', { screen: 'Register' });
+          setIsVerified(false);
         }}
         variant='menu'
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
@@ -51,6 +51,7 @@ export default function SettingsScreen({ navigation }) {
         onPress={() => {
           SecureStore.deleteItemAsync('token');
           signout.mutate();
+          setIsVerified(false);
         }}
         variant='menu'
         icon={<SignOut weight='fill' color={COLORS.mainWhite} />}

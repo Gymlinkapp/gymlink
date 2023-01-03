@@ -11,19 +11,11 @@ import {
 import Loading from '../components/Loading';
 import { useUser } from '../hooks/useUser';
 import { COLORS } from '../utils/colors';
+import { useAuth } from '../utils/context';
 
 export default function AccountScreen({ navigation }) {
   const { height } = Dimensions.get('window');
-
-  const [token, setToken] = useState(null);
-  useEffect(() => {
-    getItemAsync('token').then((t) => setToken(t));
-  }, [token]);
-  const { data: user, isLoading, error } = useUser(token);
-
-  if (isLoading) {
-    return <Loading />;
-  }
+  const { token, user } = useAuth();
 
   return (
     <ScrollView
@@ -31,11 +23,13 @@ export default function AccountScreen({ navigation }) {
       scrollEnabled
       contentContainerStyle={{ height: height, paddingBottom: 500 }}
     >
-      <View className='w-full h-2/3 overflow-hidden mb-6'>
-        <Image
-          source={{ uri: user?.images[0] }}
-          className='w-full h-full rounded-2xl'
-        />
+      <View className='w-full h-2/3 overflow-hidden mb-6' key={token}>
+        {user?.images && (
+          <Image
+            source={{ uri: user?.images[0] }}
+            className='w-full h-full rounded-2xl'
+          />
+        )}
       </View>
       <Text className='text-white text-2xl font-MontserratBold'>
         {user.firstName} {user.lastName}
@@ -53,8 +47,11 @@ export default function AccountScreen({ navigation }) {
           </Text>
           <View className='flex-row flex-wrap'>
             {user.tags &&
-              user.tags.map((tag) => (
-                <View className='mr-2 my-1 bg-secondaryDark px-6 py-2 rounded-full'>
+              user.tags.map((tag, idx) => (
+                <View
+                  key={idx}
+                  className='mr-2 my-1 bg-secondaryDark px-6 py-2 rounded-full'
+                >
                   <Text className='text-white text-md font-MontserratMedium'>
                     {tag}
                   </Text>

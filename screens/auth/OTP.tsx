@@ -9,8 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '../../components/button';
 import api from '../../utils/axiosStore';
 
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { setItemAsync } from 'expo-secure-store';
+import { useAuth } from '../../utils/context';
 
 let OTPSchema = z.object({
   otp: z.string().min(6).max(6),
@@ -18,6 +19,8 @@ let OTPSchema = z.object({
 export default function OTPScreen({ navigation, route }) {
   const { code, phoneNumber } = route.params;
   console.log('phoneNumber', phoneNumber);
+  const { setIsVerified } = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     control,
@@ -54,8 +57,8 @@ export default function OTPScreen({ navigation, route }) {
         if (data) {
           if (data.data.token) {
             setItemAsync('token', data.data.token);
-
-            navigation.replace('Root');
+            setIsVerified(true);
+            queryClient.invalidateQueries('user');
           } else {
             navigation.navigate('UserAuthDetails', {
               phoneNumber: phoneNumber,

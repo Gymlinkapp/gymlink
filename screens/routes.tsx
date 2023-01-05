@@ -14,6 +14,7 @@ import { User } from '../utils/users';
 import { useUser } from '../hooks/useUser';
 import { useAuth } from '../utils/context';
 import Loading from '../components/Loading';
+import { useLocation } from '../hooks/useLocation';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,11 +37,10 @@ export default function Routes({ socket }: { socket: any }) {
         setIsVerified(false);
       }
     }
+    if (!token) {
+      setIsVerified(false);
+    }
   }, [token, , user]);
-
-  if (token && isLoading) {
-    return <Loading />;
-  }
 
   return (
     <Stack.Navigator>

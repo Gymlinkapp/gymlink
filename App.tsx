@@ -32,7 +32,7 @@ import api from './utils/axiosStore';
 import { useUser } from './hooks/useUser';
 import Loading from './components/Loading';
 import Routes from './screens/routes';
-import { AuthProvider } from './utils/context';
+import { AuthProvider, useAuth } from './utils/context';
 
 const queryClient = new QueryClient();
 
@@ -40,8 +40,6 @@ const queryClient = new QueryClient();
 const socket = io('http://10.0.1.198:3000');
 
 export default function App() {
-  const location = useLocation();
-
   const [fontsLoaded] = useFonts({
     MontserratRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/fonts/Montserrat-Medium.ttf'),

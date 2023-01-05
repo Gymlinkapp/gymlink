@@ -7,7 +7,9 @@ export let URL =
       'http://10.0.1.198:3000'
     : 'https://gymlink-service.onrender.com';
 
-const instance = axios.create({ baseURL: URL });
+const instance = axios.create({
+  baseURL: 'https://gymlink-service.onrender.com',
+});
 instance.interceptors.request.use((config) => {
   config.params = {
     // add your default ones

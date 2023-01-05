@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import { getItemAsync, setItemAsync } from 'expo-secure-store';
+import { useAuth } from '../utils/context';
 
 /* 
 
@@ -33,6 +34,7 @@ import { getItemAsync, setItemAsync } from 'expo-secure-store';
 export const useLocation = () => {
   const [location, setLocation] = useState<Location.LocationObject>(null);
   const [error, setError] = useState<boolean>(false);
+  const { setLat, setLong } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -57,6 +59,8 @@ export const useLocation = () => {
       // saving the longitude and latitude to secure store
       setItemAsync('long', location.coords.longitude.toString());
       setItemAsync('lat', location.coords.latitude.toString());
+      setLong(location.coords.longitude);
+      setLat(location.coords.latitude);
     }
     console.log('location: ', location);
   }, []);

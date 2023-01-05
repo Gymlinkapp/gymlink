@@ -11,6 +11,10 @@ const AuthContext = createContext(
     setToken: React.Dispatch<React.SetStateAction<string>>;
     user: User;
     setUser: React.Dispatch<React.SetStateAction<User>>;
+    long: number;
+    setLong: React.Dispatch<React.SetStateAction<number>>;
+    lat: number;
+    setLat: React.Dispatch<React.SetStateAction<number>>;
   }
 );
 
@@ -19,10 +23,23 @@ const AuthProvider = ({ children }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [token, setToken] = useState('');
   const [user, setUser] = useState<User | null>(null);
+  const [long, setLong] = useState(0);
+  const [lat, setLat] = useState(0);
 
   return (
     <AuthContext.Provider
-      value={{ isVerified, setIsVerified, token, setToken, user, setUser }}
+      value={{
+        isVerified,
+        setIsVerified,
+        token,
+        setToken,
+        user,
+        setUser,
+        long,
+        setLong,
+        lat,
+        setLat,
+      }}
     >
       {children}
     </AuthContext.Provider>

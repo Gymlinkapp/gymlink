@@ -20,8 +20,10 @@ import { useEffect, useState } from 'react';
 import { getItemAsync } from 'expo-secure-store';
 import axios from 'axios';
 import { useAuth } from '../../utils/context';
+import { useMutation } from 'react-query';
+import { useLocation } from '../../hooks/useLocation';
 
-const userDetailsSchema = z.object({
+const userGymLocationSchema = z.object({
   // experience: z.string().min(1).max(20),
   enteredGymLocation: z.string().min(1).max(100),
   gymLocation: z.object({
@@ -29,23 +31,23 @@ const userDetailsSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
   }),
-  bio: z.string(),
+  bio: z.string().min(1).max(1000),
 });
 
 export default function UserAccountPrompts({ navigation }) {
-  const [longitude, setLongitude] = useState(0);
-  const [latitude, setLatitude] = useState(0);
+  const location = useLocation();
   const [placesURL, setPlacesURL] = useState('');
   const [nearGyms, setNearGyms] = useState([]);
-  const { token } = useAuth();
+  const { token, long, lat, setLat, setLong } = useAuth();
+  const [d, setD] = useState({});
+
   useEffect(() => {
-    getItemAsync('long').then((long) => {
-      setLongitude(parseFloat(long));
-    });
-    getItemAsync('lat').then((lat) => {
-      setLatitude(parseFloat(lat));
-    });
-  }, [longitude, latitude]);
+    if (location) {
+      setLat(location.coords.latitude);
+      setLong(location.coords.longitude);
+    }
+  }, [location]);
+
   const {
     handleSubmit,
     control,
@@ -53,7 +55,7 @@ export default function UserAccountPrompts({ navigation }) {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(userDetailsSchema),
+    resolver: zodResolver(userGymLocationSchema),
     defaultValues: {
       // experience: '',
       enteredGymLocation: '',
@@ -67,7 +69,7 @@ export default function UserAccountPrompts({ navigation }) {
   const autoCompleteGymLocations = async (input: string) => {
     // const apiKey = process.env.GOOGLE_API_KEY;
     const apiKey = 'AIzaSyBeVNaKylQx0vKkZ4zW8T_J01s2rUK7KQA&';
-    const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${latitude}%2C${longitude}&radius=500&key=${apiKey}`;
+    const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${lat}%2C${long}&radius=500&key=${apiKey}`;
     console.log(URL);
     try {
       const res = await axios.get(URL);
@@ -78,28 +80,50 @@ export default function UserAccountPrompts({ navigation }) {
     }
   };
 
-  const onSubmit = async (data: z.infer<typeof userDetailsSchema>) => {
-    try {
-      const res = await api.post(`/users/${token}`, {
-        bio: data.bio,
-        authSteps: 5,
-        gym: data.gymLocation,
-        tempJWT: token,
-      });
-
-      if (res.status === 200) {
-        navigation.navigate('UserFavoriteMovements');
+  const saveUserGymLocation = useMutation(
+    async (data: z.infer<typeof userGymLocationSchema>) => {
+      try {
+        return await api.post(
+          `/users/${token}`,
+          {
+            bio: data.bio,
+            authSteps: 5,
+            gym: data.gymLocation,
+            tempJWT: token,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
+    },
+    {
+      onSuccess: async (data) => {
+        if (data && (data.data.step === 5 || data.data.gymId)) {
+          setD(data.data);
+          navigation.navigate('UserFavoriteMovements');
+        }
+      },
+      onError: (error) => {
+        console.log(error);
+      },
     }
+  );
+
+  const onSubmit = async (data: z.infer<typeof userGymLocationSchema>) => {
+    console.log(data);
+    await saveUserGymLocation.mutateAsync(data);
   };
 
   console.log(getValues('gymLocation'));
   console.log(errors);
 
   return (
-    <SafeAreaView className='w-full h-full flex-1 relative '>
+    <SafeAreaView className='w-full h-full flex-1 relative'>
       <View className='py-6'>
         <Text className='text-2xl font-MontserratBold text-primaryWhite'>
           Final Touches
@@ -186,8 +210,8 @@ export default function UserAccountPrompts({ navigation }) {
                                   onPress={() => {
                                     setValue('gymLocation', {
                                       name: item.description,
-                                      longitude: longitude,
-                                      latitude: latitude,
+                                      longitude: long,
+                                      latitude: lat,
                                     });
                                     setValue(
                                       'enteredGymLocation',
@@ -213,48 +237,25 @@ export default function UserAccountPrompts({ navigation }) {
                     </View>
                   )}
                 />
-                {/* <Controller
-                  control={control}
-                  name='experience'
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { isTouched, error },
-                  }) => (
-                    <View className='my-2 flex-1 ml-4'>
-                      <Text className='text-white py-2 text-l font-MontserratMedium'>
-                        Years of experience
-                      </Text>
-                      <TextInput
-                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                          isTouched && 'border-2 border-tertiaryDark'
-                        }`}
-                        cursorColor={COLORS.mainWhite}
-                        value={value.toString()}
-                        onBlur={onBlur}
-                        onChangeText={(value) => onChange(parseInt(value))}
-                        keyboardType='numeric'
-                      />
-                      {error && (
-                        <Text className='text-red-500 font-MontserratRegular'>
-                          {error.message}
-                        </Text>
-                      )}
-                    </View>
-                  )}
-                /> */}
               </View>
+              <Text className='text-white'>
+                Errors: {JSON.stringify(errors)}
+              </Text>
+              <Text className='text-white'>Response: {JSON.stringify(d)}</Text>
+              <Text className='text-white'>Lat: {lat}</Text>
+              <Text className='text-white'>Long: {long}</Text>
             </>
           )}
         />
       </KeyboardAvoidingView>
 
-      {/* {Object.keys(errors).length === 0 && ( */}
-      <View className='flex-1 justify-end'>
-        <Button variant='primary' onPress={handleSubmit(onSubmit)}>
-          Continue
-        </Button>
-      </View>
-      {/* )} */}
+      {Object.keys(errors).length === 0 && (
+        <View className='flex-1 justify-end'>
+          <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+            Continue
+          </Button>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

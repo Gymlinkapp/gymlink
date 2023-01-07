@@ -238,12 +238,14 @@ export default function UserAccountPrompts({ navigation }) {
                   )}
                 />
               </View>
-              <Text className='text-white'>
+
+              {/* debugging stats for testflight // act as logs */}
+              {/* <Text className='text-white'>
                 Errors: {JSON.stringify(errors)}
-              </Text>
-              <Text className='text-white'>Response: {JSON.stringify(d)}</Text>
+              </Text> */}
+              {/* <Text className='text-white'>Response: {JSON.stringify(d)}</Text>
               <Text className='text-white'>Lat: {lat}</Text>
-              <Text className='text-white'>Long: {long}</Text>
+              <Text className='text-white'>Long: {long}</Text> */}
             </>
           )}
         />

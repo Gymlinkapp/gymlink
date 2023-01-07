@@ -11,7 +11,7 @@ import { z } from 'zod';
 import PhoneInput from 'react-native-phone-number-input';
 import { COLORS } from '../../utils/colors';
 import Button from '../../components/button';
-import api, { URL } from '../../utils/axiosStore';
+import api from '../../utils/axiosStore';
 import { useMutation } from 'react-query';
 import axios from 'axios';
 import { useState } from 'react';

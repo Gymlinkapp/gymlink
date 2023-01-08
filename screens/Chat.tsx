@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -7,12 +7,14 @@ import {
   Text,
   TextInput,
   View,
-} from "react-native";
-import Button from "../components/button";
-import { useChat } from "../hooks/useChat";
-import { keyboardVerticalOffset } from "../utils/ui";
-import { User } from "../utils/users";
-import { Message } from "./Chats";
+} from 'react-native';
+import Button from '../components/button';
+import { useChat } from '../hooks/useChat';
+import { keyboardVerticalOffset } from '../utils/ui';
+import { User } from '../utils/users';
+import { Message } from './Chats';
+import { useQueryClient } from 'react-query';
+import Loading from '../components/Loading';
 
 interface MessageData extends Message {
   roomName: string;
@@ -27,23 +29,24 @@ export default function ChatScreen({ route, navigation }) {
     isLoading: isChatLoading,
     error: isChatError,
   } = useChat(roomId);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
-  // flatlistref
   const flatListRef = useRef(null);
 
-  console.log("messages", messages);
   useEffect(() => {
     navigation.setOptions({ title: roomName });
 
-    if (chat) setMessages(chat.messages);
+    if (chat) {
+      setMessages(chat.messages);
+      console.log('chat', chat.messages);
+    }
 
-    socket.emit("join-chat", { roomName, roomId });
-    socket.on("recieve-message", (data: MessageData) => {
-      console.log("data", data);
+    socket.emit('join-chat', { roomName, roomId });
+    socket.on('recieve-message', (data: MessageData) => {
       setMessages((messages) => [...messages, data]);
     });
-  }, [socket, chat]);
+    console.log('messages', messages);
+  }, [socket, chat, roomName, roomId]);
 
   const messageData: MessageData = {
     roomName: roomName,
@@ -58,28 +61,28 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   const sendMessage = async () => {
-    await socket.emit("chat-message", messageData);
+    await socket.emit('chat-message', messageData);
     setMessages((messages) => [...messages, messageData]);
-    setMessage("");
+    setMessage('');
   };
 
   const amIAuthor = (message: Message) =>
-    message.sender.id === user.id ? "flex-row-reverse" : "flex-row";
-
+    message.sender.id === user.id ? 'flex-row-reverse' : 'flex-row';
+  if (isChatLoading) return <Loading />;
   return (
     <KeyboardAvoidingView
-      className="flex-1"
-      behavior="padding"
+      className='flex-1'
+      behavior='padding'
       keyboardVerticalOffset={keyboardVerticalOffset}
     >
-      <SafeAreaView className="flex-1 bg-primaryDark px-4">
-        <KeyboardAvoidingView behavior="height" className="flex-1">
+      <SafeAreaView className='flex-1 bg-primaryDark px-4'>
+        <KeyboardAvoidingView behavior='height' className='flex-1'>
           <FlatList
             maintainVisibleContentPosition={
-              Platform.OS === "ios" ? { minIndexForVisible: 1 } : undefined
+              Platform.OS === 'ios' ? { minIndexForVisible: 1 } : undefined
             }
             keyExtractor={(item) => item.id}
-            className="px-4"
+            className='px-4'
             data={messages}
             initialScrollIndex={messages.length - 1}
             // when a new message is sent, scroll to the bottom
@@ -98,30 +101,30 @@ export default function ChatScreen({ route, navigation }) {
             }}
             // hides the scroll bar
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View className={`${amIAuthor(item)} my-2`}>
-                <View className="flex-col w-1/2 bg-secondaryDark p-4 rounded-full">
+            renderItem={({ item, index }) => (
+              <View className={`${amIAuthor(item)} my-2`} key={index}>
+                <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
                   {item.sender.id !== user.id && (
-                    <Text className="text-secondaryWhite">
+                    <Text className='text-secondaryWhite'>
                       {item.sender?.firstName} {item.sender?.lastName}
                     </Text>
                   )}
-                  <Text className="text-white">{item.content}</Text>
+                  <Text className='text-white'>{item.content}</Text>
                 </View>
               </View>
             )}
           />
         </KeyboardAvoidingView>
         {socket && (
-          <View className="flex-row items-center bg-primaryDark">
-            <View className="flex-1 mr-2">
+          <View className='flex-row items-center bg-primaryDark'>
+            <View className='flex-1 mr-2'>
               <TextInput
                 value={message}
                 onChangeText={(text) => setMessage(text)}
-                className="bg-secondaryDark text-white p-4 rounded-md"
+                className='bg-secondaryDark text-white p-4 rounded-md'
               />
             </View>
-            <Button variant="primary" textSize="xs" onPress={sendMessage}>
+            <Button variant='primary' textSize='xs' onPress={sendMessage}>
               Send
             </Button>
           </View>

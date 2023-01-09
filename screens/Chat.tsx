@@ -29,7 +29,12 @@ export default function ChatScreen({ route, navigation }) {
     isLoading: isChatLoading,
     error: isChatError,
   } = useChat(roomId);
-  const [message, setMessage] = useState('');
+  const [messageData, setMessageData] = useState<MessageData>({
+    roomName: roomName,
+    roomId: roomId,
+    sender: user,
+    content: '',
+  });
   const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
   const flatListRef = useRef(null);
 
@@ -38,36 +43,26 @@ export default function ChatScreen({ route, navigation }) {
 
     if (chat) {
       setMessages(chat.messages);
-      console.log('chat', chat.messages);
     }
 
     socket.emit('join-chat', { roomName, roomId });
     socket.on('recieve-message', (data: MessageData) => {
-      setMessages((messages) => [...messages, data]);
+      console.log('recieved message', data);
+      setMessages([...messages, data]);
     });
-    console.log('messages', messages);
-  }, [socket, chat, roomName, roomId]);
 
-  const messageData: MessageData = {
-    roomName: roomName,
-    roomId: roomId,
-    sender: {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      ...user,
-    },
-    content: message,
-  };
+    console.log('messages', messages);
+  }, [socket, chat, roomName, roomId, chat.messages]);
 
   const sendMessage = async () => {
+    setMessageData({ ...messageData, sender: user });
     await socket.emit('chat-message', messageData);
-    setMessages((messages) => [...messages, messageData]);
-    setMessage('');
+    setMessages([...messages, messageData]);
+    setMessageData({ ...messageData, content: '' });
   };
 
   const amIAuthor = (message: Message) =>
-    message.sender.id === user.id ? 'flex-row-reverse' : 'flex-row';
+    message.sender?.id === user.id ? 'flex-row-reverse' : 'flex-row';
   if (isChatLoading) return <Loading />;
   return (
     <KeyboardAvoidingView
@@ -101,10 +96,10 @@ export default function ChatScreen({ route, navigation }) {
             }}
             // hides the scroll bar
             showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <View className={`${amIAuthor(item)} my-2`} key={index}>
+            renderItem={({ item }) => (
+              <View className={`${amIAuthor(item)} my-2`} key={item.id}>
                 <View className='flex-col w-1/2 bg-secondaryDark p-4 rounded-full'>
-                  {item.sender.id !== user.id && (
+                  {item.sender?.id !== user.id && (
                     <Text className='text-secondaryWhite'>
                       {item.sender?.firstName} {item.sender?.lastName}
                     </Text>
@@ -119,14 +114,18 @@ export default function ChatScreen({ route, navigation }) {
           <View className='flex-row items-center bg-primaryDark'>
             <View className='flex-1 mr-2'>
               <TextInput
-                value={message}
-                onChangeText={(text) => setMessage(text)}
+                value={messageData.content}
+                onChangeText={(text) =>
+                  setMessageData({ ...messageData, content: text })
+                }
                 className='bg-secondaryDark text-white p-4 rounded-md'
               />
             </View>
-            <Button variant='primary' textSize='xs' onPress={sendMessage}>
-              Send
-            </Button>
+            {messageData.content.length > 0 && (
+              <Button variant='primary' textSize='xs' onPress={sendMessage}>
+                Send
+              </Button>
+            )}
           </View>
         )}
       </SafeAreaView>

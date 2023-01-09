@@ -37,8 +37,8 @@ import { AuthProvider, useAuth } from './utils/context';
 const queryClient = new QueryClient();
 
 // needs to be this for ios not localhost
-// const socket = io('http://10.0.1.198:3000');
-const socket = io('https://gymlink-service.onrender.com');
+const socket = io('http://10.0.1.198:3000');
+// const socket = io('https://gymlink-service.onrender.com');
 
 export default function App() {
   const [fontsLoaded] = useFonts({

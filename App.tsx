@@ -33,12 +33,12 @@ import { useUser } from './hooks/useUser';
 import Loading from './components/Loading';
 import Routes from './screens/routes';
 import { AuthProvider, useAuth } from './utils/context';
+import { URL } from './utils/url';
 
 const queryClient = new QueryClient();
 
 // needs to be this for ios not localhost
-const socket = io('http://10.0.1.198:3000');
-// const socket = io('https://gymlink-service.onrender.com');
+const socket = io(URL);
 
 export default function App() {
   const [fontsLoaded] = useFonts({

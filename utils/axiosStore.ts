@@ -1,8 +1,8 @@
 import axios from 'axios';
+import { URL } from './url';
 
 const instance = axios.create({
-  // baseURL: 'https://gymlink-service.onrender.com',
-  baseURL: 'http://10.0.1.198:3000',
+  baseURL: URL,
 });
 instance.interceptors.request.use((config) => {
   config.params = {

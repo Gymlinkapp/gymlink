@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { COLORS } from '../../utils/colors';
 import { z } from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { save } from '../../utils/secureStore';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,7 +17,8 @@ let OTPSchema = z.object({
   otp: z.string().min(6).max(6),
 });
 export default function OTPScreen({ navigation, route }) {
-  const { code, phoneNumber } = route.params;
+  const { phoneNumber } = route.params;
+  const [incorrectCode, setIncorrectCode] = useState<Boolean>(false);
   console.log('phoneNumber', phoneNumber);
   const { setIsVerified } = useAuth();
   const queryClient = useQueryClient();
@@ -25,6 +26,7 @@ export default function OTPScreen({ navigation, route }) {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(OTPSchema),
@@ -32,6 +34,32 @@ export default function OTPScreen({ navigation, route }) {
       otp: '',
     },
   });
+
+  const sendSMS = useMutation(
+    async () => {
+      try {
+        return await api.post(
+          '/auth/sendsms',
+          {
+            phoneNumber: phoneNumber,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      onSuccess: (data) => {
+        if (data) {
+        }
+      },
+    }
+  );
 
   const verifyCode = useMutation(
     async (data: z.infer<typeof OTPSchema>) => {
@@ -49,11 +77,12 @@ export default function OTPScreen({ navigation, route }) {
           }
         );
       } catch (error) {
-        console.log(error);
+        setIncorrectCode(true);
       }
     },
     {
       onSuccess: (data) => {
+        console.log(data);
         if (data) {
           if (data.data.token) {
             setItemAsync('token', data.data.token);
@@ -63,6 +92,16 @@ export default function OTPScreen({ navigation, route }) {
             navigation.navigate('UserAuthDetails', {
               phoneNumber: phoneNumber,
             });
+          }
+        }
+      },
+      onError: (error) => {
+        console.log(error);
+        // @ts-expect-error -- not sure what the error is
+        const { response } = error;
+        if (response) {
+          if (response.status === 400) {
+            setIncorrectCode(true);
           }
         }
       },
@@ -77,6 +116,19 @@ export default function OTPScreen({ navigation, route }) {
     }
   };
 
+  const resendCode = async () => {
+    // clear the OTP value
+    // remove the error message
+    // mutation to sendSMS
+    setValue('otp', '');
+    setIncorrectCode(false);
+    try {
+      await sendSMS.mutateAsync();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SafeAreaView className='w-full px-6 flex-col'>
       <View className='pt-12'>
@@ -84,11 +136,11 @@ export default function OTPScreen({ navigation, route }) {
           Verification Code
         </Text>
         <Text className='font-MontserratRegular text-secondaryWhite'>
-          We have sent a verification code to your phone number. Please enter
-          the code below.
+          We have sent a verification code to {phoneNumber}. Please enter the
+          code below.
         </Text>
       </View>
-      <View className='h-1/3'>
+      <View className='h-1/3 w-full'>
         <Controller
           control={control}
           name='otp'
@@ -107,6 +159,21 @@ export default function OTPScreen({ navigation, route }) {
             />
           )}
         />
+        <Text className='font-MontserratRegular text-secondaryWhite'>
+          Code can be entered automaically from messages above your keyboard.
+        </Text>
+
+        {incorrectCode && (
+          <>
+            <Text className='font-MontserratRegular text-red-500'>
+              Incorrect Code
+            </Text>
+
+            <Button variant='primary' onPress={() => resendCode()}>
+              Try again. Resend Code.
+            </Button>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );

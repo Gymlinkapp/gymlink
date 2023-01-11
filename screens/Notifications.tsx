@@ -114,6 +114,7 @@ export default function NotificationScreen({ navigation, route }) {
         console.log(data);
         queryClient.invalidateQueries('friendRequests');
         queryClient.invalidateQueries('users');
+        queryClient.invalidateQueries('friends');
       },
     }
   );

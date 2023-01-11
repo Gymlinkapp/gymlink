@@ -31,7 +31,7 @@ function ChatItem({ message, user }: { message: Message; user: User }) {
     message.sender?.id === user.id ? 'flex-row-reverse' : 'flex-row';
   return (
     <View className={`${amIAuthor(message)} my-2`}>
-      <View className='bg-secondaryDark p-4 rounded-full'>
+      <View className='bg-secondaryDark p-4 min-w-[125px] max-w-[310px] rounded-3xl'>
         <View>
           {isAuthor ? (
             <Text className='text-sm text-secondaryWhite'>Me</Text>
@@ -74,7 +74,6 @@ export default function ChatScreen({ route, navigation }) {
     });
 
     socket.on('typing', (data) => {
-      console.log('typing: ', data);
       setIsTyping(data);
     });
 

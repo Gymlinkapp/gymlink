@@ -10,7 +10,6 @@ export default function FriendsScreen({ navigation }) {
   const { height } = Dimensions.get('window');
   const token = useToken();
   const { data: friends, isLoading, error } = useFriends(token);
-  console.log(friends);
   if (isLoading) return <Loading />;
   if (friends.length === 0)
     return (
@@ -26,7 +25,10 @@ export default function FriendsScreen({ navigation }) {
       contentContainerStyle={{ height: height, paddingBottom: 500 }}
     >
       {friends?.map((friend) => (
-        <View className='mr-2 my-1 bg-secondaryDark px-6 py-2 rounded-full'>
+        <View
+          className='mr-2 my-1 bg-secondaryDark px-6 py-2 rounded-full'
+          key={friend.id}
+        >
           <Text className='text-white text-md font-MontserratMedium'>
             {friend.firstName} {friend.lastName}
           </Text>

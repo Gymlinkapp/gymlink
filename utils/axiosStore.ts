@@ -4,6 +4,7 @@ import { URL } from './url';
 const instance = axios.create({
   baseURL: URL,
 });
+console.log('URL', URL);
 instance.interceptors.request.use((config) => {
   config.params = {
     // add your default ones

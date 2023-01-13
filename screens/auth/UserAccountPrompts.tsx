@@ -71,6 +71,10 @@ export default function UserAccountPrompts({ navigation }) {
     const apiKey = 'AIzaSyBeVNaKylQx0vKkZ4zW8T_J01s2rUK7KQA&';
     const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${lat}%2C${long}&radius=500&key=${apiKey}`;
     console.log(URL);
+    if (input === '') {
+      setNearGyms([]);
+      return;
+    }
     try {
       const res = await axios.get(URL);
       setNearGyms(res.data.predictions);
@@ -175,69 +179,69 @@ export default function UserAccountPrompts({ navigation }) {
                 )}
               />
 
-              <View className='flex-row'>
-                <Controller
-                  control={control}
-                  name='enteredGymLocation'
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { isTouched, error },
-                  }) => (
-                    <View className='my-2 flex-1'>
+              <Controller
+                control={control}
+                name='enteredGymLocation'
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { isTouched, error },
+                }) => (
+                  <View className='my-2 w-full h-full flex-1'>
+                    <View className='flex-1 w-full'>
                       <Text className='text-white py-2 text-l font-MontserratMedium'>
                         What gym you at?
                       </Text>
-                      <View className='flex-1'>
-                        <TextInput
-                          className={`bg-secondaryDark rounded-t-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                            isTouched && 'border-2 border-tertiaryDark'
-                          }`}
-                          cursorColor={COLORS.mainWhite}
-                          value={value}
-                          onBlur={onBlur}
-                          onChangeText={(value) => {
-                            onChange(value);
-                            autoCompleteGymLocations(value);
-                          }}
-                        />
-                        {nearGyms.length > 0 && (
-                          <View className='bg-secondaryDark rounded-b-md'>
-                            <FlatList
-                              data={nearGyms}
-                              renderItem={({ item }) => (
-                                <TouchableOpacity
-                                  className='px-2 py-6 border-b-2 border-tertiaryDark'
-                                  onPress={() => {
-                                    setValue('gymLocation', {
-                                      name: item.description,
-                                      longitude: long,
-                                      latitude: lat,
-                                    });
-                                    setValue(
-                                      'enteredGymLocation',
-                                      getValues('gymLocation').name
-                                    );
-                                    setNearGyms([]);
-                                  }}
-                                >
-                                  <Text className='text-white font-MontserratMedium'>
-                                    {item.description}
-                                  </Text>
-                                </TouchableOpacity>
-                              )}
-                            />
-                          </View>
-                        )}
-                      </View>
-                      {error && (
-                        <Text className='text-red-500 font-MontserratRegular'>
-                          {error.message}
-                        </Text>
-                      )}
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 flex-1 text-white font-[MontserratMedium] ${
+                          (value !== '' || isTouched) &&
+                          ' rounded-b-none border-2 border-b-0 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(value) => {
+                          onChange(value);
+                          autoCompleteGymLocations(value);
+                        }}
+                      />
                     </View>
-                  )}
-                />
-              </View>
+                    {nearGyms.length > 0 && (
+                      <View className='bg-secondaryDark rounded-b-md border-2 border-tertiaryDark'>
+                        <FlatList
+                          data={nearGyms}
+                          renderItem={({ item }) => (
+                            <TouchableOpacity
+                              className='px-2 py-6'
+                              onPress={() => {
+                                setValue('gymLocation', {
+                                  name: item.description,
+                                  longitude: long,
+                                  latitude: lat,
+                                });
+                                setValue(
+                                  'enteredGymLocation',
+                                  getValues('gymLocation').name
+                                );
+                                setNearGyms([]);
+                              }}
+                            >
+                              <Text className='text-white font-MontserratMedium'>
+                                {item.description}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      </View>
+                    )}
+
+                    {error && (
+                      <Text className='text-red-500 font-MontserratRegular'>
+                        {error.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              />
 
               {/* debugging stats for testflight // act as logs */}
               {/* <Text className='text-white'>

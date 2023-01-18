@@ -105,6 +105,7 @@ export default function ChatScreen({ route, navigation }) {
       <SafeAreaView className='flex-1 bg-primaryDark px-4'>
         <KeyboardAvoidingView behavior='height' className='flex-1'>
           <FlatList
+            showsVerticalScrollIndicator={false}
             ref={flatListRef}
             data={messages}
             onContentSizeChange={() =>

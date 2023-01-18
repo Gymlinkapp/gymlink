@@ -22,6 +22,7 @@ export default function AccountScreen({ navigation, route }) {
     <ScrollView
       className='px-6 flex-1'
       scrollEnabled
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{ height: height, paddingBottom: 500 }}
     >
       <View className='w-full h-2/3 overflow-hidden mb-6' key={user.id}>

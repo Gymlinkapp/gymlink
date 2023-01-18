@@ -17,8 +17,14 @@ import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
-export default function ProfileScreen({ navigation, route }) {
-  const { user } = route.params;
+export default function ProfileScreen({
+  navigation,
+  route,
+}: {
+  navigation?: any;
+  route?: any;
+}) {
+  const { user, isFriend } = route.params;
   const { user: currUser } = useAuth();
   const { height } = Dimensions.get('window');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -56,30 +62,33 @@ export default function ProfileScreen({ navigation, route }) {
   }, [currentImageIndex]);
   return (
     <View className='w-full h-full'>
-      <View className='absolute bottom-12 w-full items-center z-50'>
-        <View className='rounded-full bg-primaryDark w-4/5 h-full flex-row p-4 items-center justify-between'>
-          <TouchableOpacity className='bg-secondaryDark  justify-center items-center w-16 h-16 rounded-full'>
-            <X color='rgb(204, 201, 201)' />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className='bg-white justify-center items-center w-16 h-16 rounded-full'
-            onPress={() => {
-              useSendFriendRequest.mutate({
-                fromUserId: currUser.id,
-                toUserId: user.id,
-              });
-              // user can send a friend request through the profile page.
-              // the user id is being stored and passed to the parent home screen where in the <Person/> component, can determine the UI state of the animation, etc.
-              navigation.navigate('Home', { userId: user.id });
-            }}
-          >
-            <Barbell weight='fill' />
-          </TouchableOpacity>
+      {!isFriend && (
+        <View className='absolute bottom-12 w-full items-center z-50'>
+          <View className='rounded-full bg-primaryDark w-4/5 h-full flex-row p-4 items-center justify-between'>
+            <TouchableOpacity className='bg-secondaryDark  justify-center items-center w-16 h-16 rounded-full'>
+              <X color='rgb(204, 201, 201)' />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className='bg-white justify-center items-center w-16 h-16 rounded-full'
+              onPress={() => {
+                useSendFriendRequest.mutate({
+                  fromUserId: currUser.id,
+                  toUserId: user.id,
+                });
+                // user can send a friend request through the profile page.
+                // the user id is being stored and passed to the parent home screen where in the <Person/> component, can determine the UI state of the animation, etc.
+                navigation.navigate('Home', { userId: user.id });
+              }}
+            >
+              <Barbell weight='fill' />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
       <ScrollView
         className='px-6 flex-1 relative'
         scrollEnabled
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           height: height,
           paddingBottom: 500,

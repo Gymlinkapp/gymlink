@@ -30,6 +30,7 @@ export default function FriendsScreen({ navigation }) {
     <ScrollView
       className='px-6 flex-1'
       scrollEnabled
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{ height: height, paddingBottom: 500 }}
     >
       {friends?.map((friend) => (
@@ -48,8 +49,8 @@ export default function FriendsScreen({ navigation }) {
                   {friend.firstName} {friend.lastName}
                 </Text>
                 <Text className='text-secondaryWhite text-sm leading-4'>
-                  {friend.bio?.length > 100
-                    ? truncate(friend.bio, 100)
+                  {friend.bio?.length > 30
+                    ? truncate(friend.bio, 30)
                     : friend.bio}
                 </Text>
               </View>
@@ -57,7 +58,10 @@ export default function FriendsScreen({ navigation }) {
             <TouchableOpacity
               className='bg-accent h-[50px] w-[50px] justify-center items-center rounded-full'
               onPress={() => {
-                navigation.navigate('Profile', { user: friend });
+                navigation.navigate('Profile', {
+                  user: friend,
+                  isFriend: true,
+                });
               }}
             >
               <User color='#fff' />

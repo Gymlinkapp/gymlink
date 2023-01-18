@@ -144,7 +144,7 @@ export default function CreateChatScreen({ navigation, route }) {
                 }) => (
                   <View className='my-2 flex-1'>
                     <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      What gym you at?
+                      Invite a friend
                     </Text>
                     <View className='flex-1'>
                       <TextInput
@@ -155,7 +155,7 @@ export default function CreateChatScreen({ navigation, route }) {
                         value={
                           selectedFriend
                             ? `${selectedFriend.firstName} ${selectedFriend.lastName}`
-                            : ''
+                            : value
                         }
                         onBlur={onBlur}
                         onChangeText={(value) => {

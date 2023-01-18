@@ -41,7 +41,7 @@ export default function HomeScreen({ navigation, route }) {
         ref={flatListRef}
         renderItem={({ item, index }) =>
           index !== users.length - 1 ? (
-            <Person user={item} key={index} />
+            <Person user={item} key={index} navigation={navigation} />
           ) : (
             <View className='py-12'>
               <Button

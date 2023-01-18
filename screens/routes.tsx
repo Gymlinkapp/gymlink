@@ -15,6 +15,8 @@ import { useUser } from '../hooks/useUser';
 import { useAuth } from '../utils/context';
 import Loading from '../components/Loading';
 import { useLocation } from '../hooks/useLocation';
+import AccountScreen from './Account';
+import ProfileScreen from './Profile';
 
 const Stack = createNativeStackNavigator();
 
@@ -88,6 +90,15 @@ export default function Routes({ socket }: { socket: any }) {
           name='Settings'
           component={SettingsScreen}
           initialParams={{ setIsVerified }}
+          options={{
+            contentStyle: {
+              backgroundColor: COLORS.secondaryDark,
+            },
+          }}
+        />
+        <Stack.Screen
+          name='Profile'
+          component={ProfileScreen}
           options={{
             contentStyle: {
               backgroundColor: COLORS.secondaryDark,

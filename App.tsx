@@ -39,7 +39,7 @@ const queryClient = new QueryClient();
 
 // needs to be this for ios not localhost
 const socket = io(URL);
-console.log(process.env.NODE_ENV);
+console.log(URL);
 
 export default function App() {
   const [fontsLoaded] = useFonts({

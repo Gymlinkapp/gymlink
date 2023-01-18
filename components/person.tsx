@@ -25,6 +25,7 @@ import useToken from '../hooks/useToken';
 import { useUser } from '../hooks/useUser';
 import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
+import { useNavigation } from '@react-navigation/native';
 
 // reusable component to wrap the user's info with animations
 function Info({
@@ -41,7 +42,7 @@ function Info({
       style={{
         flex: 1,
         flexDirection: row ? 'row' : 'column',
-        alignItems: 'center',
+        // alignItems: 'center',
         // the info will slide down, then animate back up
         opacity: swipe.interpolate({
           inputRange: [0, 100],
@@ -67,11 +68,13 @@ function UserInfo({
   slide,
   swipe,
   gym,
+  navigation,
 }: {
   user: Partial<User>;
   slide: number;
   swipe: Animated.Value;
   gym?: Gym;
+  navigation?: any;
 }) {
   switch (slide) {
     case 0:
@@ -80,6 +83,18 @@ function UserInfo({
           <Text className='text-secondaryWhite text-sm leading-4'>
             {user.bio?.length > 100 ? truncate(user.bio, 100) : user.bio}
           </Text>
+          {user?.bio.length > 100 && (
+            <Text
+              className='text-white text-md mt-2 font-MontserratBold leading-4'
+              onPress={() => {
+                navigation.navigate('Profile', {
+                  user: user,
+                });
+              }}
+            >
+              Show More
+            </Text>
+          )}
         </Info>
       );
     case 1:
@@ -119,7 +134,13 @@ function UserInfo({
   }
 }
 
-export default function Person({ user }: { user: Partial<User> }) {
+export default function Person({
+  user,
+  navigation,
+}: {
+  user: Partial<User>;
+  navigation?: any;
+}) {
   const token = useToken();
   const { data: currUser } = useUser(token);
   const { width, height } = Dimensions.get('window');
@@ -324,6 +345,7 @@ export default function Person({ user }: { user: Partial<User> }) {
               swipe={swipe}
               user={user}
               slide={currentImageIndex}
+              navigation={navigation}
             />
           </BlurView>
         </Animated.View>

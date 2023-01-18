@@ -13,16 +13,20 @@ import { useUser } from '../hooks/useUser';
 import { COLORS } from '../utils/colors';
 import { useAuth } from '../utils/context';
 
-// This is the user's account screen.
-export default function AccountScreen({ navigation, route }) {
+// This is a user's profile screen displayed when 'Show More' is pressed.
+export default function ProfileScreen({ navigation, route }) {
+  const { user } = route.params;
   const { height } = Dimensions.get('window');
-  const { token, user } = useAuth();
 
   return (
     <ScrollView
       className='px-6 flex-1'
       scrollEnabled
-      contentContainerStyle={{ height: height, paddingBottom: 500 }}
+      contentContainerStyle={{
+        height: height,
+        paddingBottom: 500,
+        paddingTop: 25,
+      }}
     >
       <View className='w-full h-2/3 overflow-hidden mb-6' key={user.id}>
         {user?.images && (

@@ -137,9 +137,11 @@ function UserInfo({
 export default function Person({
   user,
   navigation,
+  route,
 }: {
   user: Partial<User>;
   navigation?: any;
+  route?: any;
 }) {
   const token = useToken();
   const { data: currUser } = useUser(token);
@@ -163,7 +165,11 @@ export default function Person({
         useNativeDriver: true,
       }).start();
     }
-  }, [sentFriendRequest]);
+
+    if (route.params?.userId === user.id) {
+      setSentFriendRequest(true);
+    }
+  }, [sentFriendRequest, route.params?.userId]);
 
   const CARD_WIDTH = width;
 
@@ -177,7 +183,6 @@ export default function Person({
   const SWIPE_ANIMIATION_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
   const SWIPE_ANIMATION_VALUE = 100;
 
-  // const sendFriendRequest = (fromUser: User, toUser: User) => {};
   const useSendFriendRequest = useMutation(
     async ({
       fromUserId,

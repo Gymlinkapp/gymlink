@@ -1,10 +1,18 @@
-import { Dimensions, ScrollView, Text, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import useToken from '../hooks/useToken';
 import { useUser } from '../hooks/useUser';
 import Loading from '../components/Loading';
 import { useFriends } from '../hooks/useFriends';
 import EmptyScreen from '../components/EmptyScreen';
-import { UserCircle } from 'phosphor-react-native';
+import { User, UserCircle } from 'phosphor-react-native';
+import { truncate } from '../utils/ui';
 
 export default function FriendsScreen({ navigation }) {
   const { height } = Dimensions.get('window');
@@ -26,12 +34,35 @@ export default function FriendsScreen({ navigation }) {
     >
       {friends?.map((friend) => (
         <View
-          className='mr-2 my-1 bg-secondaryDark px-6 py-2 rounded-full'
+          className='mr-2 my-1 bg-secondaryDark px-2 py-2 rounded-full'
           key={friend.id}
         >
-          <Text className='text-white text-md font-MontserratMedium'>
-            {friend.firstName} {friend.lastName}
-          </Text>
+          <View className='flex-row items-center justify-between'>
+            <View className='flex-row items-center gap-4'>
+              <Image
+                source={{ uri: friend?.images[0] }}
+                className='w-[50px] h-[50px] rounded-full'
+              />
+              <View>
+                <Text className='text-white text-md font-MontserratMedium'>
+                  {friend.firstName} {friend.lastName}
+                </Text>
+                <Text className='text-secondaryWhite text-sm leading-4'>
+                  {friend.bio?.length > 100
+                    ? truncate(friend.bio, 100)
+                    : friend.bio}
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              className='bg-accent h-[50px] w-[50px] justify-center items-center rounded-full'
+              onPress={() => {
+                navigation.navigate('Profile', { user: friend });
+              }}
+            >
+              <User color='#fff' />
+            </TouchableOpacity>
+          </View>
         </View>
       ))}
     </ScrollView>

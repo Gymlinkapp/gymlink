@@ -122,7 +122,7 @@ export default function UserImageUpload({ navigation, route }) {
               await setItemAsync('token', token);
 
               navigation.popToTop();
-              navigation.navigate('UserPrompts');
+              navigation.navigate('UserGymLocation');
             }}
           >
             Continue

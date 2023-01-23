@@ -9,15 +9,22 @@ import UserGymLocation from './auth/UserGymLocation';
 import UserFavoriteMovements from './auth/UserFavoriteMovements';
 import EmailLoginScreen from './auth/EmailLoginScreen';
 import { useAuth } from '../utils/context';
+import CreateSplit from './auth/CreateGymSplit';
 
-export const stepToScreen = {
+// create a proper type for above object so I can access it by `stepToScreen.Register` instead of `stepToScreen[0]`
+type StepToScreen = {
+  [key: number]: string;
+};
+
+export const stepToScreen: StepToScreen = {
   0: 'Register',
   1: 'OTPScreen',
   2: 'InitialUserDetails',
   3: 'UserImageUpload',
-  4: 'UserPrompts',
-  5: 'UserFavoriteMovements',
-  6: 'EmailLoginScreen',
+  4: 'UserGymLocation',
+  5: 'UserGymSplit',
+  6: 'UserFavoriteMovements',
+  7: 'EmailLoginScreen',
 };
 
 const AuthStack = createNativeStackNavigator();
@@ -75,6 +82,13 @@ export default function AuthStackScreen({ navigation, route }) {
       />
       <AuthStack.Screen
         name={stepToScreen[5]}
+        component={CreateSplit}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <AuthStack.Screen
+        name={stepToScreen[6]}
         component={UserFavoriteMovements}
         options={{
           headerShown: false,

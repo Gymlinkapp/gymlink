@@ -106,7 +106,7 @@ export default function UserGymLocation({ navigation }) {
       onSuccess: async (data) => {
         if (data && (data.data.step === 5 || data.data.gymId)) {
           setD(data.data);
-          navigation.navigate('UserFavoriteMovements');
+          navigation.navigate('UserGymSplit');
         }
       },
       onError: (error) => {

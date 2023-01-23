@@ -49,6 +49,9 @@ export default function Routes({ socket }: { socket: any }) {
       {!isVerified ? (
         <Stack.Screen
           name='Auth'
+          options={{
+            headerShown: false,
+          }}
           component={AuthStackScreen}
           initialParams={{ token }}
         />

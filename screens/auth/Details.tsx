@@ -18,16 +18,17 @@ import { save, getValueFor } from '../../utils/secureStore';
 import { useEffect, useState } from 'react';
 import { getItemAsync, setItemAsync } from 'expo-secure-store';
 import { useAuth } from '../../utils/context';
+import AuthLayout from '../../layouts/AuthLayout';
 
 const userDetailsSchema = z.object({
   firstName: z.string().min(1).max(20),
   lastName: z.string().min(1).max(20),
+  bio: z.string().min(1).max(1000),
   email: z.string().email(),
   age: z.number().min(16).max(100),
-  password: z.string().min(8).max(20),
 });
 
-export default function UserAuthDetailsScreen({ route, navigation }) {
+export default function InitialUserDetails({ route, navigation }) {
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
   const { token, setToken } = useAuth();
@@ -51,15 +52,13 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
       firstName: '',
       lastName: '',
       email: '',
+      bio: '',
       age: 18,
-      password: '',
     },
   });
   const { code, phoneNumber } = route.params;
   console.log(phoneNumber);
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
-
-  console.log(errors);
 
   const saveUserDetails = useMutation(
     async (data: z.infer<typeof userDetailsSchema>) => {
@@ -70,9 +69,8 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
             phoneNumber: phoneNumber,
             firstName: data.firstName,
             lastName: data.lastName,
-            email: data.email,
             age: data.age,
-            password: data.password,
+            email: data.email,
             longitude: longitude,
             latitude: latitude,
           },
@@ -90,11 +88,12 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
       onSuccess: async (data) => {
         if (data) {
           console.log(data.data);
+          console.log(data.data);
           await setItemAsync('token', data.data.token).then((res) => {
             console.log('token saved', res);
           });
           setToken(data.data.token);
-          navigation.navigate('UserBaseAccount', {
+          navigation.navigate('UserImageUpload', {
             token: data.data.token,
           });
         }
@@ -109,159 +108,123 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
     try {
       Number(data.age);
       return saveUserDetails.mutateAsync(data);
-      //   console.log(data);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <View className='flex-1 px-12'>
-      <View className='py-12'>
-        <Text className='text-2xl font-MontserratBold text-primaryWhite'>
-          Setup your Account
-        </Text>
-        <Text className='text-base font-MontserratRegular text-secondaryWhite'>
-          Enter your details to continue
-        </Text>
-      </View>
-      <KeyboardAvoidingView
-        behavior='position'
-        keyboardVerticalOffset={keyboardVerticalOffset}
-      >
-        <FlatList
-          className='bg-primaryDark'
-          data={[1]}
-          renderItem={() => (
-            <>
-              <Controller
-                control={control}
-                name='firstName'
-                render={({
-                  field: { onChange, onBlur, value },
-                  fieldState: { error, isTouched },
-                }) => (
-                  <View className='my-2'>
-                    <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      First Name
+    <AuthLayout
+      title='Setup your Account'
+      description='Enter your details to continue'
+    >
+      <FlatList
+        className='bg-primaryDark flex-1'
+        data={[1]}
+        renderItem={() => (
+          <>
+            <Controller
+              control={control}
+              name='firstName'
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error, isTouched },
+              }) => (
+                <View className='my-2'>
+                  <Text className='text-white py-2 text-l font-MontserratMedium'>
+                    First Name
+                  </Text>
+                  <TextInput
+                    className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                      isTouched && 'border-2 border-tertiaryDark'
+                    }`}
+                    cursorColor={COLORS.mainWhite}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={(value) => onChange(value)}
+                  />
+                  {error && (
+                    <Text className='text-red-500 font-MontserratRegular'>
+                      {error.message}
                     </Text>
-                    <TextInput
-                      className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                        isTouched && 'border-2 border-tertiaryDark'
-                      }`}
-                      cursorColor={COLORS.mainWhite}
-                      value={value}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                    />
-                    {error && (
-                      <Text className='text-red-500 font-MontserratRegular'>
-                        {error.message}
-                      </Text>
-                    )}
-                  </View>
-                )}
-              />
-              <Controller
-                control={control}
-                name='lastName'
-                render={({
-                  field: { onChange, onBlur, value },
-                  fieldState: { error, isTouched },
-                }) => (
-                  <View className='my-2'>
-                    <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      Last Name
-                    </Text>
-                    <TextInput
-                      className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                        isTouched && 'border-2 border-tertiaryDark'
-                      }`}
-                      cursorColor={COLORS.mainWhite}
-                      value={value}
-                      onBlur={onBlur}
-                      onChangeText={(value) => onChange(value)}
-                    />
-                    {error && (
-                      <Text className='text-red-500 font-MontserratRegular'>
-                        {error.message}
-                      </Text>
-                    )}
-                  </View>
-                )}
-              />
-              <View className='flex-row'>
-                <Controller
-                  control={control}
-                  name='email'
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { isTouched, error },
-                  }) => (
-                    <View className='my-2 flex-1'>
-                      <Text className='text-white py-2 text-l font-MontserratMedium'>
-                        Email
-                      </Text>
-                      <TextInput
-                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                          isTouched && 'border-2 border-tertiaryDark'
-                        }`}
-                        cursorColor={COLORS.mainWhite}
-                        value={value}
-                        onBlur={onBlur}
-                        onChangeText={(value) => onChange(value)}
-                      />
-                      {error && (
-                        <Text className='text-red-500 font-MontserratRegular'>
-                          {error.message}
-                        </Text>
-                      )}
-                    </View>
                   )}
-                />
-                <Controller
-                  control={control}
-                  name='age'
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { isTouched, error },
-                  }) => (
-                    <View className='my-2 flex-[0.35] ml-4'>
-                      <Text className='text-white py-2 text-l font-MontserratMedium'>
-                        Age
-                      </Text>
-                      <TextInput
-                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                          isTouched && 'border-2 border-tertiaryDark'
-                        }`}
-                        cursorColor={COLORS.mainWhite}
-                        value={value.toString() || ''}
-                        onBlur={onBlur}
-                        onChangeText={(value) => onChange(parseInt(value) || 0)}
-                        keyboardType='numeric'
-                      />
-                      {error && (
-                        <Text className='text-red-500 font-MontserratRegular'>
-                          {error.message}
-                        </Text>
-                      )}
-                    </View>
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name='lastName'
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error, isTouched },
+              }) => (
+                <View className='my-2'>
+                  <Text className='text-white py-2 text-l font-MontserratMedium'>
+                    Last Name
+                  </Text>
+                  <TextInput
+                    className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                      isTouched && 'border-2 border-tertiaryDark'
+                    }`}
+                    cursorColor={COLORS.mainWhite}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={(value) => onChange(value)}
+                  />
+                  {error && (
+                    <Text className='text-red-500 font-MontserratRegular'>
+                      {error.message}
+                    </Text>
                   )}
-                />
-              </View>
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name='bio'
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error, isTouched },
+              }) => (
+                <View className='my-2'>
+                  <Text className='text-white py-2 text-l font-MontserratMedium'>
+                    Bio
+                  </Text>
+                  <TextInput
+                    className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                      isTouched && 'border-2 border-tertiaryDark'
+                    }`}
+                    cursorColor={COLORS.mainWhite}
+                    value={value}
+                    onBlur={onBlur}
+                    multiline
+                    numberOfLines={10}
+                    onChangeText={onChange}
+                    returnKeyType='done'
+                    returnKeyLabel='done'
+                    enablesReturnKeyAutomatically
+                  />
+                  {error && (
+                    <Text className='text-red-500 font-MontserratRegular'>
+                      {error.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+            <View className='flex-row'>
               <Controller
                 control={control}
-                name='password'
+                name='email'
                 render={({
                   field: { onChange, onBlur, value },
-                  fieldState: { error, isTouched },
+                  fieldState: { isTouched, error },
                 }) => (
-                  <View className='my-2'>
+                  <View className='my-2 flex-1 mr-2'>
                     <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      Password
+                      Email
                     </Text>
                     <TextInput
-                      secureTextEntry
                       className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
                         isTouched && 'border-2 border-tertiaryDark'
                       }`}
@@ -278,17 +241,42 @@ export default function UserAuthDetailsScreen({ route, navigation }) {
                   </View>
                 )}
               />
-            </>
-          )}
-        />
-      </KeyboardAvoidingView>
-      {Object.keys(errors).length === 0 && (
-        <SafeAreaView className='flex-1 justify-end'>
-          <Button variant='primary' onPress={handleSubmit(onSubmit)}>
-            Continue
-          </Button>
-        </SafeAreaView>
-      )}
-    </View>
+              <Controller
+                control={control}
+                name='age'
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { isTouched, error },
+                }) => (
+                  <View className='my-2 w-1/4'>
+                    <Text className='text-white py-2 text-l font-MontserratMedium'>
+                      Age
+                    </Text>
+                    <TextInput
+                      className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                        isTouched && 'border-2 border-tertiaryDark'
+                      }`}
+                      cursorColor={COLORS.mainWhite}
+                      value={value.toString() || ''}
+                      onBlur={onBlur}
+                      onChangeText={(value) => onChange(parseInt(value) || 0)}
+                      keyboardType='numeric'
+                    />
+                    {error && (
+                      <Text className='text-red-500 font-MontserratRegular'>
+                        {error.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              />
+            </View>
+          </>
+        )}
+      />
+      <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+        Continue
+      </Button>
+    </AuthLayout>
   );
 }

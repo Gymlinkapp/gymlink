@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../hooks/useUser';
 import RegisterScreen from './auth/Register';
 import OTPScreen from './auth/OTP';
-import UserAuthDetailsScreen from './auth/Details';
-import FinishUserBaseAccountScreen from './auth/FinishUserBaseAccount';
-import UserAccountPrompts from './auth/UserAccountPrompts';
+import InitialUserDetails from './auth/Details';
+import UserImageUpload from './auth/UserImageUpload';
+import UserGymLocation from './auth/UserGymLocation';
 import UserFavoriteMovements from './auth/UserFavoriteMovements';
 import EmailLoginScreen from './auth/EmailLoginScreen';
 import { useAuth } from '../utils/context';
@@ -13,8 +13,8 @@ import { useAuth } from '../utils/context';
 export const stepToScreen = {
   0: 'Register',
   1: 'OTPScreen',
-  2: 'UserAuthDetails',
-  3: 'UserBaseAccount',
+  2: 'InitialUserDetails',
+  3: 'UserImageUpload',
   4: 'UserPrompts',
   5: 'UserFavoriteMovements',
   6: 'EmailLoginScreen',
@@ -38,14 +38,14 @@ export default function AuthStackScreen({ navigation, route }) {
   return (
     <AuthStack.Navigator>
       <AuthStack.Screen
-        name='Register'
+        name={stepToScreen[0]}
         component={RegisterScreen}
         options={{
           headerShown: false,
         }}
       />
       <AuthStack.Screen
-        name='OTPScreen'
+        name={stepToScreen[1]}
         component={OTPScreen}
         initialParams={{ setIsVerified }}
         options={{
@@ -53,28 +53,28 @@ export default function AuthStackScreen({ navigation, route }) {
         }}
       />
       <AuthStack.Screen
-        name='UserAuthDetails'
-        component={UserAuthDetailsScreen}
+        name={stepToScreen[2]}
+        component={InitialUserDetails}
         options={{
           headerShown: false,
         }}
       />
       <AuthStack.Screen
-        name='UserBaseAccount'
-        component={FinishUserBaseAccountScreen}
+        name={stepToScreen[3]}
+        component={UserImageUpload}
         options={{
           headerShown: false,
         }}
       />
       <AuthStack.Screen
-        name='UserPrompts'
-        component={UserAccountPrompts}
+        name={stepToScreen[4]}
+        component={UserGymLocation}
         options={{
           headerShown: false,
         }}
       />
       <AuthStack.Screen
-        name='UserFavoriteMovements'
+        name={stepToScreen[5]}
         component={UserFavoriteMovements}
         options={{
           headerShown: false,

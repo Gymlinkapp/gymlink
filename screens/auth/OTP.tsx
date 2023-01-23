@@ -89,7 +89,7 @@ export default function OTPScreen({ navigation, route }) {
             setIsVerified(true);
             queryClient.invalidateQueries('user');
           } else {
-            navigation.navigate('UserAuthDetails', {
+            navigation.navigate('InitialUserDetails', {
               phoneNumber: phoneNumber,
             });
           }

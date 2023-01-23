@@ -19,6 +19,7 @@ import { COLORS } from '../../utils/colors';
 import { useMutation } from 'react-query';
 import useToken from '../../hooks/useToken';
 import { useAuth } from '../../utils/context';
+import AuthLayout from '../../layouts/AuthLayout';
 
 const getPermissionAsync = async () => {
   if (Platform.OS !== 'web') {
@@ -29,7 +30,7 @@ const getPermissionAsync = async () => {
   }
 };
 
-export default function FinishUserBaseAccountScreen({ navigation, route }) {
+export default function UserImageUpload({ navigation, route }) {
   const [image, setImage] = useState<string[] | []>([]);
   const { token } = useAuth();
 
@@ -66,7 +67,10 @@ export default function FinishUserBaseAccountScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView className='flex-1 justify-between '>
+    <AuthLayout
+      title='Your Pictures'
+      description='Pick your favorite physique, portrait or selfie.'
+    >
       <View className='flex-row flex-wrap w-full flex-1'>
         {image && image.length === 1 && (
           <View className='w-[45%] h-32 rounded-2xl m-2 overflow-hidden relative'>
@@ -125,6 +129,6 @@ export default function FinishUserBaseAccountScreen({ navigation, route }) {
           </Button>
         )}
       </View>
-    </SafeAreaView>
+    </AuthLayout>
   );
 }

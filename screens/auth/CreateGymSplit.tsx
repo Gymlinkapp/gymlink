@@ -1,13 +1,8 @@
-import {
-  FlatList,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import AuthLayout from "../../layouts/AuthLayout";
-import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { exercises, preSelectedSplits } from "../../utils/split";
+import * as Haptics from 'expo-haptics';
 
 type WeekSplit = {
   day: string;
@@ -15,13 +10,6 @@ type WeekSplit = {
 };
 
 export default function CreateSplit({ navigation, route }) {
-  console.log(route.params);
-  const preSelectedSplits = [
-    "Bro Split",
-    "Push Pull Legs",
-    "Upper Lower",
-    "Full Body",
-  ];
   const [selectedSplit, setSelectedSplit] = useState<string>(
     preSelectedSplits[0]
   );
@@ -57,16 +45,38 @@ export default function CreateSplit({ navigation, route }) {
     },
   ]);
 
-  const exercises = [
-    "Chest",
-    "Back",
-    "Arms",
-    "Legs",
-    "Shoulders",
-    "Abs",
-    "Rest",
-    "Cardio",
-  ];
+  useEffect(() => {
+    if (route.params?.assignExercise) {
+      console.log(route.params);
+      const { assignExercise } = route.params;
+      const newWeekSplit = weekSplit.map((day) => {
+        const { day: d } = day;
+
+        // if the day is selected from the previous screen, add the exercise to the array.
+        if (assignExercise.days.includes(d.toLowerCase()) && !day.exercises.includes(assignExercise.exercise)) {
+          return {
+            ...day,
+            exercises: [...day.exercises, assignExercise.exercise],
+          };
+        }
+        return day;
+      });
+
+      setWeekSplit([...newWeekSplit]);
+    }
+  }, [route.params?.assignExercise]);
+
+  const isCustom = selectedSplit === "Custom";
+  const setCustomSplit = () => {
+    // clear all exercises from the week split
+    setWeekSplit(
+      weekSplit.map((day) => ({
+        ...day,
+        exercises: [],
+      }))
+    );
+    setSelectedSplit("Custom");
+  };
 
   return (
     <AuthLayout
@@ -74,14 +84,7 @@ export default function CreateSplit({ navigation, route }) {
       description="Fill out what you're hitting this week."
     >
       <View>
-        {/* <LinearGradient
-          colors={['rgba(0,0,0,0.75)', transparentWhite]}
-          className='w-full h-full absolute top-0 left-0 z-30'
-          start={[0.5, 0]}
-          end={[0, 1]}
-
-        /> */}
-        <Text className="text-white mb-2 font-MontserratRegular">
+        <Text className="text-secondaryWhite mb-2 font-MontserratRegular">
           Already know you're split? Select it!
         </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -107,7 +110,7 @@ export default function CreateSplit({ navigation, route }) {
           className={`mt-1 ${
             selectedSplit === "Custom" ? "bg-primaryWhite" : "bg-secondaryDark"
           } px-4 py-2 rounded-full`}
-          onPress={() => setSelectedSplit("Custom")}
+          onPress={setCustomSplit}
         >
           <Text
             className={`${
@@ -120,17 +123,21 @@ export default function CreateSplit({ navigation, route }) {
       </View>
 
       {/* if custom is selected, show excercises to assign to days */}
-      {selectedSplit === "Custom" && (
+      {isCustom && (
         <View>
-          <Text className="text-white my-2 font-MontserratRegular">
-            Choose your exercises. Tap and
+          <Text className="text-secondaryWhite my-2 font-MontserratRegular">
+            Choose your exercises. Tap and select the days you want to hit them. Tap and hold to remove.
           </Text>
           <View className="flex-row flex-wrap">
             {exercises.map((exercise, idx) => (
               <TouchableOpacity
                 onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  const days = weekSplit
+                    .filter((day) => day.exercises.includes(exercise))
                   navigation.navigate("AssignExcercise", {
                     exercise: exercise,
+                    days: days.map((day) => day.day.toLowerCase()),
                   });
                 }}
                 key={idx}
@@ -161,9 +168,26 @@ export default function CreateSplit({ navigation, route }) {
               {day.exercises.map((exercise, idx) => (
                 <TouchableOpacity
                   key={idx}
+                  onLongPress={() => {
+                    // remove exercise from day
+                    const newWeekSplit = weekSplit.map((d) => {
+                      const { day: dName } = d;
+                      if (dName === day.day) {
+                        return {
+                          ...d,
+                          exercises: d.exercises.filter(
+                            (e) => e !== exercise
+                          ),
+                        };
+                      }
+                      return d;
+                    });
+                    setWeekSplit([...newWeekSplit]);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
                   className="bg-primaryDark rounded-full px-6 py-4"
                 >
-                  <Text className="text-white">{exercise}</Text>
+                  <Text className="text-white font-MontserratRegular">{exercise}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>

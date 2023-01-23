@@ -14,7 +14,8 @@ type WeekSplit = {
   exercises: string[];
 };
 
-export default function CreateSplit() {
+export default function CreateSplit({ navigation, route }) {
+  console.log(route.params);
   const preSelectedSplits = [
     "Bro Split",
     "Push Pull Legs",
@@ -69,7 +70,7 @@ export default function CreateSplit() {
 
   return (
     <AuthLayout
-      title="What is current split."
+      title="What is your current split."
       description="Fill out what you're hitting this week."
     >
       <View>
@@ -118,20 +119,27 @@ export default function CreateSplit() {
         </TouchableOpacity>
       </View>
 
+      {/* if custom is selected, show excercises to assign to days */}
       {selectedSplit === "Custom" && (
-      <View>
-          
-        <Text className="text-white my-2 font-MontserratRegular">
-            Choose your exercises. Tap and 
-        </Text>
-        <View className="flex-row flex-wrap">
-          {exercises.map((exercise, idx) => (
-
-        <TouchableOpacity key={idx} className="px-4 py-2 rounded-full bg-secondaryDark m-1">
-            <Text className="text-white">{exercise}</Text>
-          </TouchableOpacity>
-          ))}
-      </View>
+        <View>
+          <Text className="text-white my-2 font-MontserratRegular">
+            Choose your exercises. Tap and
+          </Text>
+          <View className="flex-row flex-wrap">
+            {exercises.map((exercise, idx) => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("AssignExcercise", {
+                    exercise: exercise,
+                  });
+                }}
+                key={idx}
+                className="px-4 py-2 rounded-full bg-secondaryDark m-1"
+              >
+                <Text className="text-white">{exercise}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       )}
       <ScrollView className="mt-12" showsVerticalScrollIndicator={false}>

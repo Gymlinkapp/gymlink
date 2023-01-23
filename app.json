@@ -27,9 +27,6 @@
         "backgroundColor": "#FFFFFF"
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "extra": {
       "eas": {
         "projectId": "f213c336-9501-40ed-a752-3339db5b1545"

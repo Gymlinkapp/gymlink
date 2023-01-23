@@ -10,6 +10,7 @@ import UserFavoriteMovements from './auth/UserFavoriteMovements';
 import EmailLoginScreen from './auth/EmailLoginScreen';
 import { useAuth } from '../utils/context';
 import CreateSplit from './auth/CreateGymSplit';
+import AssignExcercise from './auth/AssignExcercise';
 
 // create a proper type for above object so I can access it by `stepToScreen.Register` instead of `stepToScreen[0]`
 type StepToScreen = {
@@ -101,6 +102,24 @@ export default function AuthStackScreen({ navigation, route }) {
           headerShown: false,
         }}
       />
+      <AuthStack.Group
+        screenOptions={{
+          headerBlurEffect: 'dark',
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      >
+        <AuthStack.Screen
+          name='AssignExcercise'
+          component={AssignExcercise}
+          initialParams={{ setIsVerified }}
+          /* options={{ */
+          /*   contentStyle: { */
+          /*     backgroundColor: COLORS.secondaryDark, */
+          /*   }, */
+          /* }} */
+        />
+      </AuthStack.Group>
     </AuthStack.Navigator>
   );
 }

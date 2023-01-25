@@ -10,12 +10,9 @@ import ChatScreen from './Chat';
 import SettingsScreen from './Settings';
 import { COLORS } from '../utils/colors';
 import api from '../utils/axiosStore';
-import { User } from '../utils/users';
 import { useUser } from '../hooks/useUser';
 import { useAuth } from '../utils/context';
 import Loading from '../components/Loading';
-import { useLocation } from '../hooks/useLocation';
-import AccountScreen from './Account';
 import ProfileScreen from './Profile';
 
 const Stack = createNativeStackNavigator();

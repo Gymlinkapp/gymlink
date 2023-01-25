@@ -1,8 +1,22 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AuthLayout from "../../layouts/AuthLayout";
 import { useEffect, useState } from "react";
-import { exercises, preSelectedSplits } from "../../utils/split";
-import * as Haptics from 'expo-haptics';
+import {
+  exercises,
+  preSelectedSplits,
+  PushPullLegsSplit,
+  BroSplit,
+} from "../../utils/split";
+import * as Haptics from "expo-haptics";
+import { useMutation } from "react-query";
+import api from "../../utils/axiosStore";
+import Button from "../../components/button";
 
 type WeekSplit = {
   day: string;
@@ -10,6 +24,8 @@ type WeekSplit = {
 };
 
 export default function CreateSplit({ navigation, route }) {
+  const {token} = route.params
+  const { width, height } = Dimensions.get("window");
   const [selectedSplit, setSelectedSplit] = useState<string>(
     preSelectedSplits[0]
   );
@@ -53,7 +69,10 @@ export default function CreateSplit({ navigation, route }) {
         const { day: d } = day;
 
         // if the day is selected from the previous screen, add the exercise to the array.
-        if (assignExercise.days.includes(d.toLowerCase()) && !day.exercises.includes(assignExercise.exercise)) {
+        if (
+          assignExercise.days.includes(d.toLowerCase()) &&
+          !day.exercises.includes(assignExercise.exercise)
+        ) {
           return {
             ...day,
             exercises: [...day.exercises, assignExercise.exercise],
@@ -66,6 +85,28 @@ export default function CreateSplit({ navigation, route }) {
     }
   }, [route.params?.assignExercise]);
 
+  const saveSplit = useMutation(
+    async (data: WeekSplit[]) => {
+      try {
+        return await api.post("/users/split", {
+          split: data,
+          token,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      onSuccess: async (data) => {
+        if (data) {
+          navigation.navigate("UserFavoriteMovements")
+        }
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    }
+  );
   const isCustom = selectedSplit === "Custom";
   const setCustomSplit = () => {
     // clear all exercises from the week split
@@ -90,7 +131,16 @@ export default function CreateSplit({ navigation, route }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {preSelectedSplits.map((split, idx) => (
             <TouchableOpacity
-              onPress={() => setSelectedSplit(split)}
+              onPress={() => {
+                setSelectedSplit(split);
+                if (split === "Push Pull Legs") {
+                  setWeekSplit(PushPullLegsSplit);
+                }
+                if (split === "Bro Split") {
+                  setWeekSplit(BroSplit);
+                }
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               className={`mr-1 ${
                 selectedSplit === split ? "bg-primaryWhite" : "bg-secondaryDark"
               } px-4 py-2 rounded-full`}
@@ -126,15 +176,17 @@ export default function CreateSplit({ navigation, route }) {
       {isCustom && (
         <View>
           <Text className="text-secondaryWhite my-2 font-MontserratRegular">
-            Choose your exercises. Tap and select the days you want to hit them. Tap and hold to remove.
+            Choose your exercises. Tap and select the days you want to hit them.
+            Tap and hold to remove.
           </Text>
           <View className="flex-row flex-wrap">
             {exercises.map((exercise, idx) => (
               <TouchableOpacity
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  const days = weekSplit
-                    .filter((day) => day.exercises.includes(exercise))
+                  const days = weekSplit.filter((day) =>
+                    day.exercises.includes(exercise)
+                  );
                   navigation.navigate("AssignExcercise", {
                     exercise: exercise,
                     days: days.map((day) => day.day.toLowerCase()),
@@ -149,7 +201,11 @@ export default function CreateSplit({ navigation, route }) {
           </View>
         </View>
       )}
-      <ScrollView className="mt-12" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="mt-12"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ height: height / 1.25, paddingBottom: 50 }}
+      >
         {weekSplit.map((day, idx) => (
           <View key={idx} className="mb-2 flex-row">
             <View className="bg-secondaryDark w-16 h-16 rounded-md justify-center items-center">
@@ -175,9 +231,7 @@ export default function CreateSplit({ navigation, route }) {
                       if (dName === day.day) {
                         return {
                           ...d,
-                          exercises: d.exercises.filter(
-                            (e) => e !== exercise
-                          ),
+                          exercises: d.exercises.filter((e) => e !== exercise),
                         };
                       }
                       return d;
@@ -187,13 +241,38 @@ export default function CreateSplit({ navigation, route }) {
                   }}
                   className="bg-primaryDark rounded-full px-6 py-4"
                 >
-                  <Text className="text-white font-MontserratRegular">{exercise}</Text>
+                  <Text className="text-white font-MontserratRegular">
+                    {exercise}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
         ))}
       </ScrollView>
+      <View
+        className="absolute bottom-0 left-0 bg-primaryDark flex-row"
+        style={{
+          width: width,
+        }}
+      >
+        <Button variant="primary" className="flex-1" 
+          onPress={() => {
+            saveSplit.mutate(weekSplit);
+          }}
+        >
+          Continue
+        </Button>
+        <Button
+          variant="secondary"
+          className="flex-1"
+          onPress={() => {
+            navigation.navigate("UserFavoriteMovements");
+          }}
+        >
+          Skip
+        </Button>
+      </View>
     </AuthLayout>
   );
 }

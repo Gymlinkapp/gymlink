@@ -85,7 +85,7 @@ export default function UserGymLocation({ navigation }) {
   const saveUserGymLocation = useMutation(
     async (data: z.infer<typeof userGymLocationSchema>) => {
       try {
-        return await api.post(
+        return await api.put(
           `/users/${token}`,
           {
             authSteps: 5,
@@ -106,7 +106,7 @@ export default function UserGymLocation({ navigation }) {
       onSuccess: async (data) => {
         if (data && (data.data.step === 5 || data.data.gymId)) {
           setD(data.data);
-          navigation.navigate('UserGymSplit');
+          navigation.navigate('UserGymSplit', {token: token});
         }
       },
       onError: (error) => {

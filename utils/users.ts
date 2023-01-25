@@ -20,3 +20,5 @@ export type User = {
   chatId: string | null;
   authSteps: number;
 };
+
+export const AUTH_STEPS = 7;

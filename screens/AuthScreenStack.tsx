@@ -11,6 +11,7 @@ import EmailLoginScreen from './auth/EmailLoginScreen';
 import { useAuth } from '../utils/context';
 import CreateSplit from './auth/CreateGymSplit';
 import AssignExcercise from './auth/AssignExcercise';
+import { AUTH_STEPS } from '../utils/users';
 
 // create a proper type for above object so I can access it by `stepToScreen.Register` instead of `stepToScreen[0]`
 type StepToScreen = {
@@ -37,7 +38,7 @@ export default function AuthStackScreen({ navigation, route }) {
   const { data: user, isLoading } = useUser(token);
 
   useEffect(() => {
-    if (!isLoading && user && user.authSteps !== 6) {
+    if (!isLoading && user && user.authSteps !== AUTH_STEPS) {
       setStep(stepToScreen[user.authSteps]);
       navigation.navigate(step);
     }

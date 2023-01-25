@@ -14,6 +14,7 @@ import { useUser } from '../hooks/useUser';
 import { useAuth } from '../utils/context';
 import Loading from '../components/Loading';
 import ProfileScreen from './Profile';
+import { AUTH_STEPS } from '../utils/users';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +31,7 @@ export default function Routes({ socket }: { socket: any }) {
 
     if (user) {
       setUser(user);
-      if (user.authSteps === 6 && user.tempJWT) {
+      if (user.authSteps === AUTH_STEPS && user.tempJWT) {
         setIsVerified(true);
       } else {
         setIsVerified(false);

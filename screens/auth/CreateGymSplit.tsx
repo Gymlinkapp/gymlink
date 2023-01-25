@@ -4,19 +4,20 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import AuthLayout from "../../layouts/AuthLayout";
-import { useEffect, useState } from "react";
+} from 'react-native';
+import AuthLayout from '../../layouts/AuthLayout';
+import { useEffect, useState } from 'react';
 import {
   exercises,
   preSelectedSplits,
   PushPullLegsSplit,
   BroSplit,
-} from "../../utils/split";
-import * as Haptics from "expo-haptics";
-import { useMutation } from "react-query";
-import api from "../../utils/axiosStore";
-import Button from "../../components/button";
+} from '../../utils/split';
+import * as Haptics from 'expo-haptics';
+import { useMutation } from 'react-query';
+import api from '../../utils/axiosStore';
+import Button from '../../components/button';
+import { useAuth } from '../../utils/context';
 
 type WeekSplit = {
   day: string;
@@ -24,40 +25,40 @@ type WeekSplit = {
 };
 
 export default function CreateSplit({ navigation, route }) {
-  const {token} = route.params
-  const { width, height } = Dimensions.get("window");
+  const { token } = useAuth();
+  const { width, height } = Dimensions.get('window');
   const [selectedSplit, setSelectedSplit] = useState<string>(
     preSelectedSplits[0]
   );
 
   const [weekSplit, setWeekSplit] = useState<WeekSplit[]>([
     {
-      day: "Monday",
-      exercises: ["Chest"],
+      day: 'Monday',
+      exercises: ['Chest'],
     },
     {
-      day: "Tuesday",
-      exercises: ["Back"],
+      day: 'Tuesday',
+      exercises: ['Back'],
     },
     {
-      day: "Wednesday",
-      exercises: ["Arms"],
+      day: 'Wednesday',
+      exercises: ['Arms'],
     },
     {
-      day: "Thursday",
-      exercises: ["Rest"],
+      day: 'Thursday',
+      exercises: ['Rest'],
     },
     {
-      day: "Friday",
-      exercises: ["Legs"],
+      day: 'Friday',
+      exercises: ['Legs'],
     },
     {
-      day: "Saturday",
-      exercises: ["Shoulders"],
+      day: 'Saturday',
+      exercises: ['Shoulders'],
     },
     {
-      day: "Sunday",
-      exercises: ["Abs"],
+      day: 'Sunday',
+      exercises: ['Abs'],
     },
   ]);
 
@@ -88,9 +89,10 @@ export default function CreateSplit({ navigation, route }) {
   const saveSplit = useMutation(
     async (data: WeekSplit[]) => {
       try {
-        return await api.post("/users/split", {
+        return await api.post('/users/split', {
           split: data,
           token,
+          authSteps: 6,
         });
       } catch (error) {
         console.log(error);
@@ -99,7 +101,7 @@ export default function CreateSplit({ navigation, route }) {
     {
       onSuccess: async (data) => {
         if (data) {
-          navigation.navigate("UserFavoriteMovements")
+          navigation.navigate('UserFavoriteMovements');
         }
       },
       onError: (error) => {
@@ -107,7 +109,7 @@ export default function CreateSplit({ navigation, route }) {
       },
     }
   );
-  const isCustom = selectedSplit === "Custom";
+  const isCustom = selectedSplit === 'Custom';
   const setCustomSplit = () => {
     // clear all exercises from the week split
     setWeekSplit(
@@ -116,16 +118,16 @@ export default function CreateSplit({ navigation, route }) {
         exercises: [],
       }))
     );
-    setSelectedSplit("Custom");
+    setSelectedSplit('Custom');
   };
 
   return (
     <AuthLayout
-      title="What is your current split."
+      title='What is your current split.'
       description="Fill out what you're hitting this week."
     >
       <View>
-        <Text className="text-secondaryWhite mb-2 font-MontserratRegular">
+        <Text className='text-secondaryWhite mb-2 font-MontserratRegular'>
           Already know you're split? Select it!
         </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -133,22 +135,22 @@ export default function CreateSplit({ navigation, route }) {
             <TouchableOpacity
               onPress={() => {
                 setSelectedSplit(split);
-                if (split === "Push Pull Legs") {
+                if (split === 'Push Pull Legs') {
                   setWeekSplit(PushPullLegsSplit);
                 }
-                if (split === "Bro Split") {
+                if (split === 'Bro Split') {
                   setWeekSplit(BroSplit);
                 }
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               className={`mr-1 ${
-                selectedSplit === split ? "bg-primaryWhite" : "bg-secondaryDark"
+                selectedSplit === split ? 'bg-primaryWhite' : 'bg-secondaryDark'
               } px-4 py-2 rounded-full`}
               key={idx}
             >
               <Text
                 className={`${
-                  selectedSplit === split ? "text-primaryDark" : "text-white"
+                  selectedSplit === split ? 'text-primaryDark' : 'text-white'
                 } font-MontserratMedium`}
               >
                 {split}
@@ -158,13 +160,13 @@ export default function CreateSplit({ navigation, route }) {
         </ScrollView>
         <TouchableOpacity
           className={`mt-1 ${
-            selectedSplit === "Custom" ? "bg-primaryWhite" : "bg-secondaryDark"
+            selectedSplit === 'Custom' ? 'bg-primaryWhite' : 'bg-secondaryDark'
           } px-4 py-2 rounded-full`}
           onPress={setCustomSplit}
         >
           <Text
             className={`${
-              selectedSplit === "Custom" ? "text-primaryDark" : "text-white"
+              selectedSplit === 'Custom' ? 'text-primaryDark' : 'text-white'
             } font-MontserratMedium text-center`}
           >
             Custom
@@ -175,11 +177,11 @@ export default function CreateSplit({ navigation, route }) {
       {/* if custom is selected, show excercises to assign to days */}
       {isCustom && (
         <View>
-          <Text className="text-secondaryWhite my-2 font-MontserratRegular">
+          <Text className='text-secondaryWhite my-2 font-MontserratRegular'>
             Choose your exercises. Tap and select the days you want to hit them.
             Tap and hold to remove.
           </Text>
-          <View className="flex-row flex-wrap">
+          <View className='flex-row flex-wrap'>
             {exercises.map((exercise, idx) => (
               <TouchableOpacity
                 onPress={() => {
@@ -187,37 +189,37 @@ export default function CreateSplit({ navigation, route }) {
                   const days = weekSplit.filter((day) =>
                     day.exercises.includes(exercise)
                   );
-                  navigation.navigate("AssignExcercise", {
+                  navigation.navigate('AssignExcercise', {
                     exercise: exercise,
                     days: days.map((day) => day.day.toLowerCase()),
                   });
                 }}
                 key={idx}
-                className="px-4 py-2 rounded-full bg-secondaryDark m-1"
+                className='px-4 py-2 rounded-full bg-secondaryDark m-1'
               >
-                <Text className="text-white">{exercise}</Text>
+                <Text className='text-white'>{exercise}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
       )}
       <ScrollView
-        className="mt-12"
+        className='mt-12'
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ height: height / 1.25, paddingBottom: 50 }}
       >
         {weekSplit.map((day, idx) => (
-          <View key={idx} className="mb-2 flex-row">
-            <View className="bg-secondaryDark w-16 h-16 rounded-md justify-center items-center">
-              <Text className="text-white font-MontserratBold">
+          <View key={idx} className='mb-2 flex-row'>
+            <View className='bg-secondaryDark w-16 h-16 rounded-md justify-center items-center'>
+              <Text className='text-white font-MontserratBold'>
                 {day.day[0]}
               </Text>
             </View>
             <ScrollView
               horizontal
-              className="ml-2 bg-secondaryDark rounded-md"
+              className='ml-2 bg-secondaryDark rounded-md'
               contentContainerStyle={{
-                alignItems: "center",
+                alignItems: 'center',
                 paddingHorizontal: 8,
               }}
             >
@@ -239,9 +241,9 @@ export default function CreateSplit({ navigation, route }) {
                     setWeekSplit([...newWeekSplit]);
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
-                  className="bg-primaryDark rounded-full px-6 py-4"
+                  className='bg-primaryDark rounded-full px-6 py-4'
                 >
-                  <Text className="text-white font-MontserratRegular">
+                  <Text className='text-white font-MontserratRegular'>
                     {exercise}
                   </Text>
                 </TouchableOpacity>
@@ -251,12 +253,14 @@ export default function CreateSplit({ navigation, route }) {
         ))}
       </ScrollView>
       <View
-        className="absolute bottom-0 left-0 bg-primaryDark flex-row"
+        className='absolute bottom-0 left-0 bg-primaryDark flex-row'
         style={{
           width: width,
         }}
       >
-        <Button variant="primary" className="flex-1" 
+        <Button
+          variant='primary'
+          className='flex-1'
           onPress={() => {
             saveSplit.mutate(weekSplit);
           }}
@@ -264,10 +268,10 @@ export default function CreateSplit({ navigation, route }) {
           Continue
         </Button>
         <Button
-          variant="secondary"
-          className="flex-1"
+          variant='secondary'
+          className='flex-1'
           onPress={() => {
-            navigation.navigate("UserFavoriteMovements");
+            navigation.navigate('UserFavoriteMovements');
           }}
         >
           Skip

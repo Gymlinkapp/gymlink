@@ -270,8 +270,15 @@ export default function CreateSplit({ navigation, route }) {
         <Button
           variant='secondary'
           className='flex-1'
-          onPress={() => {
-            navigation.navigate('UserFavoriteMovements');
+          onPress={async () => {
+            try {
+              await api.put(`/users/${token}`, {
+                authSteps: 6,
+              });
+              navigation.navigate('UserFavoriteMovements');
+            } catch (error) {
+              console.log(error);
+            }
           }}
         >
           Skip

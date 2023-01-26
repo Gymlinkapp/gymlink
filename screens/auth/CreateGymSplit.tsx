@@ -12,17 +12,13 @@ import {
   preSelectedSplits,
   PushPullLegsSplit,
   BroSplit,
+  WeekSplit,
 } from '../../utils/split';
 import * as Haptics from 'expo-haptics';
 import { useMutation } from 'react-query';
 import api from '../../utils/axiosStore';
 import Button from '../../components/button';
 import { useAuth } from '../../utils/context';
-
-type WeekSplit = {
-  day: string;
-  exercises: string[];
-};
 
 export default function CreateSplit({ navigation, route }) {
   const { token } = useAuth();
@@ -64,7 +60,6 @@ export default function CreateSplit({ navigation, route }) {
 
   useEffect(() => {
     if (route.params?.assignExercise) {
-      console.log(route.params);
       const { assignExercise } = route.params;
       const newWeekSplit = weekSplit.map((day) => {
         const { day: d } = day;
@@ -223,7 +218,7 @@ export default function CreateSplit({ navigation, route }) {
                 paddingHorizontal: 8,
               }}
             >
-              {day.exercises.map((exercise, idx) => (
+              {day?.exercises?.map((exercise, idx) => (
                 <TouchableOpacity
                   key={idx}
                   onLongPress={() => {

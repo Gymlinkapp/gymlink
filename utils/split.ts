@@ -1,82 +1,87 @@
 export const exercises = [
-  "Chest",
-  "Back",
-  "Shoulders",
-  "Abs",
-  "Rest",
-  "Cardio",
-  "Triceps",
-  "Biceps",
-  "Quads",
-  "Hamstrings",
-  "Glutes",
-  "Rear Dealts",
+  'Chest',
+  'Back',
+  'Shoulders',
+  'Abs',
+  'Rest',
+  'Cardio',
+  'Triceps',
+  'Biceps',
+  'Quads',
+  'Hamstrings',
+  'Glutes',
+  'Rear Dealts',
 ];
 export const preSelectedSplits = [
-  "Bro Split",
-  "Push Pull Legs",
-  "Upper Lower",
-  "Full Body",
+  'Bro Split',
+  'Push Pull Legs',
+  'Upper Lower',
+  'Full Body',
 ];
+
+export type WeekSplit = {
+  day: string;
+  exercises: string[];
+};
 
 export const BroSplit = [
   {
-    day: "Monday",
-    exercises: ["Chest"],
+    day: 'Monday',
+    exercises: ['Chest'],
   },
   {
-    day: "Tuesday",
-    exercises: ["Back"],
+    day: 'Tuesday',
+    exercises: ['Back'],
   },
   {
-    day: "Wednesday",
-    exercises: ["Arms"],
+    day: 'Wednesday',
+    exercises: ['Arms'],
   },
   {
-    day: "Thursday",
-    exercises: ["Rest"],
+    day: 'Thursday',
+    exercises: ['Rest'],
   },
   {
-    day: "Friday",
-    exercises: ["Legs"],
+    day: 'Friday',
+    exercises: ['Legs'],
   },
   {
-    day: "Saturday",
-    exercises: ["Shoulders"],
+    day: 'Saturday',
+    exercises: ['Shoulders'],
   },
   {
-    day: "Sunday",
-    exercises: ["Abs"],
+    day: 'Sunday',
+    exercises: ['Abs'],
   },
 ];
 
 export const PushPullLegsSplit = [
   {
-    day: "Monday",
-    exercises: ["Chest", "Shoulders", "Triceps"],
+    day: 'Monday',
+    exercises: ['Chest', 'Shoulders', 'Triceps'],
   },
   {
-    day: "Tuesday",
-    exercises: ["Back", "Biceps", "Rear Dealts"],
+    day: 'Tuesday',
+    exercises: ['Back', 'Biceps', 'Rear Dealts'],
   },
   {
-    day: "Wednesday",
-    exercises: ["Quads", "Hamstrings", "Glutes", "Calves"],
+    day: 'Wednesday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
   },
   {
-    day: "Thursday",
-    exercises: ["Rest"],
+    day: 'Thursday',
+    exercises: ['Rest'],
   },
   {
-    day: "Friday",
-    exercises: ["Chest", "Shoulders", "Triceps"],
+    day: 'Friday',
+    exercises: ['Chest', 'Shoulders', 'Triceps'],
   },
   {
-    day: "Saturday",
-    exercises: ["Back", "Biceps", "Rear Dealts"],
+    day: 'Saturday',
+    exercises: ['Back', 'Biceps', 'Rear Dealts'],
   },
   {
-    day: "Sunday",
-    exercises: ["Quads", "Hamstrings", "Glutes", "Calves"],
+    day: 'Sunday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
   },
 ];

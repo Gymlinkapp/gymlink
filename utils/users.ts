@@ -19,6 +19,20 @@ export type User = {
   updatedAt: Date;
   chatId: string | null;
   authSteps: number;
+  splitId: string | null;
+  split: Split | null;
 };
+
+export type Split = {
+  id: string;
+  monday: string[];
+  tuesday: string[];
+  wednesday: string[];
+  thursday: string[];
+  friday: string[];
+  saturday: string[];
+  sunday: string[];
+  User: User;
+}
 
 export const AUTH_STEPS = 7;

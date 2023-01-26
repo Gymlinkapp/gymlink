@@ -9,14 +9,31 @@ import {
   View,
 } from 'react-native';
 import Loading from '../components/Loading';
+import Split from '../components/Split';
 import { useUser } from '../hooks/useUser';
 import { COLORS } from '../utils/colors';
 import { useAuth } from '../utils/context';
+import { WeekSplit } from '../utils/split';
 
 // This is the user's account screen.
 export default function AccountScreen({ navigation, route }) {
   const { height } = Dimensions.get('window');
   const { token, user } = useAuth();
+  const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
+
+  useEffect(() => {
+    if (user.split) {
+      const userSplit = Object.keys(user.split).map((day) => {
+        // dont include 'id' as a day in the key
+        if (day === 'id') return;
+        return {
+          day,
+          exercises: user.split[day],
+        };
+      }) as WeekSplit[];
+      setUserSplit(userSplit);
+    }
+  }, [user]);
 
   return (
     <ScrollView
@@ -61,7 +78,9 @@ export default function AccountScreen({ navigation, route }) {
               ))}
           </View>
         </View>
-        <Text className='text-white'>{user.bio}</Text>
+      </View>
+      <View>
+        <Split split={userSplit} />
       </View>
     </ScrollView>
   );

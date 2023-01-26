@@ -15,6 +15,7 @@ import { useAuth } from '../utils/context';
 import { Barbell, X } from 'phosphor-react-native';
 import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
+import Split from '../components/Split';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -148,6 +149,7 @@ export default function ProfileScreen({
             </View>
           </View>
         </View>
+        {/* <Split split={}/> */}
       </ScrollView>
     </View>
   );

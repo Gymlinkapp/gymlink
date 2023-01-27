@@ -10,10 +10,12 @@ import FriendsScreen from './Friends';
 import HomeScreen from './Home';
 import AccountScreen from './Account';
 import Chats from './Chats';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
 
 const Tab = createBottomTabNavigator();
 
-export default function Home({ route }) {
+export default function Home({ route, navigation }) {
   const { socket } = route.params;
   const glowEffect = (focused: boolean) => {
     return {
@@ -54,8 +56,11 @@ export default function Home({ route }) {
           },
         }}
         component={Chats}
+        // component={() => (
+        //   <ChatsAndFriendsScreen navigation={navigation} route={route} />
+        // )}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name='Friends'
         initialParams={{ socket }}
         options={{
@@ -72,7 +77,7 @@ export default function Home({ route }) {
           },
         }}
         component={FriendsScreen}
-      />
+      /> */}
       <Tab.Screen
         name='Home'
         options={{

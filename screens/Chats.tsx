@@ -22,6 +22,7 @@ import Layout from '../layouts/layout';
 import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
 import EmptyScreen from '../components/EmptyScreen';
+import { useAuth } from '../utils/context';
 
 export type Message = {
   id?: string;
@@ -46,23 +47,13 @@ export default function Chats({ navigation, route }: any) {
   const { socket } = route.params;
 
   const [room, setRoom] = useState('');
-
-  const token = useToken();
-  const {
-    data: user,
-    isLoading: isUserError,
-    error: userError,
-  } = useUser(token);
+  const { user } = useAuth();
 
   const {
     data: chats,
     isLoading: isMessagesLoading,
     error: messagesError,
   } = useChats(user?.id || '');
-
-  if (isUserError) return <Loading />;
-  if (userError)
-    return <Text className='text-white'>Error: {userError.message}</Text>;
 
   if (isMessagesLoading) return <Loading />;
   if (messagesError)

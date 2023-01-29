@@ -78,9 +78,9 @@ export default function AccountScreen({ navigation, route }) {
           className='px-6 flex-1'
           scrollEnabled
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ height: height, paddingBottom: 500 }}
+          contentContainerStyle={{ height: height * 1.5, paddingBottom: 500 }}
         >
-          <View className='w-full h-2/3 overflow-hidden mb-6' key={user.id}>
+          <View className='w-full h-[300px] overflow-hidden mb-6' key={user.id}>
             {user?.images && (
               <Image
                 source={{ uri: user?.images[0] }}
@@ -118,7 +118,7 @@ export default function AccountScreen({ navigation, route }) {
             </View>
           </View>
           <View>
-            <Split split={userSplit} />
+            <Split split={userSplit} navigation={navigation} />
           </View>
         </ScrollView>
       ) : (

@@ -16,6 +16,7 @@ import { Barbell, X } from 'phosphor-react-native';
 import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
 import Split from '../components/Split';
+import { WeekSplit } from '../utils/split';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -29,6 +30,7 @@ export default function ProfileScreen({
   const { user: currUser } = useAuth();
   const { height } = Dimensions.get('window');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
 
   const useSendFriendRequest = useMutation(
     async ({
@@ -61,6 +63,19 @@ export default function ProfileScreen({
     }, 5000);
     return () => clearInterval(interval);
   }, [currentImageIndex]);
+  useEffect(() => {
+    if (user.split) {
+      const userSplit = Object.keys(user.split).map((day) => {
+        // dont include 'id' as a day in the key
+        if (day === 'id') return;
+        return {
+          day,
+          exercises: user.split[day],
+        };
+      }) as WeekSplit[];
+      setUserSplit(userSplit);
+    }
+  }, [user]);
   return (
     <View className='w-full h-full'>
       {!isFriend && (
@@ -149,7 +164,7 @@ export default function ProfileScreen({
             </View>
           </View>
         </View>
-        {/* <Split split={}/> */}
+        <Split split={userSplit} />
       </ScrollView>
     </View>
   );

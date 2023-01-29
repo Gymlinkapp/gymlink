@@ -86,11 +86,12 @@ export default function UserGymLocation({ navigation }) {
     async (data: z.infer<typeof userGymLocationSchema>) => {
       try {
         return await api.put(
-          `/users/${token}`,
+          `/users`,
           {
             authSteps: 5,
             gym: data.gymLocation,
             tempJWT: token,
+            token: token,
           },
           {
             headers: {
@@ -106,7 +107,7 @@ export default function UserGymLocation({ navigation }) {
       onSuccess: async (data) => {
         if (data && (data.data.step === 5 || data.data.gymId)) {
           setD(data.data);
-          navigation.navigate('UserGymSplit', {token: token});
+          navigation.navigate('UserGymSplit', { token: token });
         }
       },
       onError: (error) => {

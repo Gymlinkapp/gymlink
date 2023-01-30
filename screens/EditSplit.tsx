@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import AuthLayout from '../../layouts/AuthLayout';
 import { useEffect, useState } from 'react';
 import {
   exercises,
@@ -13,50 +12,26 @@ import {
   PushPullLegsSplit,
   BroSplit,
   WeekSplit,
-} from '../../utils/split';
+  UpperLowerSplit,
+  FullBodySplit,
+} from '../utils/split';
 import * as Haptics from 'expo-haptics';
-import { useMutation } from 'react-query';
-import api from '../../utils/axiosStore';
-import Button from '../../components/button';
-import { useAuth } from '../../utils/context';
+import { useMutation, useQueryClient } from 'react-query';
+import api from '../utils/axiosStore';
+import Button from '../components/button';
+import { useAuth } from '../utils/context';
+import AuthLayout from '../layouts/AuthLayout';
 
-export default function CreateSplit({ navigation, route }) {
+export default function EditSplit({ navigation, route }) {
+  const queryClient = useQueryClient();
+  const { split } = route.params;
   const { token } = useAuth();
   const { width, height } = Dimensions.get('window');
   const [selectedSplit, setSelectedSplit] = useState<string>(
     preSelectedSplits[0]
   );
 
-  const [weekSplit, setWeekSplit] = useState<WeekSplit[]>([
-    {
-      day: 'Monday',
-      exercises: ['Chest'],
-    },
-    {
-      day: 'Tuesday',
-      exercises: ['Back'],
-    },
-    {
-      day: 'Wednesday',
-      exercises: ['Arms'],
-    },
-    {
-      day: 'Thursday',
-      exercises: ['Rest'],
-    },
-    {
-      day: 'Friday',
-      exercises: ['Legs'],
-    },
-    {
-      day: 'Saturday',
-      exercises: ['Shoulders'],
-    },
-    {
-      day: 'Sunday',
-      exercises: ['Abs'],
-    },
-  ]);
+  const [weekSplit, setWeekSplit] = useState<WeekSplit[]>(split);
 
   useEffect(() => {
     if (route.params?.assignExercise) {
@@ -81,13 +56,20 @@ export default function CreateSplit({ navigation, route }) {
     }
   }, [route.params?.assignExercise]);
 
-  const saveSplit = useMutation(
+  const editSplit = useMutation(
     async (data: WeekSplit[]) => {
+      // sometimes the first day is empty, so we filter it out.
+      const split = data.filter(
+        (d) => d && d.exercises && d.exercises.length > 0
+      );
+      console.log(split);
       try {
-        return await api.post('/users/split', {
-          split: data,
+        return await api.put('/users/split', {
+          split: split.map((day, i) => ({
+            day: day.day,
+            exercises: day.exercises.map((e: string) => e.toLowerCase()),
+          })),
           token,
-          authSteps: 6,
         });
       } catch (error) {
         console.log(error);
@@ -96,7 +78,8 @@ export default function CreateSplit({ navigation, route }) {
     {
       onSuccess: async (data) => {
         if (data) {
-          navigation.navigate('UserFavoriteMovements');
+          await queryClient.invalidateQueries('user');
+          navigation.goBack();
         }
       },
       onError: (error) => {
@@ -118,7 +101,7 @@ export default function CreateSplit({ navigation, route }) {
 
   return (
     <AuthLayout
-      title='What is your current split.'
+      title='Edit your split'
       description="Fill out what you're hitting this week."
     >
       <View>
@@ -130,12 +113,10 @@ export default function CreateSplit({ navigation, route }) {
             <TouchableOpacity
               onPress={() => {
                 setSelectedSplit(split);
-                if (split === 'Push Pull Legs') {
-                  setWeekSplit(PushPullLegsSplit);
-                }
-                if (split === 'Bro Split') {
-                  setWeekSplit(BroSplit);
-                }
+                if (split === 'Push Pull Legs') setWeekSplit(PushPullLegsSplit);
+                if (split === 'Bro Split') setWeekSplit(BroSplit);
+                if (split === 'Upper Lower') setWeekSplit(UpperLowerSplit);
+                if (split === 'Full Body') setWeekSplit(FullBodySplit);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               className={`mr-1 ${
@@ -203,52 +184,55 @@ export default function CreateSplit({ navigation, route }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ height: height / 1.25, paddingBottom: 50 }}
       >
-        {weekSplit.map((day, idx) => (
-          <View key={idx} className='mb-2 flex-row'>
-            <View className='bg-secondaryDark w-16 h-16 rounded-md justify-center items-center'>
-              <Text className='text-white font-MontserratBold'>
-                {day.day[0]}
-              </Text>
+        {weekSplit
+          .filter((d, i) => i !== 0)
+          .map((day, idx) => (
+            <View key={idx} className='mb-2 flex-row'>
+              <View className='bg-secondaryDark w-16 h-16 rounded-md justify-center items-center'>
+                <Text className='text-white font-MontserratBold'>
+                  {day?.day[0].toUpperCase()}
+                </Text>
+              </View>
+              <ScrollView
+                horizontal
+                className='ml-2 bg-secondaryDark rounded-md'
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  paddingHorizontal: 8,
+                }}
+              >
+                {day?.exercises?.map((exercise, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    onLongPress={() => {
+                      // remove exercise from day
+                      const newWeekSplit = weekSplit.map((d) => {
+                        if (d?.day === day.day) {
+                          return {
+                            day: d.day,
+                            exercises: d.exercises.filter(
+                              (e) => e !== exercise
+                            ),
+                          };
+                        }
+                        return d;
+                      });
+                      setWeekSplit([...newWeekSplit]);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    className='bg-primaryDark rounded-full px-6 py-4'
+                  >
+                    <Text className='text-white font-MontserratRegular'>
+                      {exercise}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
-            <ScrollView
-              horizontal
-              className='ml-2 bg-secondaryDark rounded-md'
-              contentContainerStyle={{
-                alignItems: 'center',
-                paddingHorizontal: 8,
-              }}
-            >
-              {day?.exercises?.map((exercise, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  onLongPress={() => {
-                    // remove exercise from day
-                    const newWeekSplit = weekSplit.map((d) => {
-                      const { day: dName } = d;
-                      if (dName === day.day) {
-                        return {
-                          ...d,
-                          exercises: d.exercises.filter((e) => e !== exercise),
-                        };
-                      }
-                      return d;
-                    });
-                    setWeekSplit([...newWeekSplit]);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  className='bg-primaryDark rounded-full px-6 py-4'
-                >
-                  <Text className='text-white font-MontserratRegular'>
-                    {exercise}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        ))}
+          ))}
       </ScrollView>
       <View
-        className='absolute bottom-0 left-0 bg-primaryDark flex-row'
+        className='absolute bottom-0 left-0 bg-primaryDark'
         style={{
           width: width,
         }}
@@ -257,7 +241,7 @@ export default function CreateSplit({ navigation, route }) {
           variant='primary'
           className='flex-1'
           onPress={() => {
-            saveSplit.mutate(weekSplit);
+            editSplit.mutate(weekSplit);
           }}
         >
           Continue
@@ -265,18 +249,11 @@ export default function CreateSplit({ navigation, route }) {
         <Button
           variant='ghost'
           className='flex-1'
-          onPress={async () => {
-            try {
-              await api.put(`/users/${token}`, {
-                authSteps: 6,
-              });
-              navigation.navigate('UserFavoriteMovements');
-            } catch (error) {
-              console.log(error);
-            }
+          onPress={() => {
+            navigation.goBack();
           }}
         >
-          Skip
+          Cancel
         </Button>
       </View>
     </AuthLayout>

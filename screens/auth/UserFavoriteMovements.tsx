@@ -43,10 +43,11 @@ export default function UserFavoriteMovements({ route, navigation }) {
     },
   });
   const onSubmit = (data: z.infer<typeof UserFavoriteMovementSchema>) => {
-    api.put(`/users/${token}`, {
+    api.put(`/users`, {
       tags: data.favoriteMovments,
       authSteps: 7,
       tempJWT: token,
+      token: token,
     });
     setIsVerified(true);
   };

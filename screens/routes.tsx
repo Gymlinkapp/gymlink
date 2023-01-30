@@ -15,6 +15,8 @@ import { useAuth } from '../utils/context';
 import Loading from '../components/Loading';
 import ProfileScreen from './Profile';
 import { AUTH_STEPS } from '../utils/users';
+import EditSplit from './EditSplit';
+import AssignExcercise from './auth/AssignExcercise';
 
 const Stack = createNativeStackNavigator();
 
@@ -87,6 +89,12 @@ export default function Routes({ socket }: { socket: any }) {
           headerShown: false,
         }}
       >
+        <Stack.Screen
+          name='AssignExcercise'
+          component={AssignExcercise}
+          initialParams={{ setIsVerified }}
+        />
+        <Stack.Screen name='EditSplit' component={EditSplit} />
         <Stack.Screen
           name='Settings'
           component={SettingsScreen}

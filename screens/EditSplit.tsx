@@ -12,6 +12,8 @@ import {
   PushPullLegsSplit,
   BroSplit,
   WeekSplit,
+  UpperLowerSplit,
+  FullBodySplit,
 } from '../utils/split';
 import * as Haptics from 'expo-haptics';
 import { useMutation, useQueryClient } from 'react-query';
@@ -56,7 +58,10 @@ export default function EditSplit({ navigation, route }) {
 
   const editSplit = useMutation(
     async (data: WeekSplit[]) => {
-      const split = data.filter((d, i) => i !== 0);
+      // sometimes the first day is empty, so we filter it out.
+      const split = data.filter(
+        (d) => d && d.exercises && d.exercises.length > 0
+      );
       console.log(split);
       try {
         return await api.put('/users/split', {
@@ -108,12 +113,10 @@ export default function EditSplit({ navigation, route }) {
             <TouchableOpacity
               onPress={() => {
                 setSelectedSplit(split);
-                if (split === 'Push Pull Legs') {
-                  setWeekSplit(PushPullLegsSplit);
-                }
-                if (split === 'Bro Split') {
-                  setWeekSplit(BroSplit);
-                }
+                if (split === 'Push Pull Legs') setWeekSplit(PushPullLegsSplit);
+                if (split === 'Bro Split') setWeekSplit(BroSplit);
+                if (split === 'Upper Lower') setWeekSplit(UpperLowerSplit);
+                if (split === 'Full Body') setWeekSplit(FullBodySplit);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               className={`mr-1 ${

@@ -85,3 +85,93 @@ export const PushPullLegsSplit = [
     exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
   },
 ];
+
+export const UpperLowerSplit = [
+  {
+    day: 'Monday',
+    exercises: ['Chest', 'Shoulders', 'Triceps'],
+  },
+  {
+    day: 'Tuesday',
+    exercises: ['Back', 'Biceps', 'Rear Dealts'],
+  },
+  {
+    day: 'Wednesday',
+    exercises: ['Rest'],
+  },
+  {
+    day: 'Thursday',
+    exercises: ['Chest', 'Shoulders', 'Triceps'],
+  },
+  {
+    day: 'Friday',
+    exercises: ['Back', 'Biceps', 'Rear Dealts'],
+  },
+  {
+    day: 'Saturday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
+  },
+  {
+    day: 'Sunday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
+  },
+];
+
+export const FullBodySplit = [
+  {
+    day: 'Monday',
+    exercises: [
+      'Chest',
+      'Shoulders',
+      'Triceps',
+      'Back',
+      'Biceps',
+      'Rear Dealts',
+    ],
+  },
+  {
+    day: 'Tuesday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
+  },
+  {
+    day: 'Wednesday',
+    exercises: [
+      'Chest',
+      'Shoulders',
+      'Triceps',
+      'Back',
+      'Biceps',
+      'Rear Dealts',
+    ],
+  },
+  {
+    day: 'Thursday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
+  },
+  {
+    day: 'Friday',
+    exercises: [
+      'Chest',
+      'Shoulders',
+      'Triceps',
+      'Back',
+      'Biceps',
+      'Rear Dealts',
+    ],
+  },
+  {
+    day: 'Saturday',
+    exercises: ['Quads', 'Hamstrings', 'Glutes', 'Calves'],
+  },
+  {
+    day: 'Sunday',
+    exercises: [
+      'Chest',
+      'Shoulders',
+      'Triceps',
+      'Back',
+      'Biceps',
+      'Rear Dealts',
+    ],
+  },
+];

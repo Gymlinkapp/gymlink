@@ -57,23 +57,13 @@ export default function EditSplit({ navigation, route }) {
   const editSplit = useMutation(
     async (data: WeekSplit[]) => {
       const split = data.filter((d, i) => i !== 0);
-      const exercises = split.map((day, i) => day.exercises[i]) as string[];
+      console.log(split);
       try {
         return await api.put('/users/split', {
           split: split.map((day, i) => ({
             day: day.day,
-            exercises: exercises.map((e) => e),
+            exercises: day.exercises.map((e: string) => e.toLowerCase()),
           })),
-          /* 
-                the split sent to the server looks like this:
-                splits: [
-                    {
-                        day: 'Monday',
-                        exercises: [Array]
-                    }
-                ]     
-            */
-          // q: how can we send exercises as an array of strings?
           token,
         });
       } catch (error) {

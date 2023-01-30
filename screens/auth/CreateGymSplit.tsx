@@ -263,7 +263,7 @@ export default function CreateSplit({ navigation, route }) {
           Continue
         </Button>
         <Button
-          variant='secondary'
+          variant='ghost'
           className='flex-1'
           onPress={async () => {
             try {

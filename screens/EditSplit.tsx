@@ -232,7 +232,7 @@ export default function EditSplit({ navigation, route }) {
           ))}
       </ScrollView>
       <View
-        className='absolute bottom-0 left-0 bg-primaryDark flex-row'
+        className='absolute bottom-0 left-0 bg-primaryDark'
         style={{
           width: width,
         }}
@@ -247,20 +247,13 @@ export default function EditSplit({ navigation, route }) {
           Continue
         </Button>
         <Button
-          variant='secondary'
+          variant='ghost'
           className='flex-1'
-          onPress={async () => {
-            try {
-              await api.put(`/users/${token}`, {
-                authSteps: 6,
-              });
-              navigation.navigate('UserFavoriteMovements');
-            } catch (error) {
-              console.log(error);
-            }
+          onPress={() => {
+            navigation.goBack();
           }}
         >
-          Skip
+          Cancel
         </Button>
       </View>
     </AuthLayout>

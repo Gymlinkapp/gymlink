@@ -25,6 +25,7 @@ import AuthLayout from '../layouts/AuthLayout';
 export default function EditSplit({ navigation, route }) {
   const queryClient = useQueryClient();
   const { split } = route.params;
+  const [splitError, setSplitError] = useState<string>('');
   const { token } = useAuth();
   const { width, height } = Dimensions.get('window');
   const [selectedSplit, setSelectedSplit] = useState<string>(
@@ -41,7 +42,7 @@ export default function EditSplit({ navigation, route }) {
 
         // if the day is selected from the previous screen, add the exercise to the array.
         if (
-          assignExercise.days.includes(d.toLowerCase()) &&
+          assignExercise.days.includes(d?.toLowerCase()) &&
           !day.exercises.includes(assignExercise.exercise)
         ) {
           return {
@@ -62,7 +63,6 @@ export default function EditSplit({ navigation, route }) {
       const split = data.filter(
         (d) => d && d.exercises && d.exercises.length > 0
       );
-      console.log(split);
       try {
         return await api.put('/users/split', {
           split: split.map((day, i) => ({
@@ -72,12 +72,14 @@ export default function EditSplit({ navigation, route }) {
           token,
         });
       } catch (error) {
-        console.log(error);
+        console.log(error.response.data);
+        setSplitError(error.response.data.message);
       }
     },
     {
       onSuccess: async (data) => {
         if (data) {
+          setSplitError('');
           await queryClient.invalidateQueries('user');
           navigation.goBack();
         }
@@ -89,7 +91,6 @@ export default function EditSplit({ navigation, route }) {
   );
   const isCustom = selectedSplit === 'Custom';
   const setCustomSplit = () => {
-    // clear all exercises from the week split
     setWeekSplit(
       weekSplit.map((day) => ({
         ...day,
@@ -168,6 +169,7 @@ export default function EditSplit({ navigation, route }) {
                   navigation.navigate('AssignExcercise', {
                     exercise: exercise,
                     days: days.map((day) => day.day.toLowerCase()),
+                    edit: true,
                   });
                 }}
                 key={idx}
@@ -179,8 +181,14 @@ export default function EditSplit({ navigation, route }) {
           </View>
         </View>
       )}
+      {splitError.length > 0 && (
+        <View className='mt-12'>
+          <Text className='text-red-500 font-MontserratMedium'>
+            {splitError}
+          </Text>
+        </View>
+      )}
       <ScrollView
-        className='mt-12'
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ height: height / 1.25, paddingBottom: 50 }}
       >

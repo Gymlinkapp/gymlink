@@ -25,37 +25,42 @@ export default function Routes({ socket }: { socket: any }) {
   const { data: user, isLoading } = useUser(token);
 
   useEffect(() => {
-    // deleteItemAsync('token');
-    getItemAsync('token').then((res) => {
-      setToken(res);
-      console.log('token', res);
-    });
+    setIsVerified(null);
+
+    getItemAsync('token')
+      .then((res) => {
+        setToken(res);
+        console.log('token', res);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsVerified(false);
+      });
 
     if (user) {
       setUser(user);
       if (user.authSteps === AUTH_STEPS && user.tempJWT) {
         setIsVerified(true);
-      } else {
-        setIsVerified(false);
       }
     }
-    if (!token) {
+    if (!user?.tempJWT && !token) {
       setIsVerified(false);
     }
+    console.log(isVerified);
   }, [token, , user]);
 
   return (
     <Stack.Navigator>
-      {!isVerified ? (
+      {isVerified === null ? (
         <Stack.Screen
-          name='Auth'
+          name='Loading'
+          component={Loading}
           options={{
+            presentation: 'modal',
             headerShown: false,
           }}
-          component={AuthStackScreen}
-          initialParams={{ token }}
         />
-      ) : (
+      ) : isVerified ? (
         <Stack.Screen
           name='Root'
           component={Home}
@@ -64,6 +69,15 @@ export default function Routes({ socket }: { socket: any }) {
             headerShown: false,
             animation: 'slide_from_right',
           }}
+        />
+      ) : (
+        <Stack.Screen
+          name='Auth'
+          options={{
+            headerShown: false,
+          }}
+          component={AuthStackScreen}
+          initialParams={{ token }}
         />
       )}
 

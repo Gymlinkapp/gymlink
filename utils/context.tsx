@@ -6,7 +6,7 @@ import { User } from './users';
 const AuthContext = createContext(
   {} as {
     isVerified: boolean;
-    setIsVerified: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsVerified: React.Dispatch<React.SetStateAction<boolean | null>>;
     token: string;
     setToken: React.Dispatch<React.SetStateAction<string>>;
     user: User;
@@ -20,7 +20,7 @@ const AuthContext = createContext(
 
 // create me a provider
 const AuthProvider = ({ children }) => {
-  const [isVerified, setIsVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(null);
   const [token, setToken] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [long, setLong] = useState(0);

@@ -43,7 +43,6 @@ export default function AuthStackScreen({ navigation, route }) {
       navigation.navigate(step);
     }
   }, [token, user, isLoading, step]);
-  console.log('step', step);
   return (
     <AuthStack.Navigator>
       <AuthStack.Screen

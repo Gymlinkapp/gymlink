@@ -136,7 +136,7 @@ export default function EditSplit({ navigation, route }) {
           ))}
         </ScrollView>
         <TouchableOpacity
-          className={`mt-1 ${
+          className={`mt-1 mb-6 ${
             selectedSplit === 'Custom' ? 'bg-primaryWhite' : 'bg-secondaryDark'
           } px-4 py-2 rounded-full`}
           onPress={setCustomSplit}
@@ -153,7 +153,7 @@ export default function EditSplit({ navigation, route }) {
 
       {/* if custom is selected, show excercises to assign to days */}
       {isCustom && (
-        <View>
+        <View className='mb-6'>
           <Text className='text-secondaryWhite my-2 font-MontserratRegular'>
             Choose your exercises. Tap and select the days you want to hit them.
             Tap and hold to remove.

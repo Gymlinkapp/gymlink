@@ -69,6 +69,7 @@ export default function InitialUserDetails({ route, navigation }) {
             phoneNumber: phoneNumber,
             firstName: data.firstName,
             bio: data.bio,
+            authSteps: 3,
             lastName: data.lastName,
             age: data.age,
             email: data.email,

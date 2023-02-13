@@ -32,7 +32,7 @@ export const stepToScreen: StepToScreen = {
 const AuthStack = createNativeStackNavigator();
 
 export default function AuthStackScreen({ navigation, route }) {
-  const { isVerified, setIsVerified } = route.params;
+  const { setIsVerified } = route.params;
   const [step, setStep] = useState('Register');
   const { token } = useAuth();
   const { data: user, isLoading } = useUser(token);

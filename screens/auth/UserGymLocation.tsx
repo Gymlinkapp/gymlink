@@ -85,8 +85,8 @@ export default function UserGymLocation({ navigation }) {
   const saveUserGymLocation = useMutation(
     async (data: z.infer<typeof userGymLocationSchema>) => {
       try {
-        return await api.put(
-          `/users`,
+        return await api.post(
+          `/users/addGym`,
           {
             authSteps: 5,
             gym: data.gymLocation,

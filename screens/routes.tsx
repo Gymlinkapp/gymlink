@@ -82,7 +82,13 @@ export default function Routes({ socket }: { socket: any }) {
         name='CreateChat'
         component={CreateChatScreen}
       />
-      <Stack.Screen name='Chat' component={ChatScreen} />
+      <Stack.Screen
+        name='Chat'
+        component={ChatScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Group
         screenOptions={{
           headerBlurEffect: 'dark',

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -15,6 +16,8 @@ import { User } from '../utils/users';
 import { Message } from './Chats';
 import { useQueryClient } from 'react-query';
 import Loading from '../components/Loading';
+import { TouchableOpacity } from 'react-native';
+import { CaretLeft } from 'phosphor-react-native';
 
 interface MessageData extends Message {
   roomName: string;
@@ -50,7 +53,7 @@ function ChatItem({ message, user }: { message: Message; user: User }) {
 }
 
 export default function ChatScreen({ route, navigation }) {
-  const { socket, user, roomId, roomName, uiName } = route.params;
+  const { socket, user, roomId, roomName, uiName, userImage } = route.params;
   const [isTyping, setIsTyping] = useState<Boolean>(false);
   const [messageData, setMessageData] = useState<MessageData>({
     roomName: roomName,
@@ -62,8 +65,6 @@ export default function ChatScreen({ route, navigation }) {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    navigation.setOptions({ title: uiName });
-
     socket.emit('join-chat', { roomName, roomId });
     socket.on('messages', (data: Message[]) => {
       setMessages(data);
@@ -97,67 +98,87 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      className='flex-1'
-      behavior='padding'
-      keyboardVerticalOffset={keyboardVerticalOffset}
-    >
-      <SafeAreaView className='flex-1 bg-primaryDark px-4'>
-        <KeyboardAvoidingView behavior='height' className='flex-1'>
-          {messages?.length > 0 && (
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              ref={flatListRef}
-              data={messages}
-              onContentSizeChange={() =>
-                flatListRef.current.scrollToEnd({ animated: true })
-              }
-              onLayout={() =>
-                flatListRef.current.scrollToEnd({ animated: true })
-              }
-              renderItem={({ item }) => (
-                <ChatItem message={item} user={user} key={item.id} />
-              )}
-              keyExtractor={(item) => item.id}
-            />
-          )}
-          {isTyping && (
-            <View className='flex-row my-2 p-4 bg-secondaryDark w-1/6 justify-center rounded-full'>
-              <Text className='text-secondaryWhite leading-3 tracking-[2.5em] font-MontserratBold'>
-                ...
-              </Text>
-            </View>
-          )}
-        </KeyboardAvoidingView>
-        {socket && (
-          <View className='flex-row items-center bg-primaryDark'>
-            <View className='flex-1 mr-2'>
-              <TextInput
-                value={messageData.content}
-                onChangeText={(text) =>
-                  setMessageData({ ...messageData, content: text })
+    <>
+      <View className='py-16 px-4'>
+        <TouchableOpacity
+          className='flex-row items-center bg-secondaryDark justify-center rounded-full w-32 py-2'
+          onPress={() => navigation.goBack()}
+        >
+          <CaretLeft color='#fff' weight='regular' />
+          <Text className='text-white'>Back</Text>
+        </TouchableOpacity>
+        <View className='flex-row items-center mt-4'>
+          <Image
+            source={{ uri: userImage }}
+            className='w-10 h-10 mr-2 rounded-full'
+          />
+          <Text className='text-2xl text-primaryWhite font-MontserratBold'>
+            {uiName}
+          </Text>
+        </View>
+      </View>
+      <KeyboardAvoidingView
+        className='flex-1'
+        behavior='padding'
+        keyboardVerticalOffset={keyboardVerticalOffset}
+      >
+        <SafeAreaView className='flex-1 bg-primaryDark px-4'>
+          <KeyboardAvoidingView behavior='height' className='flex-1'>
+            {messages?.length > 0 && (
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                ref={flatListRef}
+                data={messages}
+                onContentSizeChange={() =>
+                  flatListRef.current.scrollToEnd({ animated: true })
                 }
-                onFocus={() => {
-                  navigation.setOptions({ tabBarVisible: false });
-
-                  typingIndicator(true);
-                }}
-                onBlur={() => {
-                  navigation.setOptions({ tabBarVisible: true });
-
-                  typingIndicator(false);
-                }}
-                className='bg-secondaryDark text-white p-4 rounded-md'
+                onLayout={() =>
+                  flatListRef.current.scrollToEnd({ animated: true })
+                }
+                renderItem={({ item }) => (
+                  <ChatItem message={item} user={user} key={item.id} />
+                )}
+                keyExtractor={(item) => item.id}
               />
-            </View>
-            {messageData.content.length > 0 && (
-              <Button variant='primary' textSize='xs' onPress={sendMessage}>
-                Send
-              </Button>
             )}
-          </View>
-        )}
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+            {isTyping && (
+              <View className='flex-row my-2 p-4 bg-secondaryDark w-1/6 justify-center rounded-full'>
+                <Text className='text-secondaryWhite leading-3 tracking-[2.5em] font-MontserratBold'>
+                  ...
+                </Text>
+              </View>
+            )}
+          </KeyboardAvoidingView>
+          {socket && (
+            <View className='flex-row items-center bg-primaryDark'>
+              <View className='flex-1 mr-2'>
+                <TextInput
+                  value={messageData.content}
+                  onChangeText={(text) =>
+                    setMessageData({ ...messageData, content: text })
+                  }
+                  onFocus={() => {
+                    navigation.setOptions({ tabBarVisible: false });
+
+                    typingIndicator(true);
+                  }}
+                  onBlur={() => {
+                    navigation.setOptions({ tabBarVisible: true });
+
+                    typingIndicator(false);
+                  }}
+                  className='bg-secondaryDark text-white p-4 rounded-md'
+                />
+              </View>
+              {messageData.content.length > 0 && (
+                <Button variant='primary' textSize='xs' onPress={sendMessage}>
+                  Send
+                </Button>
+              )}
+            </View>
+          )}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+    </>
   );
 }

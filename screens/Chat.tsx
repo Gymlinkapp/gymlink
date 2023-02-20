@@ -50,7 +50,7 @@ function ChatItem({ message, user }: { message: Message; user: User }) {
 }
 
 export default function ChatScreen({ route, navigation }) {
-  const { socket, user, roomId, roomName } = route.params;
+  const { socket, user, roomId, roomName, uiName } = route.params;
   const [isTyping, setIsTyping] = useState<Boolean>(false);
   const [messageData, setMessageData] = useState<MessageData>({
     roomName: roomName,
@@ -62,7 +62,7 @@ export default function ChatScreen({ route, navigation }) {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    navigation.setOptions({ title: roomName });
+    navigation.setOptions({ title: uiName });
 
     socket.emit('join-chat', { roomName, roomId });
     socket.on('messages', (data: Message[]) => {
@@ -104,19 +104,23 @@ export default function ChatScreen({ route, navigation }) {
     >
       <SafeAreaView className='flex-1 bg-primaryDark px-4'>
         <KeyboardAvoidingView behavior='height' className='flex-1'>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            ref={flatListRef}
-            data={messages}
-            onContentSizeChange={() =>
-              flatListRef.current.scrollToEnd({ animated: true })
-            }
-            onLayout={() => flatListRef.current.scrollToEnd({ animated: true })}
-            renderItem={({ item }) => (
-              <ChatItem message={item} user={user} key={item.id} />
-            )}
-            keyExtractor={(item) => item.id}
-          />
+          {messages?.length > 0 && (
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              ref={flatListRef}
+              data={messages}
+              onContentSizeChange={() =>
+                flatListRef.current.scrollToEnd({ animated: true })
+              }
+              onLayout={() =>
+                flatListRef.current.scrollToEnd({ animated: true })
+              }
+              renderItem={({ item }) => (
+                <ChatItem message={item} user={user} key={item.id} />
+              )}
+              keyExtractor={(item) => item.id}
+            />
+          )}
           {isTyping && (
             <View className='flex-row my-2 p-4 bg-secondaryDark w-1/6 justify-center rounded-full'>
               <Text className='text-secondaryWhite leading-3 tracking-[2.5em] font-MontserratBold'>

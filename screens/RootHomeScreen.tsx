@@ -40,7 +40,7 @@ export default function Home({ route, navigation }) {
       })}
     >
       <Tab.Screen
-        name='Chats'
+        name='Friends'
         initialParams={{ socket }}
         options={{
           tabBarIcon: ({ focused }) => (

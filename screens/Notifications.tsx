@@ -160,6 +160,7 @@ export default function NotificationScreen({ navigation, route }) {
     {
       onSuccess: (data) => {
         console.log(data);
+        navigation.navigate('Friends');
         queryClient.invalidateQueries('friendRequests');
         queryClient.invalidateQueries('users');
         queryClient.invalidateQueries('friends');

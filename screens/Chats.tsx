@@ -23,6 +23,10 @@ import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
 import EmptyScreen from '../components/EmptyScreen';
 import { useAuth } from '../utils/context';
+import api from '../utils/axiosStore';
+import { useFriends } from '../hooks/useFriends';
+import { useMutation } from 'react-query';
+import { Image } from 'react-native';
 
 export type Message = {
   id?: string;
@@ -47,17 +51,10 @@ export default function Chats({ navigation, route }: any) {
   const { socket } = route.params;
 
   const [room, setRoom] = useState('');
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+  console.log('user', user);
 
-  const {
-    data: chats,
-    isLoading: isMessagesLoading,
-    error: messagesError,
-  } = useChats(user?.id || '');
-
-  if (isMessagesLoading) return <Loading />;
-  if (messagesError)
-    return <Text className='text-white'>Error: {messagesError.message}</Text>;
+  const isCurrentUser = (u: User) => u.id === user.id;
 
   return (
     <View className='relative flex-1'>
@@ -71,26 +68,52 @@ export default function Chats({ navigation, route }: any) {
       >
         <Plus weight='bold' />
       </TouchableOpacity>
-      {chats?.length ? (
+      {user.chats?.length ? (
         <View>
           <FlatList
             className='p-4'
-            data={chats}
+            // filter the friends and find the chats between the user and the friend
+            data={user.chats}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <TouchableOpacity
                 className='flex-row items-center my-2 bg-secondaryDark p-4 rounded-md'
-                onPress={() =>
+                onPress={() => {
                   navigation.navigate('Chat', {
                     socket: socket,
                     user: user,
                     roomName: item.name,
+                    uiName: `${
+                      isCurrentUser(item.participants[0])
+                        ? item.participants[1].firstName
+                        : item.participants[0].firstName
+                    } ${
+                      isCurrentUser(item.participants[0])
+                        ? item.participants[1].lastName
+                        : item.participants[0].lastName
+                    }`,
                     roomId: item.id,
-                  })
-                }
+                  });
+                }}
               >
-                <View className='bg-primaryDark mr-4 w-12 h-12 rounded-full' />
+                <Image
+                  source={{
+                    uri: isCurrentUser(item.participants[0])
+                      ? item.participants[1].images[0]
+                      : item.participants[0].images[0],
+                  }}
+                  className='w-[50px] h-[50px] rounded-full mr-4'
+                />
                 <View className='flex-col'>
-                  <Text className='text-white text-xl'>{item.name}</Text>
+                  <Text className='text-white text-xl'>
+                    {isCurrentUser(item.participants[0])
+                      ? item.participants[1].firstName +
+                        ' ' +
+                        item.participants[1].lastName
+                      : item.participants[0].firstName +
+                        ' ' +
+                        item.participants[0].lastName}
+                  </Text>
                   <Text className='text-secondaryWhite'>
                     {new Date(item.createdAt).toLocaleDateString('en-US', {
                       hour: 'numeric',
@@ -102,7 +125,6 @@ export default function Chats({ navigation, route }: any) {
                 </View>
               </TouchableOpacity>
             )}
-            keyExtractor={(item) => item.id}
           />
         </View>
       ) : (

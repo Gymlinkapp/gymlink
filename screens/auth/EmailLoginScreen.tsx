@@ -13,14 +13,17 @@ import {
 import { z } from 'zod';
 import Button from '../../components/button';
 import { COLORS } from '../../utils/colors';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { setItemAsync } from 'expo-secure-store';
+import { useAuth } from '../../utils/context';
 const userLoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(20),
 });
 
 export default function EmailLoginScreen({ navigation }) {
+  const { setIsVerified } = useAuth();
+  const queryClient = useQueryClient();
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
   const {
     handleSubmit,
@@ -46,9 +49,9 @@ export default function EmailLoginScreen({ navigation }) {
     {
       onSuccess: (data) => {
         if (data) {
-          navigation.popToTop();
-          navigation.navigate('Root');
           setItemAsync('token', data.data.token);
+          setIsVerified(true);
+          queryClient.invalidateQueries('user');
         }
       },
     }

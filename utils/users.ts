@@ -1,4 +1,5 @@
 export type User = {
+  chats: any;
   id: string;
   email: string;
   phoneNumber: string;
@@ -33,6 +34,6 @@ export type Split = {
   saturday: string[];
   sunday: string[];
   User: User;
-}
+};
 
 export const AUTH_STEPS = 7;

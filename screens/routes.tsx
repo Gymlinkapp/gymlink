@@ -69,6 +69,9 @@ export default function Routes({ socket }: { socket: any }) {
         name='Notifications'
         component={NotificationScreen}
         initialParams={{ token }}
+        options={{
+          headerShown: false,
+        }}
       />
       <Stack.Screen name='UserAccountScreen' component={UserAccountScreen} />
       <Stack.Screen

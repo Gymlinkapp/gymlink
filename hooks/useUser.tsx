@@ -9,7 +9,13 @@ const fetchUser = async (token: string) => {
 };
 
 const useUser = (token: string) => {
-  return useQuery<User, Error>(['user', token], () => fetchUser(token));
+  return useQuery<User, Error>(['user', token], () => fetchUser(token), {
+    enabled: !!token,
+
+    // could be okay, but not sure on long term/with more data
+    staleTime: 1000,
+    refetchInterval: 1000,
+  });
 };
 
 export { fetchUser, useUser };

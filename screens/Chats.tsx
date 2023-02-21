@@ -40,60 +40,59 @@ export default function Chats({ navigation, route }: any) {
             // filter the friends and find the chats between the user and the friend
             data={user.chats}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                className='flex-row items-center my-2 bg-secondaryDark p-4 rounded-md'
-                onPress={() => {
-                  navigation.navigate('Chat', {
-                    socket: socket,
-                    user: user,
-                    roomName: item.name,
-                    toUser: item.participants[1],
-                    userImage: isCurrentUser(item.participants[0])
-                      ? item.participants[1].images[0]
-                      : item.participants[0].images[0],
-                    uiName: `${
-                      isCurrentUser(item.participants[0])
-                        ? item.participants[1].firstName
-                        : item.participants[0].firstName
-                    } ${
-                      isCurrentUser(item.participants[0])
-                        ? item.participants[1].lastName
-                        : item.participants[0].lastName
-                    }`,
-                    roomId: item.id,
-                  });
-                }}
-              >
-                <Image
-                  source={{
-                    uri: isCurrentUser(item.participants[0])
-                      ? item.participants[1].images[0]
-                      : item.participants[0].images[0],
+            renderItem={({ item }) => {
+              const recentMessage = item.messages[item.messages?.length - 1];
+              const me = item.participants.find(
+                (u: User) => u.id === user.id
+              ) as User;
+              const otherUser = item.participants.find(
+                (u: User) => u.id !== user.id
+              ) as User;
+              return (
+                <TouchableOpacity
+                  className='flex-row items-center my-2 bg-secondaryDark p-4 rounded-md'
+                  onPress={() => {
+                    navigation.navigate('Chat', {
+                      socket: socket,
+                      user: user,
+                      roomName: item.name,
+                      toUser: otherUser,
+                      userImage: otherUser.images[0],
+                      uiName: `${otherUser.firstName} ${otherUser.lastName}`,
+                      roomId: item.id,
+                    });
                   }}
-                  className='w-[50px] h-[50px] rounded-full mr-4'
-                />
-                <View className='flex-col'>
-                  <Text className='text-white text-xl'>
-                    {isCurrentUser(item.participants[0])
-                      ? item.participants[1].firstName +
-                        ' ' +
-                        item.participants[1].lastName
-                      : item.participants[0].firstName +
-                        ' ' +
-                        item.participants[0].lastName}
-                  </Text>
-                  <Text className='text-secondaryWhite'>
-                    {new Date(item.createdAt).toLocaleDateString('en-US', {
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
+                >
+                  <Image
+                    source={{
+                      uri: isCurrentUser(item.participants[0])
+                        ? item.participants[1].images[0]
+                        : item.participants[0].images[0],
+                    }}
+                    className='w-[50px] h-[50px] rounded-full mr-4'
+                  />
+                  <View className='flex-col'>
+                    <Text className='text-white text-xl'>
+                      {otherUser.firstName} {otherUser.lastName}
+                    </Text>
+                    <Text className='text-secondaryWhite'>
+                      {new Date(item.createdAt).toLocaleDateString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </Text>
+                    <Text className='text-white'>
+                      {recentMessage.senderId === me.id
+                        ? 'Me: '
+                        : otherUser.firstName}{' '}
+                      {recentMessage.content}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
           />
         </View>
       ) : (

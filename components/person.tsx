@@ -453,12 +453,12 @@ export default function Person({
                 setSentFriendRequest(true);
                 onGoNext(index);
 
-                // if (!sentFriendRequest) {
-                //   useSendFriendRequest.mutate({
-                //     toUserId: user.id,
-                //     fromUserId: currUser.id,
-                //   });
-                // }
+                if (!sentFriendRequest) {
+                  useSendFriendRequest.mutate({
+                    toUserId: user.id,
+                    fromUserId: currUser.id,
+                  });
+                }
               }}
               variant='primary'
               icon={<Barbell weight='fill' />}

@@ -55,7 +55,7 @@ export default function ProfileScreen({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (currentImageIndex < user.images.length - 1) {
+      if (currentImageIndex < user?.images.length - 1) {
         setCurrentImageIndex(currentImageIndex + 1);
       } else {
         setCurrentImageIndex(0);
@@ -120,7 +120,7 @@ export default function ProfileScreen({
           )}
           <View className='absolute bottom-[2.5] left-0 w-full flex-row justify-center items-center z-10'>
             <View className='flex-row px-4'>
-              {user.images.map((image, index) => (
+              {user?.images.map((image, index) => (
                 <View
                   key={image}
                   className={`flex-1 h-1 rounded-full ${

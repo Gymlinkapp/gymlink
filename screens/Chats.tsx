@@ -48,6 +48,7 @@ export default function Chats({ navigation, route }: any) {
                     socket: socket,
                     user: user,
                     roomName: item.name,
+                    toUser: item.participants[1],
                     userImage: isCurrentUser(item.participants[0])
                       ? item.participants[1].images[0]
                       : item.participants[0].images[0],

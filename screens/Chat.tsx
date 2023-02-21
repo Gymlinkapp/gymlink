@@ -53,7 +53,8 @@ function ChatItem({ message, user }: { message: Message; user: User }) {
 }
 
 export default function ChatScreen({ route, navigation }) {
-  const { socket, user, roomId, roomName, uiName, userImage } = route.params;
+  const { socket, user, roomId, roomName, uiName, userImage, toUser } =
+    route.params;
   const [isTyping, setIsTyping] = useState<Boolean>(false);
   const [messageData, setMessageData] = useState<MessageData>({
     roomName: roomName,
@@ -85,7 +86,6 @@ export default function ChatScreen({ route, navigation }) {
       socket.off('recieve-message');
     };
   }, []);
-  // console.log(isTyping);
 
   const sendMessage = async () => {
     await socket.emit('chat-message', messageData);
@@ -99,7 +99,12 @@ export default function ChatScreen({ route, navigation }) {
 
   return (
     <>
-      <View className='py-16 px-4'>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Profile', { user: toUser, isFriend: true })
+        }
+        className='py-16 px-4'
+      >
         <TouchableOpacity
           className='flex-row items-center bg-secondaryDark justify-center rounded-full w-32 py-2'
           onPress={() => navigation.goBack()}
@@ -116,7 +121,7 @@ export default function ChatScreen({ route, navigation }) {
             {uiName}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
       <KeyboardAvoidingView
         className='flex-1'
         behavior='padding'

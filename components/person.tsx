@@ -26,6 +26,7 @@ import { useUser } from '../hooks/useUser';
 import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
 import { useNavigation } from '@react-navigation/native';
+import { rotate } from '@shopify/react-native-skia';
 
 // reusable component to wrap the user's info with animations
 function Info({
@@ -138,18 +139,24 @@ export default function Person({
   user,
   navigation,
   route,
+  onGoNext,
+  index,
 }: {
   user: Partial<User>;
   navigation?: any;
   route?: any;
+  onGoNext: (index: number) => void;
+  index: number;
 }) {
   const token = useToken();
   const { data: currUser } = useUser(token);
   const { width, height } = Dimensions.get('window');
   const [sentFriendRequest, setSentFriendRequest] = useState(false);
+  const [skipped, setSkipped] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const fade = useRef(new Animated.Value(0)).current;
   const swipe = useRef(new Animated.Value(0)).current;
+  const skippedFade = useRef(new Animated.Value(0)).current;
 
   const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
@@ -166,10 +173,22 @@ export default function Person({
       }).start();
     }
 
+    if (skipped) {
+      Animated.spring(skippedFade, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.spring(skippedFade, {
+        toValue: 0,
+        useNativeDriver: true,
+      }).start();
+    }
+
     if (route.params?.userId === user.id) {
       setSentFriendRequest(true);
     }
-  }, [sentFriendRequest, route.params?.userId]);
+  }, [sentFriendRequest, route.params?.userId, skipped]);
 
   const CARD_WIDTH = width;
 
@@ -178,6 +197,9 @@ export default function Person({
   const transparentWhite = 'rgba(255, 255, 255, 0.05)';
   const gold = 'rgb(255, 215, 0)';
   const transparentGold = 'rgba(255, 215, 0, 0.25)';
+
+  const grey = 'rgba(111, 115, 120, 1)';
+  const transparentGrey = 'rgba(111, 115, 120, 0.5)';
 
   const SWIPE_ANIMATION_DURATION = 150;
   const SWIPE_ANIMIATION_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
@@ -196,11 +218,6 @@ export default function Person({
         fromUserId,
       });
       return data;
-    },
-    {
-      onSuccess: (data) => {
-        console.log(data);
-      },
     }
   );
 
@@ -208,6 +225,26 @@ export default function Person({
     <Animated.View
       className='overflow-hidden rounded-2xl relative'
       style={{
+        transform: [
+          {
+            scale: fade.interpolate({
+              inputRange: [0, 1],
+              outputRange: [1, 0.9],
+            }),
+          },
+          {
+            rotate: skippedFade.interpolate({
+              inputRange: [0, 0.5, 0.75, 1],
+              outputRange: ['0deg', '5deg', '-5deg', '0deg'],
+            }),
+          },
+          {
+            rotate: fade.interpolate({
+              inputRange: [0, 0.25, 0.75, 1],
+              outputRange: ['0deg', '1deg', '-1deg', '0deg'],
+            }),
+          },
+        ],
         width: '100%',
         height: CARD_HEIGHT,
         marginVertical: SPACING,
@@ -292,9 +329,6 @@ export default function Person({
       <Animated.View
         style={{
           borderWidth: 15,
-          // transform: [{ scale: fade }],
-          // use the scale transform but make it bigger than 1
-          // so that the border is outside the image
           transform: [
             {
               scale: fade.interpolate({
@@ -305,7 +339,7 @@ export default function Person({
           ],
           borderColor: gold,
           zIndex: 10,
-          opacity: fade,
+          opacity: sentFriendRequest ? fade : skippedFade,
           position: 'absolute',
           top: 0,
           left: 0,
@@ -314,7 +348,10 @@ export default function Person({
         }}
       >
         <LinearGradient
-          colors={[gold, transparentGold]}
+          colors={[
+            sentFriendRequest ? gold : grey,
+            sentFriendRequest ? transparentGold : transparentGrey,
+          ]}
           className='w-full h-full absolute top-0 left-0'
           start={[0, 0]}
           end={[0, 1]}
@@ -380,6 +417,10 @@ export default function Person({
             }}
           >
             <Button
+              onPress={() => {
+                setSkipped(true);
+                onGoNext(index);
+              }}
               variant='secondary'
               icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}
             >
@@ -408,14 +449,16 @@ export default function Person({
           >
             <Button
               onPress={() => {
+                // optimistically update the user's friend request status (before the actual request is sent)
                 setSentFriendRequest(true);
+                onGoNext(index);
 
-                if (!sentFriendRequest) {
-                  useSendFriendRequest.mutate({
-                    toUserId: user.id,
-                    fromUserId: currUser.id,
-                  });
-                }
+                // if (!sentFriendRequest) {
+                //   useSendFriendRequest.mutate({
+                //     toUserId: user.id,
+                //     fromUserId: currUser.id,
+                //   });
+                // }
               }}
               variant='primary'
               icon={<Barbell weight='fill' />}

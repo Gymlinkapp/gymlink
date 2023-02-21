@@ -25,6 +25,12 @@ export default function HomeScreen({ navigation, route }) {
     flatListRef.current.scrollToIndex({ index: 0, animated: true });
   };
 
+  const onGoNext = (index: number) => {
+    setTimeout(() => {
+      flatListRef.current.scrollToIndex({ index: index + 1, animated: true });
+    }, 250);
+  };
+
   return (
     <Layout navigation={navigation}>
       <FlatList
@@ -42,8 +48,10 @@ export default function HomeScreen({ navigation, route }) {
         renderItem={({ item, index }) =>
           index !== users.length - 1 ? (
             <Person
+              onGoNext={onGoNext}
               user={item}
               key={index}
+              index={index}
               navigation={navigation}
               route={route}
             />

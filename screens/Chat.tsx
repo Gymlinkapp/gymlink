@@ -99,12 +99,7 @@ export default function ChatScreen({ route, navigation }) {
 
   return (
     <>
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate('Profile', { user: toUser, isFriend: true })
-        }
-        className='py-16 px-4'
-      >
+      <View className='py-16 px-4'>
         <TouchableOpacity
           className='flex-row items-center bg-secondaryDark justify-center rounded-full w-32 py-2'
           onPress={() => navigation.goBack()}
@@ -112,7 +107,12 @@ export default function ChatScreen({ route, navigation }) {
           <CaretLeft color='#fff' weight='regular' />
           <Text className='text-white'>Back</Text>
         </TouchableOpacity>
-        <View className='flex-row items-center mt-4'>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('Profile', { user: toUser, isFriend: true })
+          }
+          className='flex-row items-center mt-4'
+        >
           <Image
             source={{ uri: userImage }}
             className='w-10 h-10 mr-2 rounded-full'
@@ -120,8 +120,8 @@ export default function ChatScreen({ route, navigation }) {
           <Text className='text-2xl text-primaryWhite font-MontserratBold'>
             {uiName}
           </Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
       <KeyboardAvoidingView
         className='flex-1'
         behavior='padding'

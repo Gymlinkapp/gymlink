@@ -12,11 +12,12 @@ import Loading from '../components/Loading';
 import { useUser } from '../hooks/useUser';
 import { COLORS } from '../utils/colors';
 import { useAuth } from '../utils/context';
-import { Barbell, X } from 'phosphor-react-native';
+import { Barbell, CaretLeft, X } from 'phosphor-react-native';
 import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
 import Split from '../components/Split';
 import { WeekSplit } from '../utils/split';
+import Button from '../components/button';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -101,6 +102,15 @@ export default function ProfileScreen({
           </View>
         </View>
       )}
+      <View className='px-6 py-2'>
+        <TouchableOpacity
+          className='flex-row items-center bg-primaryDark justify-center rounded-full w-32 py-2'
+          onPress={() => navigation.goBack()}
+        >
+          <CaretLeft color='#fff' weight='regular' />
+          <Text className='text-white'>Back</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView
         className='px-6 flex-1 relative'
         scrollEnabled

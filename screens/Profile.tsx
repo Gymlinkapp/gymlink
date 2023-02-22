@@ -78,7 +78,12 @@ export default function ProfileScreen({
     }
   }, [user]);
   return (
-    <View className='w-full h-full'>
+    <ScrollView
+      scrollEnabled
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ height: height * 1.25, paddingBottom: 50 }}
+      className='w-full h-full bg-primaryDark'
+    >
       {!isFriend && (
         <View className='absolute bottom-12 w-full items-center z-50'>
           <View className='rounded-full bg-primaryDark w-4/5 h-full flex-row p-4 items-center justify-between'>
@@ -117,8 +122,8 @@ export default function ProfileScreen({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           height: height,
-          paddingBottom: 500,
-          paddingTop: 25,
+          paddingBottom: 400,
+          // paddingTop: 25,
         }}
       >
         <View className='w-full h-2/3 overflow-hidden mb-6' key={user.id}>
@@ -176,6 +181,6 @@ export default function ProfileScreen({
         </View>
         <Split split={userSplit} />
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 }

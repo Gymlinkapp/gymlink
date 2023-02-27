@@ -31,12 +31,21 @@ const getPermissionAsync = async () => {
 };
 
 export default function UserImageUpload({ navigation, route }) {
-  const [image, setImage] = useState<string[] | []>([]);
+  const [images, setImages] = useState<string[] | []>([]);
   const { token } = useAuth();
+
+  const continueToNextScreen = async () => {
+    await api.post('/users/authSteps', { token, authSteps: 4 });
+  };
 
   const addImage = async () => {
     try {
-      await getPermissionAsync();
+      // handle permission async
+      try {
+        await getPermissionAsync();
+      } catch (error) {
+        console.log(error);
+      }
       const pickerRes = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
@@ -51,18 +60,16 @@ export default function UserImageUpload({ navigation, route }) {
         { compress: 0.5, format: ImageManipulator.SaveFormat.PNG, base64: true }
       );
 
-      setImage([...image, base64.uri]);
+      setImages([...images, base64.uri]);
 
-      const res = await api.post('/users/images', {
+      await api.post('/users/images', {
         image: base64.base64,
         token: token,
       });
-      console.log(res.data);
     } catch (err) {
       console.log(
-        'An error occurred uploading your image. Please try again later. '
+        'An error occurred uploading your image. Please try again later.'
       );
-      console.log(err);
     }
   };
 
@@ -72,20 +79,21 @@ export default function UserImageUpload({ navigation, route }) {
       description='Pick your favorite physique, portrait or selfie.'
     >
       <View className='flex-row flex-wrap w-full flex-1'>
-        {image && image.length === 1 && (
+        {/* if there is only one */}
+        {images && images.length === 1 && (
           <View className='w-[45%] h-32 rounded-2xl m-2 overflow-hidden relative'>
             <TouchableOpacity className='absolute top-0 left-0 p-1 z-20'>
               <X color={COLORS.mainWhite} size={32} />
             </TouchableOpacity>
             <Image
-              source={{ uri: image[0] }}
+              source={{ uri: images[0] }}
               className='w-full h-full object-cover z-10'
             />
           </View>
         )}
-        {image &&
-          image.length > 1 &&
-          image.map((img, i) => (
+        {images &&
+          images.length > 1 &&
+          images.map((img, i) => (
             <View
               className='w-[45%] h-32 rounded-2xl m-2 overflow-hidden relative'
               key={i}
@@ -93,8 +101,8 @@ export default function UserImageUpload({ navigation, route }) {
               <TouchableOpacity
                 className='absolute top-0 left-0 p-1 z-20'
                 onPress={() => {
-                  const newImage = image.filter((img, index) => index !== i);
-                  setImage(newImage);
+                  const newImage = images.filter((img, index) => index !== i);
+                  setImages(newImage);
                 }}
               >
                 <X color={COLORS.mainWhite} size={32} />
@@ -105,7 +113,7 @@ export default function UserImageUpload({ navigation, route }) {
               />
             </View>
           ))}
-        {image && image && (image.length === 0 || image.length < 4) && (
+        {images && images.length < 4 && (
           <TouchableOpacity
             onPress={addImage}
             className='bg-secondaryDark border-dotted border-2 border-tertiaryDark m-2 w-[45%] h-32 rounded-2xl justify-center items-center relative'
@@ -115,15 +123,10 @@ export default function UserImageUpload({ navigation, route }) {
         )}
       </View>
       <View>
-        {image && image.length > 0 && (
+        {images && images.length > 0 && (
           <Button
             variant='primary'
-            onPress={async () => {
-              await setItemAsync('token', token);
-
-              navigation.popToTop();
-              navigation.navigate('UserGymLocation');
-            }}
+            onPress={async () => await continueToNextScreen()}
           >
             Continue
           </Button>

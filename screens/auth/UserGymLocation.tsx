@@ -107,7 +107,6 @@ export default function UserGymLocation({ navigation }) {
       onSuccess: async (data) => {
         if (data && (data.data.step === 5 || data.data.gymId)) {
           setD(data.data);
-          navigation.navigate('UserGymSplit', { token: token });
         }
       },
       onError: (error) => {
@@ -117,12 +116,8 @@ export default function UserGymLocation({ navigation }) {
   );
 
   const onSubmit = async (data: z.infer<typeof userGymLocationSchema>) => {
-    console.log(data);
     await saveUserGymLocation.mutateAsync(data);
   };
-
-  console.log(getValues('gymLocation'));
-  console.log(errors);
 
   return (
     <AuthLayout

@@ -94,11 +94,6 @@ export default function CreateSplit({ navigation, route }) {
       }
     },
     {
-      onSuccess: async (data) => {
-        if (data) {
-          navigation.navigate('UserFavoriteMovements');
-        }
-      },
       onError: (error) => {
         console.log(error);
       },

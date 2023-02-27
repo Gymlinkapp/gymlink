@@ -89,15 +89,10 @@ export default function InitialUserDetails({ route, navigation }) {
     {
       onSuccess: async (data) => {
         if (data) {
-          console.log(data.data);
-          console.log(data.data);
           await setItemAsync('token', data.data.token).then((res) => {
             console.log('token saved', res);
           });
           setToken(data.data.token);
-          navigation.navigate('UserImageUpload', {
-            token: data.data.token,
-          });
         }
       },
       onError: (error) => {

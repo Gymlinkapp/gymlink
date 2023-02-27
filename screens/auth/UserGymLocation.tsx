@@ -36,7 +36,6 @@ const userGymLocationSchema = z.object({
 
 export default function UserGymLocation({ navigation }) {
   const location = useLocation();
-  const [placesURL, setPlacesURL] = useState('');
   const [nearGyms, setNearGyms] = useState([]);
   const { token, long, lat, setLat, setLong } = useAuth();
   const [d, setD] = useState({});
@@ -53,6 +52,7 @@ export default function UserGymLocation({ navigation }) {
     control,
     getValues,
     setValue,
+
     formState: { errors },
   } = useForm({
     resolver: zodResolver(userGymLocationSchema),
@@ -68,7 +68,6 @@ export default function UserGymLocation({ navigation }) {
     // const apiKey = process.env.GOOGLE_API_KEY;
     const apiKey = 'AIzaSyBeVNaKylQx0vKkZ4zW8T_J01s2rUK7KQA&';
     const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=gym&location=${lat}%2C${long}&radius=500&key=${apiKey}`;
-    console.log(URL);
     if (input === '') {
       setNearGyms([]);
       return;
@@ -76,7 +75,6 @@ export default function UserGymLocation({ navigation }) {
     try {
       const res = await axios.get(URL);
       setNearGyms(res.data.predictions);
-      // console.log(nearGyms);
     } catch (error) {
       console.log(error);
     }
@@ -142,8 +140,11 @@ export default function UserGymLocation({ navigation }) {
                   </Text>
                   <TextInput
                     className={`bg-secondaryDark rounded-md p-4 flex-1 text-white font-[MontserratMedium] ${
-                      (value !== '' || isTouched) &&
-                      ' rounded-b-none border-2 border-b-0 border-tertiaryDark'
+                      (value.length > 1 || isTouched) &&
+                      'rounded-b-none border-2 border-b-0 border-tertiaryDark'
+                    } ${
+                      nearGyms.length < 1 &&
+                      'border-b-2 border-tertiaryDark rounded-md'
                     }`}
                     cursorColor={COLORS.mainWhite}
                     value={value}

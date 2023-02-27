@@ -23,6 +23,7 @@ export default function AccountScreen({ navigation, route }) {
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
 
   useEffect(() => {
+    console.log('user', user);
     if (user.split) {
       const userSplit = Object.keys(user.split).map((day) => {
         // dont include 'id' as a day in the key

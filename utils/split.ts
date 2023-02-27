@@ -1,3 +1,7 @@
+export const checkIfEmptyDays = (split: WeekSplit[]) => {
+  const emptyDays = split.filter((day) => day.exercises.length === 0);
+  return emptyDays.length === 0;
+};
 export const exercises = [
   'Chest',
   'Back',

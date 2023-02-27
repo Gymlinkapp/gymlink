@@ -14,6 +14,7 @@ import {
   WeekSplit,
   UpperLowerSplit,
   FullBodySplit,
+  checkIfEmptyDays,
 } from '../utils/split';
 import * as Haptics from 'expo-haptics';
 import { useMutation, useQueryClient } from 'react-query';
@@ -64,6 +65,12 @@ export default function EditSplit({ navigation, route }) {
         (d) => d && d.exercises && d.exercises.length > 0
       );
       try {
+        if (!checkIfEmptyDays(split)) {
+          setSplitError(
+            'Please fill out all days of the week. Mark empty days as rest days as needed.'
+          );
+          return;
+        }
         return await api.put('/users/split', {
           split: split.map((day, i) => ({
             day: day.day,

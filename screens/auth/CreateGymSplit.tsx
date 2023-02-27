@@ -13,6 +13,7 @@ import {
   PushPullLegsSplit,
   BroSplit,
   WeekSplit,
+  checkIfEmptyDays,
 } from '../../utils/split';
 import * as Haptics from 'expo-haptics';
 import { useMutation } from 'react-query';
@@ -26,6 +27,7 @@ export default function CreateSplit({ navigation, route }) {
   const [selectedSplit, setSelectedSplit] = useState<string>(
     preSelectedSplits[0]
   );
+  const [error, setError] = useState<string>('');
 
   const [weekSplit, setWeekSplit] = useState<WeekSplit[]>(PushPullLegsSplit);
 
@@ -55,10 +57,16 @@ export default function CreateSplit({ navigation, route }) {
   const saveSplit = useMutation(
     async (data: WeekSplit[]) => {
       try {
+        if (!checkIfEmptyDays(data)) {
+          setError(
+            'Please fill out all days of the week. Mark empty days as rest days as needed.'
+          );
+          return;
+        }
         return await api.post('/users/split', {
           split: data,
           token,
-          authSteps: 6,
+          authSteps: route.params?.authStep ? route.params?.authStep : 6,
         });
       } catch (error) {
         console.log(error);
@@ -134,6 +142,9 @@ export default function CreateSplit({ navigation, route }) {
           </Text>
         </TouchableOpacity>
       </View>
+      {error.length > 0 && (
+        <Text className='text-red-500 font-MontserratMedium'>{error}</Text>
+      )}
 
       {/* if custom is selected, show excercises to assign to days */}
       {isCustom && (

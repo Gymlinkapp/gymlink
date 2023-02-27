@@ -19,7 +19,22 @@ export default function Split({
 }) {
   const { height, width } = Dimensions.get('window');
 
-  if (split.length === 0) return null;
+  if (!split || split.length === 0)
+    return (
+      <View className='flex-1 justify-center items-center'>
+        <Text className='text-white font-MontserratBold text-2xl'>
+          No Split
+        </Text>
+        <Button
+          variant='primary'
+          onPress={() => {
+            navigation.navigate('AddSplit', { authStep: 7 });
+          }}
+        >
+          Add Split
+        </Button>
+      </View>
+    );
   return (
     <View className='mt-12'>
       <View className='py-4 flex-row justify-between items-center'>

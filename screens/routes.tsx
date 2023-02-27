@@ -17,6 +17,7 @@ import ProfileScreen from './Profile';
 import { AUTH_STEPS } from '../utils/users';
 import EditSplit from './EditSplit';
 import AssignExcercise from './auth/AssignExcercise';
+import CreateSplit from './auth/CreateGymSplit';
 
 const Stack = createNativeStackNavigator();
 
@@ -102,6 +103,7 @@ export default function Routes({ socket }: { socket: any }) {
           initialParams={{ setIsVerified }}
         />
         <Stack.Screen name='EditSplit' component={EditSplit} />
+        <Stack.Screen name='AddSplit' component={CreateSplit} />
         <Stack.Screen
           name='Settings'
           component={SettingsScreen}

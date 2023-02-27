@@ -3,7 +3,7 @@ import React from 'react';
 import { Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 
 const buttonStyle = cva(
-  'py-3 px-5 rounded-full my-2 flex-row items-center justify-evenly',
+  'py-3 px-5 rounded-full flex-row items-center justify-evenly',
   {
     variants: {
       variant: {

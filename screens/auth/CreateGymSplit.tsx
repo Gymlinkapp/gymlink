@@ -27,36 +27,7 @@ export default function CreateSplit({ navigation, route }) {
     preSelectedSplits[0]
   );
 
-  const [weekSplit, setWeekSplit] = useState<WeekSplit[]>([
-    {
-      day: 'Monday',
-      exercises: ['Chest'],
-    },
-    {
-      day: 'Tuesday',
-      exercises: ['Back'],
-    },
-    {
-      day: 'Wednesday',
-      exercises: ['Arms'],
-    },
-    {
-      day: 'Thursday',
-      exercises: ['Rest'],
-    },
-    {
-      day: 'Friday',
-      exercises: ['Legs'],
-    },
-    {
-      day: 'Saturday',
-      exercises: ['Shoulders'],
-    },
-    {
-      day: 'Sunday',
-      exercises: ['Abs'],
-    },
-  ]);
+  const [weekSplit, setWeekSplit] = useState<WeekSplit[]>(PushPullLegsSplit);
 
   useEffect(() => {
     if (route.params?.assignExercise) {
@@ -243,14 +214,14 @@ export default function CreateSplit({ navigation, route }) {
         ))}
       </ScrollView>
       <View
-        className='absolute bottom-0 left-0 bg-primaryDark flex-row'
+        className='absolute bottom-0 left-0 bg-primaryDark flex'
         style={{
           width: width,
         }}
       >
         <Button
           variant='primary'
-          className='flex-1'
+          className='flex-1 mb-1'
           onPress={() => {
             saveSplit.mutate(weekSplit);
           }}
@@ -258,14 +229,14 @@ export default function CreateSplit({ navigation, route }) {
           Continue
         </Button>
         <Button
-          variant='ghost'
+          variant='secondary'
           className='flex-1'
           onPress={async () => {
             try {
-              await api.put(`/users/${token}`, {
+              await api.post(`/users/authSteps`, {
+                token,
                 authSteps: 6,
               });
-              navigation.navigate('UserFavoriteMovements');
             } catch (error) {
               console.log(error);
             }

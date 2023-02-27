@@ -13,8 +13,8 @@ export const exercises = [
   'Rear Dealts',
 ];
 export const preSelectedSplits = [
-  'Bro Split',
   'Push Pull Legs',
+  'Bro Split',
   'Upper Lower',
   'Full Body',
 ];

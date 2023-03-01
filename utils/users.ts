@@ -22,6 +22,8 @@ export type User = {
   authSteps: number;
   splitId: string | null;
   split: Split | null;
+  feed: User[];
+  seen: string[];
 };
 
 export type Split = {

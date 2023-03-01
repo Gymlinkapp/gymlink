@@ -92,7 +92,6 @@ export default function Routes({ socket }: { socket: any }) {
       />
       <Stack.Group
         screenOptions={{
-          headerBlurEffect: 'dark',
           presentation: 'modal',
           headerShown: false,
         }}

@@ -1,7 +1,7 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Barbell, MapPin, X } from 'phosphor-react-native';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Text,
@@ -13,20 +13,16 @@ import {
   FlatList,
 } from 'react-native';
 import { COLORS } from '../utils/colors';
-import { NAVBAR_HEIGHT, SPACING } from '../utils/sizes';
+import { SPACING } from '../utils/sizes';
 import { calculateCardHeight, truncate } from '../utils/ui';
 import { User } from '../utils/users';
 import Button from './button';
 import { useGym } from '../hooks/useGym';
 import { Gym } from '../utils/types/gym';
-import { useLocation } from '../hooks/useLocation';
-import { useGetLocationById } from '../hooks/useGetLocationById';
 import useToken from '../hooks/useToken';
 import { useUser } from '../hooks/useUser';
 import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
-import { useNavigation } from '@react-navigation/native';
-import { rotate } from '@shopify/react-native-skia';
 
 // reusable component to wrap the user's info with animations
 function Info({

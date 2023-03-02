@@ -14,6 +14,7 @@ import api from '../utils/axiosStore';
 import { useAuth } from '../utils/context';
 import { snapToInterval } from '../utils/snapToInterval';
 import { getFeedScrollIndex } from '../utils/getFeedScrollIndex';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HomeScreen({ navigation, route }) {
   const { token, user, setUser } = useAuth();
@@ -21,8 +22,6 @@ export default function HomeScreen({ navigation, route }) {
   const { height } = Dimensions.get('window');
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
-  console.log(user.seen);
-  // console.log(user.feed);
 
   const queryClient = useQueryClient();
 
@@ -66,13 +65,14 @@ export default function HomeScreen({ navigation, route }) {
   const onScroll = async (e) => {
     const index = getFeedScrollIndex(e, height);
 
-    if (index > currentIndex) {
-      seenUser.mutateAsync(feed[index - 1].id);
+    if (index < currentIndex) {
+      // seenUser.mutateAsync(feed[index - 1].id);
 
-      setFeed((prev) => {
-        const newFeed = [...prev];
-        newFeed.splice(index - 1, 1);
-        return newFeed;
+      // when the user scrolls, we want to not allow them to scroll back up
+      flatListRef.current.scrollToIndex({
+        index: currentIndex,
+        animated: true,
+        viewPosition: 0,
       });
     }
     setCurrentIndex(index);
@@ -80,6 +80,13 @@ export default function HomeScreen({ navigation, route }) {
 
   return (
     <Layout navigation={navigation}>
+      <LinearGradient
+        pointerEvents='none'
+        colors={['rgba(0,0,0,1)', 'rgba(0,0,0,0)']}
+        className='absolute -top-40 z-50 w-full h-80'
+        start={[0, 0]}
+        end={[0, 1]}
+      />
       <FlatList
         snapToInterval={snapToInterval(height)}
         decelerationRate='fast'
@@ -90,7 +97,7 @@ export default function HomeScreen({ navigation, route }) {
         contentInsetAdjustmentBehavior='automatic'
         style={{ paddingHorizontal: 16 }}
         contentContainerStyle={{ justifyContent: 'space-between' }}
-        // onScroll={onScroll}
+        onScroll={onScroll}
         data={feed}
         ref={flatListRef}
         renderItem={({ item, index }) =>

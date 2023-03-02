@@ -217,6 +217,25 @@ export default function Person({
     }
   );
 
+  const skipUser = useMutation(
+    async ({
+      dislikedUserId,
+      token,
+    }: {
+      dislikedUserId: string;
+      token: string;
+    }) => {
+      const { data } = await api.post(`/social/dislikeUser`, {
+        dislikedUserId,
+        token,
+      });
+      return data;
+    },
+    {
+      onSuccess: () => {},
+    }
+  );
+
   return (
     <Animated.View
       className='overflow-hidden rounded-2xl relative'
@@ -416,6 +435,11 @@ export default function Person({
               onPress={() => {
                 setSkipped(true);
                 onGoNext(index);
+
+                skipUser.mutate({
+                  dislikedUserId: user.id,
+                  token: currUser.tempJWT,
+                });
               }}
               variant='secondary'
               icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}

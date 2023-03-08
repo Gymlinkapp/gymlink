@@ -25,7 +25,13 @@ export default function HomeScreen({ navigation, route }) {
 
   const queryClient = useQueryClient();
 
-  // const { data: users, isLoading, error } = useUsers(token);
+  const { data: users, isLoading, error } = useUsers(token);
+
+  useEffect(() => {
+    if (users) {
+      setFeed(users);
+    }
+  }, [users]);
 
   const returnToTop = () => {
     flatListRef.current.scrollToIndex({ index: 0, animated: true });
@@ -60,8 +66,6 @@ export default function HomeScreen({ navigation, route }) {
     }
   );
 
-  // if (isLoading) return <Loading />;
-
   const onScroll = async (e) => {
     const index = getFeedScrollIndex(e, height);
 
@@ -78,6 +82,7 @@ export default function HomeScreen({ navigation, route }) {
     setCurrentIndex(index);
   };
 
+  if (isLoading) return <Loading />;
   return (
     <Layout navigation={navigation}>
       <LinearGradient

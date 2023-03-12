@@ -1,4 +1,4 @@
-import { SignOut, User } from 'phosphor-react-native';
+import { ClockClockwise, Gear, SignOut, User } from 'phosphor-react-native';
 import { SafeAreaView, Text, View } from 'react-native';
 import { useMutation } from 'react-query';
 import Button from '../components/button';
@@ -51,7 +51,7 @@ export default function SettingsScreen({ navigation }) {
           setIsVerified(false);
         }}
         variant='menu'
-        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
+        icon={<ClockClockwise weight='fill' color={COLORS.mainWhite} />}
       >
         Reset
       </Button>
@@ -60,7 +60,7 @@ export default function SettingsScreen({ navigation }) {
           navigation.navigate('EditAccount');
         }}
         variant='menu'
-        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
+        icon={<Gear weight='fill' color={COLORS.mainWhite} />}
       >
         Edit
       </Button>

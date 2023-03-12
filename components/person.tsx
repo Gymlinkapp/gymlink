@@ -494,7 +494,7 @@ export default function Person({
           <View className='flex-row px-4'>
             {user.images.map((image, index) => (
               <Animated.View
-                key={image}
+                key={user.id + index}
                 style={{
                   // using the swipe animation touch the scale of the indicator
                   transform: [

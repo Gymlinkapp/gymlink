@@ -18,6 +18,7 @@ import { AUTH_STEPS } from '../utils/users';
 import EditSplit from './EditSplit';
 import AssignExcercise from './auth/AssignExcercise';
 import CreateSplit from './auth/CreateGymSplit';
+import EditAccount from './EditAccount';
 
 const Stack = createNativeStackNavigator();
 
@@ -119,6 +120,15 @@ export default function Routes({ socket }: { socket: any }) {
           options={{
             contentStyle: {
               backgroundColor: COLORS.secondaryDark,
+            },
+          }}
+        />
+        <Stack.Screen
+          name='EditAccount'
+          component={EditAccount}
+          options={{
+            contentStyle: {
+              backgroundColor: COLORS.primaryDark,
             },
           }}
         />

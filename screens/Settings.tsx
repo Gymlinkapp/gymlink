@@ -55,6 +55,15 @@ export default function SettingsScreen({ navigation }) {
       >
         Reset
       </Button>
+      <Button
+        onPress={() => {
+          navigation.navigate('EditAccount');
+        }}
+        variant='menu'
+        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
+      >
+        Edit
+      </Button>
     </SafeAreaView>
   );
 }

@@ -82,7 +82,7 @@ export default function AccountScreen({ navigation, route }) {
         </View>
       </View>
       <View>
-        <Split split={userSplit} navigation={navigation} />
+        <Split split={userSplit} navigation={navigation} isEditable={true} />
       </View>
     </ScrollView>
   );

@@ -9,15 +9,19 @@ import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { WeekSplit } from '../utils/split';
 import Button from './button';
+import { useAuth } from '../utils/context';
 
 export default function Split({
   split,
   navigation,
+  isEditable,
 }: {
   split: WeekSplit[];
   navigation?: any;
+  isEditable?: boolean;
 }) {
   const { height, width } = Dimensions.get('window');
+  const { user } = useAuth();
 
   if (!split || split.length === 0)
     return (
@@ -39,15 +43,17 @@ export default function Split({
     <View className='mt-12'>
       <View className='py-4 flex-row justify-between items-center'>
         <Text className='font-MontserratBold text-white text-2xl'>Split</Text>
-        <Button
-          variant='primary'
-          textSize='sm'
-          onPress={() => {
-            navigation.navigate('EditSplit', { split });
-          }}
-        >
-          Edit
-        </Button>
+        {isEditable && (
+          <Button
+            variant='primary'
+            textSize='sm'
+            onPress={() => {
+              navigation.navigate('EditSplit', { split });
+            }}
+          >
+            Edit
+          </Button>
+        )}
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}

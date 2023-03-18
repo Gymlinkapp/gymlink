@@ -97,7 +97,7 @@ export default function HomeScreen({ navigation, route }) {
       <LinearGradient
         pointerEvents='none'
         colors={['rgba(0,0,0,1)', 'rgba(0,0,0,0)']}
-        className='absolute -top-40 z-50 w-full h-80'
+        className='absolute -top-[100px] z-50 w-full h-80'
         start={[0, 0]}
         end={[0, 1]}
       />

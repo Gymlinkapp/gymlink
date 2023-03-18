@@ -29,7 +29,16 @@ export default function HomeScreen({ navigation, route }) {
 
   useEffect(() => {
     if (users) {
-      setFeed(users);
+      // if a new user is added to the feed, we want to add them to the feed
+      setFeed((prev) => {
+        const newFeed = [...prev];
+        users.forEach((user) => {
+          if (!newFeed.find((u) => u.id === user.id)) {
+            newFeed.push(user);
+          }
+        });
+        return newFeed;
+      });
     }
   }, [users]);
 

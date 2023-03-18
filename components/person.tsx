@@ -21,7 +21,7 @@ import { useGym } from '../hooks/useGym';
 import { Gym } from '../utils/types/gym';
 import useToken from '../hooks/useToken';
 import { useUser } from '../hooks/useUser';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 
 // reusable component to wrap the user's info with animations
@@ -153,6 +153,7 @@ export default function Person({
   const fade = useRef(new Animated.Value(0)).current;
   const swipe = useRef(new Animated.Value(0)).current;
   const skippedFade = useRef(new Animated.Value(0)).current;
+  const queryClient = useQueryClient();
 
   const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
@@ -214,6 +215,12 @@ export default function Person({
         fromUserId,
       });
       return data;
+    },
+    {
+      onSuccess: () => {
+        setSentFriendRequest(true);
+        queryClient.invalidateQueries('user');
+      },
     }
   );
 
@@ -232,7 +239,9 @@ export default function Person({
       return data;
     },
     {
-      onSuccess: () => {},
+      onSuccess: () => {
+        queryClient.invalidateQueries('user');
+      },
     }
   );
 

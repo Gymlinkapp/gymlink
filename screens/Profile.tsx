@@ -19,6 +19,7 @@ import api from '../utils/axiosStore';
 import Split from '../components/Split';
 import { WeekSplit } from '../utils/split';
 import Button from '../components/button';
+import { useGym } from '../hooks/useGym';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -33,6 +34,8 @@ export default function ProfileScreen({
   const { height } = Dimensions.get('window');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
+
+  const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
   const useSendFriendRequest = useMutation(
     async ({
@@ -154,11 +157,15 @@ export default function ProfileScreen({
             <Text className='text-white text-3xl font-MontserratBold'>
               {user.firstName} {user.lastName}
             </Text>
+
             <Text className='text-white text-xl font-MontserratMedium'>
               {user.age}
             </Text>
           </View>
           <View>
+            <Text className='text-white text-lg font-MontserratMedium mb-4 mt-2'>
+              {gym?.name}
+            </Text>
             <Text className='text-secondaryWhite text-md font-MontserratMedium'>
               {user.bio}
             </Text>
@@ -171,7 +178,7 @@ export default function ProfileScreen({
                   user.tags.map((tag, idx) => (
                     <View
                       key={idx}
-                      className='mr-2 my-1 bg-primaryDark px-6 py-2 rounded-full'
+                      className='mr-2 my-1 bg-secondaryDark px-6 py-2 rounded-full'
                     >
                       <Text className='text-white text-md font-MontserratMedium'>
                         {tag}

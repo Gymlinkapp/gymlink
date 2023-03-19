@@ -15,12 +15,15 @@ import { COLORS } from '../utils/colors';
 import { useAuth } from '../utils/context';
 import { WeekSplit } from '../utils/split';
 import FriendsScreen from './Friends';
+import { useGym } from '../hooks/useGym';
 
 // This is the user's account screen.
 export default function AccountScreen({ navigation, route }) {
   const { height } = Dimensions.get('window');
   const { token, user } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
+
+  const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
   useEffect(() => {
     console.log('user', user);
@@ -58,6 +61,9 @@ export default function AccountScreen({ navigation, route }) {
       <View>
         <Text className='text-white text-xl font-MontserratMedium'>
           {user.age}
+        </Text>
+        <Text className='text-white text-lg font-MontserratMedium mb-4 mt-2'>
+          {gym?.name}
         </Text>
         <Text className='text-white text-xl font-MontserratMedium'>
           {user.bio}

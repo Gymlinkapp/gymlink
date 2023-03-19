@@ -5,6 +5,7 @@ import EmptyScreen from '../components/EmptyScreen';
 import { useAuth } from '../utils/context';
 import { Image } from 'react-native';
 import { useState } from 'react';
+import { truncate } from '../utils/ui';
 
 export type Message = {
   id?: string;
@@ -77,7 +78,9 @@ export default function Chats({ navigation, route }: any) {
                     {recentMessage && (
                       <View className='flex-row items-center'>
                         <Text className='text-white mr-2 text-md'>
-                          {recentMessage.content}
+                          {recentMessage.content.length > 15
+                            ? truncate(recentMessage.content, 15)
+                            : recentMessage.content}
                         </Text>
                         <Text className='text-secondaryWhite text-xs'>
                           {new Date(recentMessage.createdAt).toLocaleDateString(

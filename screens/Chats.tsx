@@ -76,13 +76,8 @@ export default function Chats({ navigation, route }: any) {
                       {otherUser.firstName} {otherUser.lastName}
                     </Text>
                     {recentMessage && (
-                      <View className='flex-row items-center'>
-                        <Text className='text-white mr-2 text-md'>
-                          {recentMessage.content.length > 15
-                            ? truncate(recentMessage.content, 15)
-                            : recentMessage.content}
-                        </Text>
-                        <Text className='text-secondaryWhite text-xs'>
+                      <View className='flex-col items-left'>
+                        <Text className='text-secondaryWhite text-xs mr-2'>
                           {new Date(recentMessage.createdAt).toLocaleDateString(
                             'en-US',
                             {
@@ -92,6 +87,11 @@ export default function Chats({ navigation, route }: any) {
                               day: 'numeric',
                             }
                           )}
+                        </Text>
+                        <Text className='text-white text-md'>
+                          {recentMessage.content.length > 15
+                            ? truncate(recentMessage.content, 30)
+                            : recentMessage.content}
                         </Text>
                       </View>
                     )}

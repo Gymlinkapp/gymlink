@@ -18,7 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HomeScreen({ navigation, route }) {
   const { token, user, setUser } = useAuth();
-  const [feed, setFeed] = useState<User[]>(user.feed || []);
+  const [feed, setFeed] = useState<User[]>(user?.feed || []);
   const { height } = Dimensions.get('window');
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
@@ -29,16 +29,12 @@ export default function HomeScreen({ navigation, route }) {
 
   useEffect(() => {
     if (users) {
-      // if a new user is added to the feed, we want to add them to the feed
-      setFeed((prev) => {
-        const newFeed = [...prev];
-        users.forEach((user) => {
-          if (!newFeed.find((u) => u.id === user.id)) {
-            newFeed.push(user);
-          }
-        });
-        return newFeed;
-      });
+      // set the feed without the user ids in the liked array and disliked array
+      setFeed(
+        users.filter(
+          (u) => !user.liked.includes(u.id) && !user.disliked.includes(u.id)
+        )
+      );
     }
   }, [users]);
 

@@ -24,6 +24,8 @@ export type User = {
   split: Split | null;
   feed: User[];
   seen: string[];
+  liked: string[];
+  disliked: string[];
 };
 
 export type Split = {

@@ -68,7 +68,8 @@ export default function UserImageUpload({ navigation, route }) {
       });
     } catch (err) {
       console.log(
-        'An error occurred uploading your image. Please try again later.'
+        'An error occurred uploading your image. Please try again later.',
+        err
       );
     }
   };

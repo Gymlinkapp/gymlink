@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { z } from 'zod';
 import Button from '../../components/button';
 import { COLORS } from '../../utils/colors';
@@ -78,6 +78,7 @@ export default function InitialUserDetails({ route, navigation }) {
   const [race, setRace] = useState('');
   const [raceError, setRaceError] = useState(false);
   const { token, setToken } = useAuth();
+  const queryClient = useQueryClient();
   useEffect(() => {
     getItemAsync('long').then((long) => {
       setLongitude(parseFloat(long));
@@ -116,7 +117,6 @@ export default function InitialUserDetails({ route, navigation }) {
             phoneNumber: phoneNumber,
             firstName: data.firstName,
             bio: data.bio,
-            authSteps: 3,
             lastName: data.lastName,
             age: data.age,
             email: data.email,
@@ -138,10 +138,10 @@ export default function InitialUserDetails({ route, navigation }) {
     {
       onSuccess: async (data) => {
         if (data) {
-          console.log(data.data);
-          setToken(data.data.token);
           try {
-            await setItemAsync('token', token);
+            await setItemAsync('token', data.data.token);
+            queryClient.invalidateQueries('user');
+            setToken(data.data.token);
           } catch (error) {
             console.log('here', error);
           }

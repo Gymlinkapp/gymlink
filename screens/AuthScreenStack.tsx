@@ -39,6 +39,7 @@ export default function AuthStackScreen({ navigation, route }) {
 
   useEffect(() => {
     if (!isLoading && user && user.authSteps !== AUTH_STEPS) {
+      console.log('step', step);
       setStep(stepToScreen[user.authSteps]);
       navigation.navigate(step);
     }

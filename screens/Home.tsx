@@ -27,17 +27,6 @@ export default function HomeScreen({ navigation, route }) {
 
   const { data: users, isLoading, error } = useUsers(token);
 
-  useEffect(() => {
-    if (users) {
-      // set the feed without the user ids in the liked array and disliked array
-      setFeed(
-        users.filter(
-          (u) => !user.liked.includes(u.id) && !user.disliked.includes(u.id)
-        )
-      );
-    }
-  }, [users]);
-
   const returnToTop = () => {
     flatListRef.current.scrollToIndex({ index: 0, animated: true });
   };

@@ -66,8 +66,6 @@ const userDetailsSchema = z.object({
   firstName: z.string().min(1).max(20),
   lastName: z.string().min(1).max(20),
   bio: z.string().min(1).max(1000),
-  gender: z.string().min(1).max(20),
-  race: z.string().min(1).max(20),
   email: z.string().email(),
   age: z.number().min(16).max(100),
 });
@@ -76,7 +74,9 @@ export default function InitialUserDetails({ route, navigation }) {
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
   const [gender, setGender] = useState('');
+  const [genderError, setGenderError] = useState(false);
   const [race, setRace] = useState('');
+  const [raceError, setRaceError] = useState(false);
   const { token, setToken } = useAuth();
   useEffect(() => {
     getItemAsync('long').then((long) => {
@@ -105,7 +105,6 @@ export default function InitialUserDetails({ route, navigation }) {
     },
   });
   const { code, phoneNumber } = route.params;
-  console.log(phoneNumber);
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
 
   const saveUserDetails = useMutation(
@@ -121,7 +120,8 @@ export default function InitialUserDetails({ route, navigation }) {
             lastName: data.lastName,
             age: data.age,
             email: data.email,
-            gender,
+            gender: gender.toLowerCase(),
+            race,
             longitude: longitude,
             latitude: latitude,
           },
@@ -138,10 +138,13 @@ export default function InitialUserDetails({ route, navigation }) {
     {
       onSuccess: async (data) => {
         if (data) {
-          await setItemAsync('token', data.data.token).then((res) => {
-            console.log('token saved', res);
-          });
+          console.log(data.data);
           setToken(data.data.token);
+          try {
+            await setItemAsync('token', token);
+          } catch (error) {
+            console.log('here', error);
+          }
         }
       },
       onError: (error) => {
@@ -258,67 +261,52 @@ export default function InitialUserDetails({ route, navigation }) {
                 </View>
               )}
             />
-            <Controller
-              control={control}
-              name='gender'
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error, isTouched },
-              }) => (
-                <View className='my-2 mr-1 flex-[1.5]'>
-                  <Text className='text-white py-2 text-l font-MontserratMedium'>
-                    Gender
-                  </Text>
-                  <View className='flex-row'>
-                    <UserGenderBox
-                      gender='Male'
-                      isSelected={gender === 'Male'}
-                      setSelected={setGender}
-                    />
-                    <UserGenderBox
-                      gender='Female'
-                      isSelected={gender === 'Female'}
-                      setSelected={setGender}
-                    />
-                    <UserGenderBox
-                      gender='Other'
-                      isSelected={gender === 'Other'}
-                      setSelected={setGender}
-                    />
-                  </View>
-                  {error && (
-                    <Text className='text-red-500 font-MontserratRegular'>
-                      {error.message}
-                    </Text>
-                  )}
-                </View>
+
+            <View className='my-2 mr-1 flex-[1.5]'>
+              <Text className='text-white py-2 text-l font-MontserratMedium'>
+                Gender
+              </Text>
+              <View className='flex-row'>
+                <UserGenderBox
+                  gender='Male'
+                  isSelected={gender === 'Male'}
+                  setSelected={setGender}
+                />
+                <UserGenderBox
+                  gender='Female'
+                  isSelected={gender === 'Female'}
+                  setSelected={setGender}
+                />
+                <UserGenderBox
+                  gender='Other'
+                  isSelected={gender === 'Other'}
+                  setSelected={setGender}
+                />
+              </View>
+
+              {genderError && (
+                <Text className='text-red-500 font-MontserratRegular'>
+                  Must be selected
+                </Text>
               )}
-            />
-            <Controller
-              control={control}
-              name='race'
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error, isTouched },
-              }) => (
-                <View className='my-2 ml-1 flex-1'>
-                  <Text className='text-white py-2 text-l font-MontserratMedium'>
-                    Race
-                  </Text>
-                  <CustomSelect
-                    options={races}
-                    onSelect={(option) => {
-                      setRace(option);
-                    }}
-                  />
-                  {error && (
-                    <Text className='text-red-500 font-MontserratRegular'>
-                      {error.message}
-                    </Text>
-                  )}
-                </View>
+            </View>
+
+            <View className='my-2 ml-1 flex-1'>
+              <Text className='text-white py-2 text-l font-MontserratMedium'>
+                Race
+              </Text>
+              <CustomSelect
+                options={races}
+                onSelect={(option) => {
+                  setRace(option.value);
+                }}
+              />
+              {raceError && (
+                <Text className='text-red-500 font-MontserratRegular'>
+                  Must be selected
+                </Text>
               )}
-            />
+            </View>
             <View className='flex-row'>
               <Controller
                 control={control}

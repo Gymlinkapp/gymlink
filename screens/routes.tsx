@@ -48,16 +48,16 @@ export default function Routes({ socket }: { socket: any }) {
   // deleteItemAsync('token');
   return (
     <Stack.Navigator>
-      {/* {!isVerified ? ( */}
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-        name='Auth'
-        component={AuthStackScreen}
-        initialParams={{ setIsVerified }}
-      />
-      {/* ) : (
+      {!isVerified ? (
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+          name='Auth'
+          component={AuthStackScreen}
+          initialParams={{ setIsVerified }}
+        />
+      ) : (
         <Stack.Screen
           options={{
             headerShown: false,
@@ -66,7 +66,7 @@ export default function Routes({ socket }: { socket: any }) {
           component={Home}
           initialParams={{ socket }}
         />
-      )} */}
+      )}
       <Stack.Screen
         name='Notifications'
         component={NotificationScreen}

@@ -45,10 +45,6 @@ export default function Chats({ navigation, route }: any) {
               if (item.messages && item.messages.length) {
                 recentMessage = item.messages[item.messages.length - 1];
               }
-
-              const me = item.participants.find(
-                (u: User) => u.id === user.id
-              ) as User;
               const otherUser = item.participants.find(
                 (u: User) => u.id !== user.id
               ) as User;

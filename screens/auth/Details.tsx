@@ -8,6 +8,9 @@ import {
   Text,
   TextInput,
   View,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
 } from 'react-native';
 import { useMutation } from 'react-query';
 import { z } from 'zod';
@@ -19,11 +22,52 @@ import { useEffect, useState } from 'react';
 import { getItemAsync, setItemAsync } from 'expo-secure-store';
 import { useAuth } from '../../utils/context';
 import AuthLayout from '../../layouts/AuthLayout';
+import { CustomSelect } from '../../components/CustomSelect';
+
+export const UserGenderBox = ({
+  gender,
+  isSelected,
+  setSelected,
+}: {
+  gender: string;
+  isSelected: boolean;
+  setSelected: (gender: string) => void;
+}) => {
+  return (
+    <TouchableOpacity
+      className={`h-12 flex-1 mr-1 rounded-md ${
+        isSelected ? 'bg-white' : 'bg-secondaryDark'
+      } justify-center items-center`}
+      onPress={() => setSelected(gender)}
+    >
+      <Text
+        className={`${
+          isSelected ? 'text-primaryDark' : 'text-white'
+        } font-MontserratRegular text-xs`}
+      >
+        {gender}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
+const races = [
+  { value: 'asian', label: 'Asian' },
+  { value: 'black', label: 'Black or African American' },
+  { value: 'hispanic', label: 'Hispanic or Latino' },
+  { value: 'native', label: 'Native American or Alaska Native' },
+  { value: 'pacific', label: 'Native Hawaiian or Pacific Islander' },
+  { value: 'white', label: 'White' },
+  { value: 'multiracial', label: 'Multiracial' },
+  { value: 'other', label: 'Other' },
+];
 
 const userDetailsSchema = z.object({
   firstName: z.string().min(1).max(20),
   lastName: z.string().min(1).max(20),
   bio: z.string().min(1).max(1000),
+  gender: z.string().min(1).max(20),
+  race: z.string().min(1).max(20),
   email: z.string().email(),
   age: z.number().min(16).max(100),
 });
@@ -31,6 +75,8 @@ const userDetailsSchema = z.object({
 export default function InitialUserDetails({ route, navigation }) {
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
+  const [gender, setGender] = useState('');
+  const [race, setRace] = useState('');
   const { token, setToken } = useAuth();
   useEffect(() => {
     getItemAsync('long').then((long) => {
@@ -53,6 +99,8 @@ export default function InitialUserDetails({ route, navigation }) {
       lastName: '',
       email: '',
       bio: '',
+      gender: '',
+      race: '',
       age: 18,
     },
   });
@@ -73,6 +121,7 @@ export default function InitialUserDetails({ route, navigation }) {
             lastName: data.lastName,
             age: data.age,
             email: data.email,
+            gender,
             longitude: longitude,
             latitude: latitude,
           },
@@ -200,6 +249,67 @@ export default function InitialUserDetails({ route, navigation }) {
                     returnKeyType='done'
                     returnKeyLabel='done'
                     enablesReturnKeyAutomatically
+                  />
+                  {error && (
+                    <Text className='text-red-500 font-MontserratRegular'>
+                      {error.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name='gender'
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error, isTouched },
+              }) => (
+                <View className='my-2 mr-1 flex-[1.5]'>
+                  <Text className='text-white py-2 text-l font-MontserratMedium'>
+                    Gender
+                  </Text>
+                  <View className='flex-row'>
+                    <UserGenderBox
+                      gender='Male'
+                      isSelected={gender === 'Male'}
+                      setSelected={setGender}
+                    />
+                    <UserGenderBox
+                      gender='Female'
+                      isSelected={gender === 'Female'}
+                      setSelected={setGender}
+                    />
+                    <UserGenderBox
+                      gender='Other'
+                      isSelected={gender === 'Other'}
+                      setSelected={setGender}
+                    />
+                  </View>
+                  {error && (
+                    <Text className='text-red-500 font-MontserratRegular'>
+                      {error.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name='race'
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error, isTouched },
+              }) => (
+                <View className='my-2 ml-1 flex-1'>
+                  <Text className='text-white py-2 text-l font-MontserratMedium'>
+                    Race
+                  </Text>
+                  <CustomSelect
+                    options={races}
+                    onSelect={(option) => {
+                      setRace(option);
+                    }}
                   />
                   {error && (
                     <Text className='text-red-500 font-MontserratRegular'>

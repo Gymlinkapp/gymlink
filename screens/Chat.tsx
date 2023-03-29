@@ -85,7 +85,7 @@ export default function ChatScreen({ route, navigation }) {
       socket.off('disconnect');
       socket.off('recieve-message');
     };
-  }, []);
+  }, [socket, roomName, roomId]);
 
   const sendMessage = async () => {
     await socket.emit('chat-message', messageData);

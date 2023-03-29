@@ -19,10 +19,10 @@ import { User } from '../utils/users';
 import Button from './button';
 import { useGym } from '../hooks/useGym';
 import { Gym } from '../utils/types/gym';
-import useToken from '../hooks/useToken';
 import { useUser } from '../hooks/useUser';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
+import { useAuth } from '../utils/context';
 
 // reusable component to wrap the user's info with animations
 function Info({
@@ -144,7 +144,7 @@ export default function Person({
   onGoNext: (index: number) => void;
   index: number;
 }) {
-  const token = useToken();
+  const { token, socket } = useAuth();
   const { data: currUser } = useUser(token);
   const { width, height } = Dimensions.get('window');
   const [sentFriendRequest, setSentFriendRequest] = useState(false);
@@ -202,7 +202,7 @@ export default function Person({
   const SWIPE_ANIMIATION_EASING = Easing.bezier(0.25, 0.1, 0.25, 1);
   const SWIPE_ANIMATION_VALUE = 100;
 
-  const useSendFriendRequest = useMutation(
+  const createLink = useMutation(
     async ({
       fromUserId,
       toUserId,
@@ -210,36 +210,25 @@ export default function Person({
       toUserId: string;
       fromUserId: string;
     }) => {
-      const { data } = await api.post(`/social/sendFriendRequest`, {
+      const { data } = await api.post(`/social/link`, {
         toUserId,
         fromUserId,
-      });
-      return data;
-    },
-    {
-      onSuccess: () => {
-        setSentFriendRequest(true);
-        queryClient.invalidateQueries('user');
-      },
-    }
-  );
-
-  const skipUser = useMutation(
-    async ({
-      dislikedUserId,
-      token,
-    }: {
-      dislikedUserId: string;
-      token: string;
-    }) => {
-      const { data } = await api.post(`/social/dislikeUser`, {
-        dislikedUserId,
         token,
       });
       return data;
     },
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log('chat', data.chat);
+        navigation.navigate('Chat', {
+          socket: socket,
+          user: user,
+          roomName: data.chat.name,
+          toUser: data.chat.participants.toUser,
+          userImage: data.chat.participants.toUser.images[0],
+          uiName: data.chat.name,
+          roomId: data.chat.id,
+        });
         queryClient.invalidateQueries('user');
       },
     }
@@ -425,46 +414,6 @@ export default function Person({
                     outputRange: [0.9, 1],
                   }),
                 },
-                {
-                  translateY: fade.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, 20],
-                  }),
-                },
-              ],
-              width: sentFriendRequest ? '0%' : '100%',
-              flex: sentFriendRequest ? 0 : 1,
-              opacity: fade.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0],
-              }),
-            }}
-          >
-            <Button
-              onPress={() => {
-                setSkipped(true);
-                onGoNext(index);
-
-                skipUser.mutate({
-                  dislikedUserId: user.id,
-                  token: currUser.tempJWT,
-                });
-              }}
-              variant='secondary'
-              icon={<X weight='fill' color={COLORS.mainWhite} size={24} />}
-            >
-              Go Next
-            </Button>
-          </Animated.View>
-          <Animated.View
-            style={{
-              transform: [
-                {
-                  scale: fade.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.9, 1],
-                  }),
-                },
 
                 {
                   translateY: fade.interpolate({
@@ -478,12 +427,8 @@ export default function Person({
           >
             <Button
               onPress={() => {
-                // optimistically update the user's friend request status (before the actual request is sent)
-                setSentFriendRequest(true);
-                onGoNext(index);
-
                 if (!sentFriendRequest) {
-                  useSendFriendRequest.mutate({
+                  createLink.mutate({
                     toUserId: user.id,
                     fromUserId: currUser.id,
                   });

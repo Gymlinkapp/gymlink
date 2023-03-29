@@ -23,6 +23,7 @@ import { useUser } from '../hooks/useUser';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 import { useAuth } from '../utils/context';
+import * as Haptics from 'expo-haptics';
 
 // reusable component to wrap the user's info with animations
 function Info({
@@ -432,6 +433,10 @@ export default function Person({
                     toUserId: user.id,
                     fromUserId: currUser.id,
                   });
+                  // create haptic feedback
+                  Haptics.notificationAsync(
+                    Haptics.NotificationFeedbackType.Success
+                  );
                 }
               }}
               variant='primary'

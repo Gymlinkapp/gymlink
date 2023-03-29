@@ -15,6 +15,7 @@ import { useAuth } from '../utils/context';
 import { snapToInterval } from '../utils/snapToInterval';
 import { getFeedScrollIndex } from '../utils/getFeedScrollIndex';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 
 export default function HomeScreen({ navigation, route }) {
   const { token, user, setUser } = useAuth();
@@ -62,7 +63,10 @@ export default function HomeScreen({ navigation, route }) {
 
   const onScroll = async (e) => {
     const index = getFeedScrollIndex(e, height);
-
+    // haptic feedback
+    if (index > currentIndex) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
     if (index < currentIndex) {
       // seenUser.mutateAsync(feed[index - 1].id);
 

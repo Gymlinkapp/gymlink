@@ -1,5 +1,5 @@
 import { getItemAsync } from 'expo-secure-store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  PanResponder,
 } from 'react-native';
 import Loading from '../components/Loading';
 import { useUser } from '../hooks/useUser';
@@ -31,6 +32,7 @@ import { useGym } from '../hooks/useGym';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { keyboardVerticalOffset } from '../utils/ui';
+import { Swipeable } from 'react-native-gesture-handler';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -45,6 +47,7 @@ export default function ProfileScreen({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [gestureState, setGestureState] = useState({ dx: 0, dy: 0 });
 
   const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
@@ -68,6 +71,23 @@ export default function ProfileScreen({
       },
     }
   );
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gesture) => {
+        setGestureState(gesture);
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dx < -50) {
+          navigation.navigate('ProfileInfo', {
+            user,
+            gymId: user.gymId,
+          });
+        }
+        setGestureState({ dx: 0, dy: 0 });
+      },
+    })
+  ).current;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -79,6 +99,7 @@ export default function ProfileScreen({
     }, 5000);
     return () => clearInterval(interval);
   }, [currentImageIndex]);
+
   useEffect(() => {
     if (user.split) {
       const userSplit = Object.keys(user.split).map((day) => {
@@ -93,7 +114,10 @@ export default function ProfileScreen({
     }
   }, [user]);
   return (
-    <View className='relative w-full h-full'>
+    <View className='relative w-full h-full' {...panResponder.panHandlers}>
+      {/* <Swipeable 
+        lef
+      > */}
       <View className='absolute top-0 left-0 w-full h-full'>
         <LinearGradient
           pointerEvents='none'
@@ -110,12 +134,14 @@ export default function ProfileScreen({
       </View>
       <View className='px-6 h-full justify-between'>
         <View className='py-2'>
-          <TouchableOpacity
-            className='flex-row items-center bg-primaryDark/25 justify-center rounded-full w-12 h-12 py-2 mt-10'
-            onPress={() => navigation.goBack()}
+          <BlurView
+            className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 mt-10 overflow-hidden bg-primaryDark/20'
+            intensity={20}
           >
-            <CaretLeft color='#fff' weight='regular' />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <CaretLeft color='#fff' weight='regular' />
+            </TouchableOpacity>
+          </BlurView>
         </View>
 
         <KeyboardAvoidingView
@@ -141,8 +167,8 @@ export default function ProfileScreen({
                   </Text>
                 </View>
                 <View className='flex-row items-center mb-6'>
-                  <MapPin color='#CCC9C9' weight='regular' size={18} />
-                  <Text className='text-secondaryWhite font-MontserratRegular text-lg'>
+                  <MapPin color='#CCC9C9' weight='regular' size={16} />
+                  <Text className='text-secondaryWhite font-MontserratRegular text-md'>
                     {gym?.name}
                   </Text>
                 </View>
@@ -170,6 +196,7 @@ export default function ProfileScreen({
           </SafeAreaView>
         </KeyboardAvoidingView>
       </View>
+      {/* </Swipeable> */}
     </View>
   );
 }

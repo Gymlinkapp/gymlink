@@ -75,6 +75,7 @@ export default function HomeScreen({ navigation, route }) {
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
   const { data: users } = useUsers(token);
   const [feed, setFeed] = useState<User[]>(user?.feed || users);
+  // const [feed, setFeed] = useState<User[]>(users);
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
   const isLoading = !users;
@@ -117,6 +118,8 @@ export default function HomeScreen({ navigation, route }) {
   if (isLoading) {
     return <Loading />;
   }
+
+  console.log(feed[0]);
 
   return (
     <Layout navigation={navigation}>

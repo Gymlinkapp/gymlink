@@ -19,6 +19,7 @@ import EditSplit from './EditSplit';
 import AssignExcercise from './auth/AssignExcercise';
 import CreateSplit from './auth/CreateGymSplit';
 import EditAccount from './EditAccount';
+import ProfileInfo from './ProfileInfo';
 
 const Stack = createNativeStackNavigator();
 
@@ -94,6 +95,13 @@ export default function Routes({ socket }: { socket: any }) {
       <Stack.Screen
         name='Profile'
         component={ProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name='ProfileInfo'
+        component={ProfileInfo}
         options={{
           headerShown: false,
         }}

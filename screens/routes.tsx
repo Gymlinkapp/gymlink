@@ -91,6 +91,13 @@ export default function Routes({ socket }: { socket: any }) {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name='Profile'
+        component={ProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Group
         screenOptions={{
           presentation: 'modal',
@@ -102,6 +109,7 @@ export default function Routes({ socket }: { socket: any }) {
           component={AssignExcercise}
           initialParams={{ setIsVerified }}
         />
+
         <Stack.Screen name='EditSplit' component={EditSplit} />
         <Stack.Screen name='AddSplit' component={CreateSplit} />
         <Stack.Screen
@@ -114,15 +122,7 @@ export default function Routes({ socket }: { socket: any }) {
             },
           }}
         />
-        <Stack.Screen
-          name='Profile'
-          component={ProfileScreen}
-          options={{
-            contentStyle: {
-              backgroundColor: COLORS.secondaryDark,
-            },
-          }}
-        />
+
         <Stack.Screen
           name='EditAccount'
           component={EditAccount}

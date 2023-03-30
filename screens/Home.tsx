@@ -1,4 +1,11 @@
-import { Dimensions, FlatList, Image, Text, View } from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Person from '../components/person';
 import Layout from '../layouts/layout';
 import { User } from '../utils/users';
@@ -148,7 +155,14 @@ export default function HomeScreen({ navigation, route }) {
                 ],
               }}
               renderItem={({ item: user, index }) => (
-                <View className='h-[250px] m-[0.5px] relative overflow-hidden rounded-3xl justify-end'>
+                <TouchableOpacity
+                  className='h-[250px] m-[0.5px] relative overflow-hidden rounded-3xl justify-end'
+                  onPress={() => {
+                    navigation.navigate('Profile', {
+                      user: user,
+                    });
+                  }}
+                >
                   <View className='z-50 p-4'>
                     <View className='overflow-hidden rounded-full w-8 h-8'>
                       <BlurView
@@ -179,7 +193,7 @@ export default function HomeScreen({ navigation, route }) {
                       className='w-full h-full object-cover'
                     />
                   </View>
-                </View>
+                </TouchableOpacity>
               )}
             />
           );

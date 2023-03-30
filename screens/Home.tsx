@@ -87,43 +87,15 @@ export default function HomeScreen({ navigation, route }) {
         end={[0, 1]}
       />
       <FlatList
-        snapToInterval={snapToInterval(height)}
-        decelerationRate='fast'
-        snapToAlignment='center'
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        className='bg-primaryDark relative'
-        contentInsetAdjustmentBehavior='automatic'
-        style={{ paddingHorizontal: 16 }}
-        contentContainerStyle={{ justifyContent: 'space-between' }}
-        onScroll={onScroll}
-        data={feed}
         ref={flatListRef}
-        renderItem={({ item, index }) =>
-          index !== feed.length - 1 ? (
-            <Person
-              onGoNext={onGoNext}
-              user={item}
-              key={index}
-              index={index}
-              navigation={navigation}
-              route={route}
-            />
-          ) : (
-            <View className='py-12'>
-              <Button
-                icon={<ArrowBendLeftUp color='#000' weight='bold' size={32} />}
-                variant='primary'
-                onPress={returnToTop}
-              >
-                Return to Top
-              </Button>
-              <Text className='text-tertiaryDark text-center'>
-                You've reached the end of nearby gym goers! Help grow Gymlink!
-              </Text>
-            </View>
-          )
-        }
+        data={feed}
+        keyExtractor={(item) => item.id}
+        numColumns={3}
+        renderItem={({ item: user, index }) => (
+          <View className='bg-secondaryDark h-[250px] m-1 w-[33.33%]'>
+            <View className=''></View>
+          </View>
+        )}
       />
     </Layout>
   );

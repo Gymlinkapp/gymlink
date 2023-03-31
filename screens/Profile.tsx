@@ -100,20 +100,11 @@ export default function ProfileScreen({
           });
         }
         setGestureState({ dx: 0, dy: 0 });
+
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       },
     })
   ).current;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentImageIndex < user?.images.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else {
-        setCurrentImageIndex(0);
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [currentImageIndex]);
 
   useEffect(() => {
     if (user.split) {
@@ -130,9 +121,65 @@ export default function ProfileScreen({
   }, [user]);
   return (
     <View className='relative w-full h-full' {...panResponder.panHandlers}>
-      {/* <Swipeable 
-        lef
-      > */}
+      <View className='absolute top-0 left-0 w-full h-full z-50 flex-row'>
+        <View className='absolute ml-6 py-2 flex-row mt-10 w-[56%] items-center justify-between z-50'>
+          <BlurView
+            className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 overflow-hidden bg-primaryDark/20'
+            intensity={20}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            >
+              <CaretLeft color='#fff' weight='regular' />
+            </TouchableOpacity>
+          </BlurView>
+          <BlurView
+            className='flex-row justify-self-center items-center rounded-full overflow-hidden px-6 h-8 bg-primaryDark/20'
+            intensity={20}
+          >
+            {/* indicator of images */}
+            {user.images.length > 1 &&
+              user.images.map((_, index) => (
+                <View
+                  className={`w-2 h-2 mx-1 rounded-full ${
+                    index === currentImageIndex
+                      ? 'bg-white'
+                      : 'bg-secondaryWhite'
+                  }`}
+                ></View>
+              ))}
+          </BlurView>
+        </View>
+        <TouchableOpacity
+          className='flex-1 z-40'
+          onPress={() => {
+            setCurrentImageIndex((prev) => {
+              if (prev === 0) {
+                return user.images.length - 1;
+              }
+              return prev - 1;
+            });
+
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+        ></TouchableOpacity>
+        <TouchableOpacity
+          className='flex-1 z-40'
+          onPress={() => {
+            setCurrentImageIndex((prev) => {
+              if (prev === user.images.length - 1) {
+                return 0;
+              }
+              return prev + 1;
+            });
+
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+        ></TouchableOpacity>
+      </View>
       <View className='absolute top-0 left-0 w-full h-full'>
         <LinearGradient
           pointerEvents='none'
@@ -143,22 +190,11 @@ export default function ProfileScreen({
           end={[1, 0]}
         />
         <Image
-          source={{ uri: user.images[0] }}
+          source={{ uri: user.images[currentImageIndex] }}
           className='w-full h-full object-cover'
         />
       </View>
       <View className='px-6 h-full justify-between'>
-        <View className='py-2'>
-          <BlurView
-            className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 mt-10 overflow-hidden bg-primaryDark/20'
-            intensity={20}
-          >
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <CaretLeft color='#fff' weight='regular' />
-            </TouchableOpacity>
-          </BlurView>
-        </View>
-
         <KeyboardAvoidingView
           className='flex-1'
           behavior='padding'
@@ -226,7 +262,6 @@ export default function ProfileScreen({
           </SafeAreaView>
         </KeyboardAvoidingView>
       </View>
-      {/* </Swipeable> */}
     </View>
   );
 }

@@ -1,4 +1,10 @@
-import { ClockClockwise, Gear, SignOut, User } from 'phosphor-react-native';
+import {
+  ClockClockwise,
+  Eye,
+  Gear,
+  SignOut,
+  User,
+} from 'phosphor-react-native';
 import { SafeAreaView, Text, View } from 'react-native';
 import { useMutation } from 'react-query';
 import Button from '../components/button';
@@ -10,7 +16,7 @@ import useSignout from '../hooks/useSignout';
 import { useAuth } from '../utils/context';
 
 export default function SettingsScreen({ navigation }) {
-  const { setIsVerified, token } = useAuth();
+  const { setIsVerified, token, user } = useAuth();
   const signout = useSignout(token);
 
   return (
@@ -63,6 +69,19 @@ export default function SettingsScreen({ navigation }) {
         icon={<Gear weight='fill' color={COLORS.mainWhite} />}
       >
         Edit
+      </Button>
+      <Button
+        onPress={() => {
+          navigation.popToTop();
+
+          navigation.navigate('Profile', {
+            user: user,
+          });
+        }}
+        variant='menu'
+        icon={<Eye weight='fill' color={COLORS.mainWhite} />}
+      >
+        Preview
       </Button>
     </SafeAreaView>
   );

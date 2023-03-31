@@ -170,7 +170,11 @@ export default function ProfileScreen({
         currentImageIndex={currentImageIndex}
         navigation={navigation}
       />
-      <View className='absolute top-28 left-0 w-full h-[75%] my-auto z-50 flex-row transform -translate-y-1/2'>
+      <View
+        className={`absolute top-28 left-0 w-full -translate-y-1/2 my-auto z-50 flex-row transform ${
+          isTyping ? 'h-[15%]' : 'h-[75%]'
+        }`}
+      >
         <View className='z-40 w-full h-full'>
           <TouchableOpacity
             className='flex-1 z-40'

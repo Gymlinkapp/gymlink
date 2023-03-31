@@ -220,7 +220,6 @@ export default function Person({
     },
     {
       onSuccess: (data) => {
-        console.log('chat', data.chat);
         navigation.navigate('Chat', {
           socket: socket,
           user: user,

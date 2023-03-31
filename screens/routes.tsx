@@ -4,8 +4,6 @@ import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
 import AuthStackScreen from './AuthScreenStack';
 import Home from './RootHomeScreen';
 import NotificationScreen from './Notifications';
-import UserAccountScreen from './UserAccount';
-import CreateChatScreen from './CreateChat';
 import ChatScreen from './Chat';
 import SettingsScreen from './Settings';
 import { COLORS } from '../utils/colors';
@@ -19,6 +17,7 @@ import EditSplit from './EditSplit';
 import AssignExcercise from './auth/AssignExcercise';
 import CreateSplit from './auth/CreateGymSplit';
 import EditAccount from './EditAccount';
+import ProfileInfo from './ProfileInfo';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +29,6 @@ export default function Routes({ socket }: { socket: any }) {
   useEffect(() => {
     getItemAsync('token').then((res) => {
       setToken(res);
-      console.log('token', res);
     });
 
     if (user) {
@@ -80,18 +78,23 @@ export default function Routes({ socket }: { socket: any }) {
           headerShown: false,
         }}
       />
-      <Stack.Screen name='UserAccountScreen' component={UserAccountScreen} />
-      <Stack.Screen
-        options={{
-          presentation: 'modal',
-          headerShown: false,
-        }}
-        name='CreateChat'
-        component={CreateChatScreen}
-      />
       <Stack.Screen
         name='Chat'
         component={ChatScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name='Profile'
+        component={ProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name='ProfileInfo'
+        component={ProfileInfo}
         options={{
           headerShown: false,
         }}
@@ -107,6 +110,7 @@ export default function Routes({ socket }: { socket: any }) {
           component={AssignExcercise}
           initialParams={{ setIsVerified }}
         />
+
         <Stack.Screen name='EditSplit' component={EditSplit} />
         <Stack.Screen name='AddSplit' component={CreateSplit} />
         <Stack.Screen
@@ -119,15 +123,7 @@ export default function Routes({ socket }: { socket: any }) {
             },
           }}
         />
-        <Stack.Screen
-          name='Profile'
-          component={ProfileScreen}
-          options={{
-            contentStyle: {
-              backgroundColor: COLORS.secondaryDark,
-            },
-          }}
-        />
+
         <Stack.Screen
           name='EditAccount'
           component={EditAccount}

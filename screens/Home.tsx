@@ -110,7 +110,6 @@ export default function HomeScreen({ navigation, route }) {
         });
         setHasInitialScrolled(true);
       }, 500);
-
       setColumnData(columnData);
     }
   }, [isLoading, users, feed]);

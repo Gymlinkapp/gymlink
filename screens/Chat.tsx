@@ -118,7 +118,7 @@ export default function ChatScreen({ route, navigation }) {
       socket.off('disconnect');
       socket.off('recieve-message');
     };
-  }, []);
+  }, [socket, roomName, roomId]);
 
   const typingIndicator = async (isTyping: boolean) => {
     await socket.emit('typing', { roomName, isTyping });

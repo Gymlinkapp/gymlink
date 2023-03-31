@@ -12,11 +12,14 @@ import AccountScreen from './Account';
 import Chats from './Chats';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
+import ProfileInfo from './ProfileInfo';
+import { useAuth } from '../utils/context';
 
 const Tab = createBottomTabNavigator();
 
 export default function Home({ route, navigation }) {
   const { socket } = route.params;
+  const { user } = useAuth();
   const glowEffect = (focused: boolean) => {
     return {
       shadowColor: focused ? COLORS.accent : COLORS.secondaryWhite,
@@ -113,7 +116,8 @@ export default function Home({ route, navigation }) {
             backgroundColor: COLORS.primaryDark,
           },
         }}
-        component={AccountScreen}
+        component={ProfileInfo}
+        initialParams={{ user }}
       />
     </Tab.Navigator>
   );

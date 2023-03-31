@@ -1,7 +1,7 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CaretLeft, MapPin } from 'phosphor-react-native';
-import { TouchableOpacity } from 'react-native';
+import { ScrollView, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native';
 import { Text } from 'react-native';
 import { View } from 'react-native';
@@ -10,6 +10,7 @@ import Split from '../components/Split';
 import { WeekSplit } from '../utils/split';
 import { useEffect, useState } from 'react';
 import { useGym } from '../hooks/useGym';
+import { useAuth } from '../utils/context';
 
 const ProfileInfoSection = ({
   title,
@@ -36,6 +37,7 @@ export default function ProfileInfo({
   navigation: any;
 }) {
   const { user, gymId } = route.params;
+  const { user: currUser } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -75,9 +77,11 @@ export default function ProfileInfo({
   }, [user]);
   return (
     <View className='relative'>
-      <View className='px-6 absolute z-50 w-52 h-52 justify-between'>
-        <BackButton navigation={navigation} />
-      </View>
+      {currUser.id !== user.id && (
+        <View className='px-6 absolute z-50 w-52 h-52 justify-between'>
+          <BackButton navigation={navigation} />
+        </View>
+      )}
       <View className='w-full h-72 rounded-[50px] overflow-hidden justify-end'>
         <View className='z-50 p-4'>
           <Text className='text-white font-MontserratRegular text-lg mb-2'>
@@ -109,7 +113,7 @@ export default function ProfileInfo({
           className='w-full h-full absolute top-0 left-0 object-cover'
         />
       </View>
-      <View className='mt-2'>
+      <ScrollView className='mt-2 mb-52'>
         <ProfileInfoSection title='About'>
           <Text className='text-md text-secondaryWhite font-MontserratRegular'>
             {user.bio}
@@ -132,8 +136,10 @@ export default function ProfileInfo({
             </View>
           </ProfileInfoSection>
         )}
-        {userSplit.length > 0 && <Split split={userSplit} isEditable={false} />}
-      </View>
+        {userSplit.length > 0 && (
+          <Split split={userSplit} isEditable={user.id === currUser?.id} />
+        )}
+      </ScrollView>
     </View>
   );
 }

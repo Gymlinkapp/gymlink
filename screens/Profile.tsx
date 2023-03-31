@@ -33,6 +33,50 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { keyboardVerticalOffset } from '../utils/ui';
 import * as Haptics from 'expo-haptics';
+import { User } from '../utils/users';
+
+export function ProfileHeader({
+  user,
+  currentImageIndex,
+  navigation,
+}: {
+  user: User;
+  currentImageIndex: number;
+  navigation;
+}) {
+  return (
+    <View className='absolute ml-6 py-2 flex-row mt-10 w-[56%] items-center justify-between z-50'>
+      <BlurView
+        className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 overflow-hidden bg-primaryDark/20'
+        intensity={20}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+        >
+          <CaretLeft color='#fff' weight='regular' />
+        </TouchableOpacity>
+      </BlurView>
+      <BlurView
+        className='flex-row justify-self-center items-center rounded-full overflow-hidden px-6 h-8 bg-primaryDark/20'
+        intensity={20}
+      >
+        {/* indicator of images */}
+        {user.images.length > 1 &&
+          user.images.map((_, index) => (
+            <View
+              key={index}
+              className={`w-2 h-2 mx-1 rounded-full ${
+                index === currentImageIndex ? 'bg-white' : 'bg-secondaryWhite'
+              }`}
+            ></View>
+          ))}
+      </BlurView>
+    </View>
+  );
+}
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -121,66 +165,42 @@ export default function ProfileScreen({
   }, [user]);
   return (
     <View className='relative w-full h-full' {...panResponder.panHandlers}>
-      <View className='absolute top-0 left-0 w-full h-full z-50 flex-row'>
-        <View className='absolute ml-6 py-2 flex-row mt-10 w-[56%] items-center justify-between z-50'>
-          <BlurView
-            className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 overflow-hidden bg-primaryDark/20'
-            intensity={20}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                navigation.goBack();
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-            >
-              <CaretLeft color='#fff' weight='regular' />
-            </TouchableOpacity>
-          </BlurView>
-          <BlurView
-            className='flex-row justify-self-center items-center rounded-full overflow-hidden px-6 h-8 bg-primaryDark/20'
-            intensity={20}
-          >
-            {/* indicator of images */}
-            {user.images.length > 1 &&
-              user.images.map((_, index) => (
-                <View
-                  className={`w-2 h-2 mx-1 rounded-full ${
-                    index === currentImageIndex
-                      ? 'bg-white'
-                      : 'bg-secondaryWhite'
-                  }`}
-                ></View>
-              ))}
-          </BlurView>
+      <ProfileHeader
+        user={user}
+        currentImageIndex={currentImageIndex}
+        navigation={navigation}
+      />
+      <View className='absolute top-28 left-0 w-full h-[75%] my-auto z-50 flex-row transform -translate-y-1/2'>
+        <View className='z-40 w-full h-full'>
+          <TouchableOpacity
+            className='flex-1 z-40'
+            onPress={() => {
+              setCurrentImageIndex((prev) => {
+                if (prev === user.images.length - 1) {
+                  return 0;
+                }
+                return prev + 1;
+              });
+
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+          ></TouchableOpacity>
+          <TouchableOpacity
+            className='flex-1 z-40'
+            onPress={() => {
+              setCurrentImageIndex((prev) => {
+                if (prev === 0) {
+                  return user.images.length - 1;
+                }
+                return prev - 1;
+              });
+
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+          ></TouchableOpacity>
         </View>
-        <TouchableOpacity
-          className='flex-1 z-40'
-          onPress={() => {
-            setCurrentImageIndex((prev) => {
-              if (prev === 0) {
-                return user.images.length - 1;
-              }
-              return prev - 1;
-            });
-
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-        ></TouchableOpacity>
-        <TouchableOpacity
-          className='flex-1 z-40'
-          onPress={() => {
-            setCurrentImageIndex((prev) => {
-              if (prev === user.images.length - 1) {
-                return 0;
-              }
-              return prev + 1;
-            });
-
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-        ></TouchableOpacity>
       </View>
-      <View className='absolute top-0 left-0 w-full h-full'>
+      <View className='absolute top-0 left-0 w-full h-full pointer-events-none'>
         <LinearGradient
           pointerEvents='none'
           colors={['rgba(0,0,0,1)', 'rgba(0,0,0,0)']}
@@ -194,7 +214,9 @@ export default function ProfileScreen({
           className='w-full h-full object-cover'
         />
       </View>
-      <View className='px-6 h-full justify-between'>
+
+      {/* user info: */}
+      <View className='px-6 justify-between z-40 absolute bottom-0 w-full pointer-events-none h-full'>
         <KeyboardAvoidingView
           className='flex-1'
           behavior='padding'
@@ -230,7 +252,7 @@ export default function ProfileScreen({
                     <TextInput
                       value={message}
                       onChangeText={(text) => setMessage(text)}
-                      className='p-2 px-4 rounded-full text-white'
+                      className='p-2 px-4 rounded-full text-white z-50'
                       placeholder='Shoot a message and link up'
                       onFocus={() => setIsTyping(true)}
                     />

@@ -4,8 +4,6 @@ import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
 import AuthStackScreen from './AuthScreenStack';
 import Home from './RootHomeScreen';
 import NotificationScreen from './Notifications';
-import UserAccountScreen from './UserAccount';
-import CreateChatScreen from './CreateChat';
 import ChatScreen from './Chat';
 import SettingsScreen from './Settings';
 import { COLORS } from '../utils/colors';
@@ -31,7 +29,6 @@ export default function Routes({ socket }: { socket: any }) {
   useEffect(() => {
     getItemAsync('token').then((res) => {
       setToken(res);
-      console.log('token', res);
     });
 
     if (user) {
@@ -80,15 +77,6 @@ export default function Routes({ socket }: { socket: any }) {
         options={{
           headerShown: false,
         }}
-      />
-      <Stack.Screen name='UserAccountScreen' component={UserAccountScreen} />
-      <Stack.Screen
-        options={{
-          presentation: 'modal',
-          headerShown: false,
-        }}
-        name='CreateChat'
-        component={CreateChatScreen}
       />
       <Stack.Screen
         name='Chat'

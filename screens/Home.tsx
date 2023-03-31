@@ -118,8 +118,6 @@ export default function HomeScreen({ navigation, route }) {
     return <Loading />;
   }
 
-  console.log(feed[0]);
-
   return (
     <Layout navigation={navigation}>
       <LinearGradient

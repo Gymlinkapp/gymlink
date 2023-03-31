@@ -74,7 +74,6 @@ export default function ChatScreen({ route, navigation }) {
         ]
       : []
   );
-  console.log('msg', messages);
   const flatListRef = useRef(null);
   const sendMessage = async () => {
     await socket.emit('chat-message', messageData);

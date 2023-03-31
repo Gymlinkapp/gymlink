@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useUser } from '../hooks/useUser';
 import Layout from '../layouts/layout';
-import { useGetFriendRequests } from '../hooks/useGetFriendRequests';
 import Loading from '../components/Loading';
 import { useEffect, useRef, useState } from 'react';
 import { FriendRequest } from '../utils/types/friendRequest';
@@ -168,64 +167,19 @@ export default function NotificationScreen({ navigation, route }) {
     }
   );
 
-  const {
-    data: friendRequests,
-    isLoading: isFriendRequestsLoading,
-    error: friendRequestsError,
-  } = useGetFriendRequests(token);
-
-  if (isFriendRequestsLoading) return <Loading />;
-
-  if (friendRequests?.length === 0) {
-    return (
-      <View className='mt-20 px-4'>
-        <TouchableOpacity
-          className='flex-row items-center bg-secondaryDark w-24 mb-4 justify-center rounded-full py-2'
-          onPress={() => navigation.goBack()}
-        >
-          <CaretLeft color='#fff' weight='regular' />
-          <Text className='text-white'>Back</Text>
-        </TouchableOpacity>
-        <EmptyScreen
-          icon={<Bell color='rgb(204,201,201)' weight='fill' />}
-          text='No notifications right now!'
-        />
-      </View>
-    );
-  }
-
   return (
-    <SafeAreaView>
-      <View className='p-4'>
-        <View className='pt-4 pb-6'>
-          <TouchableOpacity
-            className='flex-row items-center bg-secondaryDark w-24 mb-4 justify-center rounded-full py-2'
-            onPress={() => navigation.goBack()}
-          >
-            <CaretLeft color='#fff' weight='regular' />
-            <Text className='text-white'>Back</Text>
-          </TouchableOpacity>
-          <Text className='text-2xl font-MontserratBold text-primaryWhite'>
-            Notifications
-          </Text>
-          <Text className='text-base font-MontserratRegular text-secondaryWhite'>
-            See your friend requests, messages, and more here!
-          </Text>
-        </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ height: height, paddingBottom: 500 }}
-        >
-          {friendRequests?.map((request) => (
-            <Notification
-              friendRequest={request}
-              acceptFriendRequest={acceptFriendRequest}
-              declineFriendRequest={declineFriendRequest}
-              navigation={navigation}
-            />
-          ))}
-        </ScrollView>
-      </View>
-    </SafeAreaView>
+    <View className='mt-20 px-4'>
+      <TouchableOpacity
+        className='flex-row items-center bg-secondaryDark w-24 mb-4 justify-center rounded-full py-2'
+        onPress={() => navigation.goBack()}
+      >
+        <CaretLeft color='#fff' weight='regular' />
+        <Text className='text-white'>Back</Text>
+      </TouchableOpacity>
+      <EmptyScreen
+        icon={<Bell color='rgb(204,201,201)' weight='fill' />}
+        text='No notifications right now!'
+      />
+    </View>
   );
 }

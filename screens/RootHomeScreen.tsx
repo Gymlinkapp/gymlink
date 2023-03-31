@@ -8,7 +8,6 @@ import {
 } from 'phosphor-react-native';
 import FriendsScreen from './Friends';
 import HomeScreen from './Home';
-import AccountScreen from './Account';
 import Chats from './Chats';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';

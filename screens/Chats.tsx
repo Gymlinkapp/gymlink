@@ -13,6 +13,7 @@ import {
 } from 'react-native-gesture-handler';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
+import * as Haptics from 'expo-haptics';
 
 export type Message = {
   id?: string;
@@ -78,6 +79,7 @@ export default function Chats({ navigation, route }: any) {
               createLink.mutate({
                 chatId: chatId,
               });
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
             <X color='#fff' weight='fill' />

@@ -141,6 +141,7 @@ export default function HomeScreen({ navigation, route }) {
         initialNumToRender={10}
         removeClippedSubviews={true}
         showsVerticalScrollIndicator={false}
+        className='min-h-full'
         renderItem={({ item: column, index }) => {
           return (
             <FlatList

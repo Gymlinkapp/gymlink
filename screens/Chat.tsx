@@ -62,8 +62,19 @@ export default function ChatScreen({ route, navigation }) {
     sender: user,
     content: '',
   });
-  const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
-  console.log(messages);
+  const [messages, setMessages] = useState<MessageData[] | Message[]>(
+    message
+      ? [
+          {
+            roomName: roomName,
+            roomId: roomId,
+            sender: user,
+            content: message,
+          },
+        ]
+      : []
+  );
+  console.log('msg', messages);
   const flatListRef = useRef(null);
   const sendMessage = async () => {
     await socket.emit('chat-message', messageData);
@@ -72,19 +83,26 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   useEffect(() => {
-    socket.emit('join-chat', { roomName, roomId });
+    if (message) {
+      socket.emit('join-chat', {
+        roomName,
+        roomId,
+        message: {
+          roomName,
+          roomId,
+          sender: user,
+          content: message,
+        },
+      });
+    } else {
+      socket.emit('join-chat', {
+        roomName,
+        roomId,
+      });
+    }
     socket.on('messages', (data: Message[]) => {
       setMessages(data);
     });
-
-    if (message) {
-      socket.emit('chat-message', {
-        roomName,
-        roomId,
-        content: message,
-        sender: user,
-      } as MessageData);
-    }
 
     socket.on('recieve-message', (data: MessageData) => {
       setMessages((messages) => [...messages, data]);

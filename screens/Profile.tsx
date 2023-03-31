@@ -73,7 +73,7 @@ export default function ProfileScreen({
         console.log('chat', data.chat);
         navigation.navigate('Chat', {
           socket: socket,
-          user: user,
+          user: currUser,
           roomName: data.chat.name,
           toUser: data.chat.participants.toUser,
           userImage: data.chat.participants.toUser.images[0],

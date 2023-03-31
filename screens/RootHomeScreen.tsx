@@ -39,10 +39,17 @@ export default function Home({ route, navigation }) {
         headerStyle: {
           backgroundColor: COLORS.primaryDark,
         },
+        tabBarStyle: {
+          borderRadius: 50,
+          paddingTop: 10,
+          backgroundColor: COLORS.primaryDark,
+          elevation: 0,
+          position: 'absolute',
+        },
       })}
     >
       <Tab.Screen
-        name='Friends'
+        name='Chats'
         initialParams={{ socket }}
         options={{
           tabBarIcon: ({ focused }) => (

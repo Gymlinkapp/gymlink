@@ -1,6 +1,7 @@
 // create me a boilerplate for react context
 import React, { createContext, useContext, useState } from 'react';
 import { User } from './users';
+import { Socket } from 'socket.io-client';
 
 // create me a context
 const AuthContext = createContext(
@@ -15,6 +16,8 @@ const AuthContext = createContext(
     setLong: React.Dispatch<React.SetStateAction<number>>;
     lat: number;
     setLat: React.Dispatch<React.SetStateAction<number>>;
+    socket: Socket;
+    setSocket: React.Dispatch<React.SetStateAction<Socket>>;
   }
 );
 
@@ -25,6 +28,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [long, setLong] = useState(0);
   const [lat, setLat] = useState(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   return (
     <AuthContext.Provider
@@ -39,6 +43,8 @@ const AuthProvider = ({ children }) => {
         setLong,
         lat,
         setLat,
+        socket,
+        setSocket,
       }}
     >
       {children}

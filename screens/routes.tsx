@@ -24,7 +24,8 @@ import ProfileInfo from './ProfileInfo';
 const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
-  const { isVerified, setIsVerified, setToken, token, setUser } = useAuth();
+  const { isVerified, setIsVerified, setToken, token, setUser, setSocket } =
+    useAuth();
   const { data: user, isLoading } = useUser(token);
 
   useEffect(() => {
@@ -44,7 +45,11 @@ export default function Routes({ socket }: { socket: any }) {
     if (!token) {
       setIsVerified(false);
     }
-  }, [token, , user]);
+
+    if (socket) {
+      setSocket(socket);
+    }
+  }, [token, user, socket]);
 
   // deleteItemAsync('token');
   return (

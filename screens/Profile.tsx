@@ -23,7 +23,7 @@ import {
   PaperPlaneRight,
   X,
 } from 'phosphor-react-native';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 import Split from '../components/Split';
 import { WeekSplit } from '../utils/split';
@@ -32,7 +32,7 @@ import { useGym } from '../hooks/useGym';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { keyboardVerticalOffset } from '../utils/ui';
-import { Swipeable } from 'react-native-gesture-handler';
+import * as Haptics from 'expo-haptics';
 
 // This is a user's profile screen displayed when 'Show More' is pressed.
 export default function ProfileScreen({
@@ -43,15 +43,17 @@ export default function ProfileScreen({
   route?: any;
 }) {
   const { user, isFriend } = route.params;
-  const { user: currUser } = useAuth();
+  const { user: currUser, socket, token } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [gestureState, setGestureState] = useState({ dx: 0, dy: 0 });
+  const [message, setMessage] = useState('');
+  const queryClient = useQueryClient();
 
   const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
 
-  const useSendFriendRequest = useMutation(
+  const createLink = useMutation(
     async ({
       fromUserId,
       toUserId,
@@ -59,18 +61,31 @@ export default function ProfileScreen({
       toUserId: string;
       fromUserId: string;
     }) => {
-      const { data } = await api.post(`/social/sendFriendRequest`, {
+      const { data } = await api.post(`/social/link`, {
         toUserId,
         fromUserId,
+        token,
       });
       return data;
     },
     {
       onSuccess: (data) => {
-        console.log(data);
+        console.log('chat', data.chat);
+        navigation.navigate('Chat', {
+          socket: socket,
+          user: user,
+          roomName: data.chat.name,
+          toUser: data.chat.participants.toUser,
+          userImage: data.chat.participants.toUser.images[0],
+          uiName: data.chat.name,
+          roomId: data.chat.id,
+          message,
+        });
+        queryClient.invalidateQueries('user');
       },
     }
   );
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
@@ -177,20 +192,35 @@ export default function ProfileScreen({
                 <View className='flex-1 overflow-hidden rounded-full mr-6'>
                   <BlurView intensity={15} className='bg-primaryWhite/10'>
                     <TextInput
+                      value={message}
+                      onChangeText={(text) => setMessage(text)}
                       className='p-2 px-4 rounded-full text-white'
                       placeholder='Shoot a message and link up'
                       onFocus={() => setIsTyping(true)}
                     />
                   </BlurView>
                 </View>
-                <PaperPlaneRight
-                  color='#CCC9C9'
-                  weight='regular'
-                  size={18}
-                  style={{
-                    flex: 0.25,
+                <TouchableOpacity
+                  onPress={() => {
+                    createLink.mutate({
+                      toUserId: user.id,
+                      fromUserId: currUser.id,
+                    });
+                    // create haptic feedback
+                    Haptics.notificationAsync(
+                      Haptics.NotificationFeedbackType.Success
+                    );
                   }}
-                />
+                >
+                  <PaperPlaneRight
+                    color='#CCC9C9'
+                    weight='regular'
+                    size={18}
+                    style={{
+                      flex: 0.25,
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
             </KeyboardAvoidingView>
           </SafeAreaView>

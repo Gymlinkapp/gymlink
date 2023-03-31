@@ -53,7 +53,7 @@ function ChatItem({ message, user }: { message: Message; user: User }) {
 }
 
 export default function ChatScreen({ route, navigation }) {
-  const { socket, user, roomId, roomName, uiName, userImage, toUser } =
+  const { socket, user, roomId, roomName, uiName, userImage, toUser, message } =
     route.params;
   const [isTyping, setIsTyping] = useState<Boolean>(false);
   const [messageData, setMessageData] = useState<MessageData>({
@@ -63,13 +63,28 @@ export default function ChatScreen({ route, navigation }) {
     content: '',
   });
   const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
+  console.log(messages);
   const flatListRef = useRef(null);
+  const sendMessage = async () => {
+    await socket.emit('chat-message', messageData);
+    setMessages((messages) => [...messages, messageData]);
+    setMessageData({ ...messageData, content: '' });
+  };
 
   useEffect(() => {
     socket.emit('join-chat', { roomName, roomId });
     socket.on('messages', (data: Message[]) => {
       setMessages(data);
     });
+
+    if (message) {
+      socket.emit('chat-message', {
+        roomName,
+        roomId,
+        content: message,
+        sender: user,
+      } as MessageData);
+    }
 
     socket.on('recieve-message', (data: MessageData) => {
       setMessages((messages) => [...messages, data]);
@@ -86,12 +101,6 @@ export default function ChatScreen({ route, navigation }) {
       socket.off('recieve-message');
     };
   }, []);
-
-  const sendMessage = async () => {
-    await socket.emit('chat-message', messageData);
-    setMessages((messages) => [...messages, messageData]);
-    setMessageData({ ...messageData, content: '' });
-  };
 
   const typingIndicator = async (isTyping: boolean) => {
     await socket.emit('typing', { roomName, isTyping });

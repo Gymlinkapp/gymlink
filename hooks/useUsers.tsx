@@ -4,7 +4,7 @@ import api from '../utils/axiosStore';
 import { User } from '../utils/users';
 
 const fetchUsers = async (token: string) => {
-  const { data } = await api.get(`/users/getNearByUsers/${token}`);
+  const { data } = await api.get(`/users/getNearByUsers?token=${token}`);
   return data;
 };
 

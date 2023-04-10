@@ -1,31 +1,15 @@
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Person from '../components/person';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import Layout from '../layouts/layout';
 import { User } from '../utils/users';
 import React, { useEffect, useRef, useState } from 'react';
-import { calculateCardHeight, calculateSnapInterval } from '../utils/ui';
 import { useUsers } from '../hooks/useUsers';
-import useToken from '../hooks/useToken';
 import Loading from '../components/Loading';
-import Button from '../components/button';
-import { ArrowBendDoubleUpLeft, ArrowBendLeftUp } from 'phosphor-react-native';
-import { useMutation, useQueryClient } from 'react-query';
-import api from '../utils/axiosStore';
 import { useAuth } from '../utils/context';
-import { snapToInterval } from '../utils/snapToInterval';
 import { getFeedScrollIndex } from '../utils/getFeedScrollIndex';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { exercises } from '../utils/split';
-import { Filter, FilterValue } from '../utils/types/filter';
 import Filters from '../components/Filters';
+import { FilterType } from '../utils/types/filter';
 
 // const onScroll = async (e) => {
 //   const index = getFeedScrollIndex(e, height);
@@ -42,25 +26,6 @@ import Filters from '../components/Filters';
 //   }
 //   setCurrentIndex(index);
 // };
-
-const FeedColumn = ({ data, index }) => {
-  return (
-    <FlatList
-      data={data} // use the filtered arrays for each column
-      keyExtractor={(item) => item.id}
-      listKey={index + Math.random()}
-      className='flex-1'
-      renderItem={({ item: user, index }) => (
-        <View className='h-[250px] m-[0.5px] relative overflow-hidden rounded-3xl'>
-          <Image
-            source={{ uri: user.images[0] }}
-            className='absolute top-0 left-0 w-full h-full object-cover'
-          />
-        </View>
-      )}
-    />
-  );
-};
 
 function splitArrayIntoColumns(array, numColumns) {
   const columnArrays = Array.from({ length: numColumns }, () => []);
@@ -99,48 +64,43 @@ export default function HomeScreen({ navigation, route }) {
       });
 
       if (user) {
-        // goingToday
-        // workoutType
-        // skillLevel
-        // gender
-        // goals
         setFilters([
           {
-            filter: 'goingToday',
+            filter: FilterType.GOING_TODAY,
             name: 'Going Today',
             values: [
               {
                 name: user.filterGoingToday ? 'Yes' : 'No',
                 value: user.filterGoingToday,
-                filter: 'goingToday',
+                filter: FilterType.GOING_TODAY,
               },
             ],
           },
           {
-            filter: 'workoutType',
+            filter: FilterType.WORKOUT_TYPE,
             name: 'Workout Type',
             values: user.filterWorkout.map((workout) => {
               return {
                 name: workout,
                 value: workout,
-                filter: 'workoutType',
+                filter: FilterType.WORKOUT_TYPE,
               };
             }),
           },
           {
-            filter: 'skillLevel',
+            filter: FilterType.SKILL_LEVEL,
             name: 'Skill Level',
             values: user.filterSkillLevel.map((skill) => {
               return {
                 name: skill,
                 value: skill,
-                filter: 'skillLevel',
+                filter: FilterType.SKILL_LEVEL,
               };
             }),
           },
           {
-            filter: 'gender',
-            name: 'Gender',
+            filter: FilterType.GENDER,
+            name: FilterType.GENDER,
             values: user.filterGender.map((gender) => {
               return {
                 name: gender,
@@ -150,13 +110,13 @@ export default function HomeScreen({ navigation, route }) {
             }),
           },
           {
-            filter: 'goals',
+            filter: FilterType.GOALS,
             name: 'Goals',
             values: user.filterGoals.map((goal) => {
               return {
                 name: goal,
                 value: goal,
-                filter: 'goals',
+                filter: FilterType.GOALS,
               };
             }),
           },

@@ -10,29 +10,37 @@ export type Filter = {
   values: FilterValue[];
 };
 
+export enum FilterType {
+  GOING_TODAY = 'goingToday',
+  WORKOUT_TYPE = 'workoutType',
+  SKILL_LEVEL = 'skillLevel',
+  GENDER = 'gender',
+  GOALS = 'goals',
+}
+
 export const defaultFilters: Filter[] = [
   {
-    filter: 'goingToday',
+    filter: FilterType.GOING_TODAY,
     name: 'Going Today',
     values: [],
   },
   {
-    filter: 'workoutType',
+    filter: FilterType.WORKOUT_TYPE,
     name: 'Workout Type',
     values: [],
   },
   {
-    filter: 'skillLevel',
+    filter: FilterType.SKILL_LEVEL,
     name: 'Workout Skill Level',
     values: [],
   },
   {
-    filter: 'gender',
+    filter: FilterType.GENDER,
     name: 'Gender',
     values: [],
   },
   {
-    filter: 'goals',
+    filter: FilterType.GOALS,
     name: 'Goals',
     values: [],
   },
@@ -40,12 +48,12 @@ export const defaultFilters: Filter[] = [
 
 export const goingTodayValues = [
   {
-    filter: 'goingToday',
+    filter: FilterType.GOING_TODAY,
     name: 'Yes',
     value: true,
   },
   {
-    filter: 'goingToday',
+    filter: FilterType.GOING_TODAY,
     name: 'No',
     value: false,
   },
@@ -53,17 +61,17 @@ export const goingTodayValues = [
 
 export const workoutTypeValues = [
   {
-    filter: 'workoutType',
+    filter: FilterType.WORKOUT_TYPE,
     name: 'Cardio',
     value: 'cardio',
   },
   {
-    filter: 'workoutType',
+    filter: FilterType.WORKOUT_TYPE,
     name: 'Bench',
     value: 'bench',
   },
   {
-    filter: 'workoutType',
+    filter: FilterType.WORKOUT_TYPE,
     name: 'Squat',
     value: 'squat',
   },
@@ -71,17 +79,17 @@ export const workoutTypeValues = [
 
 export const skillLevelValues = [
   {
-    filter: 'skillLevel',
+    filter: FilterType.SKILL_LEVEL,
     name: 'Low',
     value: 'low',
   },
   {
-    filter: 'skillLevel',
+    filter: FilterType.SKILL_LEVEL,
     name: 'Medium',
     value: 'medium',
   },
   {
-    filter: 'skillLevel',
+    filter: FilterType.SKILL_LEVEL,
     name: 'High',
     value: 'high',
   },
@@ -89,29 +97,29 @@ export const skillLevelValues = [
 
 export const genderValues = [
   {
-    filter: 'gender',
+    filter: FilterType.GENDER,
     name: 'Male',
     value: 'male',
   },
   {
-    filter: 'gender',
+    filter: FilterType.GENDER,
     name: 'Female',
     value: 'female',
   },
 ];
 export const goalValues = [
   {
-    filter: 'goals',
+    filter: FilterType.SKILL_LEVEL,
     name: 'Weight Loss',
     value: 'weightLoss',
   },
   {
-    filter: 'goals',
+    filter: FilterType.SKILL_LEVEL,
     name: 'Muscle Gain',
     value: 'muscleGain',
   },
   {
-    filter: 'goals',
+    filter: FilterType.SKILL_LEVEL,
     name: 'Toning',
     value: 'toning',
   },

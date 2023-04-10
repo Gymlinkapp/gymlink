@@ -8,23 +8,26 @@ import {
   Filter,
   FilterValue,
   defaultFilters,
+  genderValues,
+  goalValues,
   goingTodayValues,
-  intensityValues,
+  skillLevelValues,
   workoutTypeValues,
 } from '../utils/types/filter';
 import { useAuth } from '../utils/context';
 import { X } from 'phosphor-react-native';
 import Button from './button';
 import { BlurView } from 'expo-blur';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 
 export default function Filters() {
+  const queryClient = useQueryClient();
   const [modalVisible, setModalVisible] = useState(false);
   const [values, setValues] = useState<FilterValue[]>([]);
   const [modalTitle, setModalTitle] = useState('');
   const [selectedValues, setSelectedValues] = useState<FilterValue[]>([]);
-  const { setFilters, filters } = useAuth();
+  const { setFilters, filters, token } = useAuth();
 
   // every time a user clicks save, we want to update the filters in the context, the transform the filters and send them to the server.
 
@@ -41,15 +44,19 @@ export default function Filters() {
 
       console.log('transformedFilters', transformedFilters);
 
-      // try {
-      //   return await api.post('/feed/filter', {
-      //     filters: transformedFilters,
-      //   });
-      // } catch (error) {}
+      try {
+        return await api.post('/users/filter', {
+          token,
+          filters: transformedFilters,
+        });
+      } catch (error) {
+        console.log('error', error);
+      }
     },
     {
       onSuccess: (data) => {
         console.log('data', data);
+        queryClient.invalidateQueries('user');
       },
     }
   );
@@ -112,8 +119,14 @@ export default function Filters() {
                     case 'workoutType':
                       setValues(workoutTypeValues);
                       break;
-                    case 'intensity':
-                      setValues(intensityValues);
+                    case 'skillLevel':
+                      setValues(skillLevelValues);
+                      break;
+                    case 'gender':
+                      setValues(genderValues);
+                      break;
+                    case 'goals':
+                      setValues(goalValues);
                       break;
                     default:
                       break;

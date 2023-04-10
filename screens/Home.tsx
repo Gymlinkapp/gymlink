@@ -72,7 +72,7 @@ function splitArrayIntoColumns(array, numColumns) {
 
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_SCROLL_POSITION = 250;
-  const { token, user, setUser, filters } = useAuth();
+  const { token, user, setUser, filters, setFilters } = useAuth();
   const flatListRef = useRef(null);
   const [columnData, setColumnData] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
@@ -98,6 +98,71 @@ export default function HomeScreen({ navigation, route }) {
         }
       });
 
+      if (user) {
+        // goingToday
+        // workoutType
+        // skillLevel
+        // gender
+        // goals
+        setFilters([
+          {
+            filter: 'goingToday',
+            name: 'Going Today',
+            values: [
+              {
+                name: user.filterGoingToday ? 'Yes' : 'No',
+                value: user.filterGoingToday,
+                filter: 'goingToday',
+              },
+            ],
+          },
+          {
+            filter: 'workoutType',
+            name: 'Workout Type',
+            values: user.filterWorkout.map((workout) => {
+              return {
+                name: workout,
+                value: workout,
+                filter: 'workoutType',
+              };
+            }),
+          },
+          {
+            filter: 'skillLevel',
+            name: 'Skill Level',
+            values: user.filterSkillLevel.map((skill) => {
+              return {
+                name: skill,
+                value: skill,
+                filter: 'skillLevel',
+              };
+            }),
+          },
+          {
+            filter: 'gender',
+            name: 'Gender',
+            values: user.filterGender.map((gender) => {
+              return {
+                name: gender,
+                value: gender,
+                filter: 'gender',
+              };
+            }),
+          },
+          {
+            filter: 'goals',
+            name: 'Goals',
+            values: user.filterGoals.map((goal) => {
+              return {
+                name: goal,
+                value: goal,
+                filter: 'goals',
+              };
+            }),
+          },
+        ]);
+      }
+
       const columns = splitArrayIntoColumns(feed, numColumns);
       const columnData = columns.map((column, index) => {
         return {
@@ -115,7 +180,7 @@ export default function HomeScreen({ navigation, route }) {
       }, 500);
       setColumnData(columnData);
     }
-  }, [isLoading, users, feed]);
+  }, [isLoading, users, feed, user]);
 
   if (isLoading) {
     return <Loading />;

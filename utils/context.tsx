@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { User } from './users';
 import { Socket } from 'socket.io-client';
-import { Filter } from './types/filter';
+import { Filter, defaultFilters } from './types/filter';
 import { exercises } from './split';
 
 // create me a context
@@ -33,87 +33,7 @@ const AuthProvider = ({ children }) => {
   const [long, setLong] = useState(0);
   const [lat, setLat] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [filters, setFilters] = useState<Filter[]>([
-    {
-      filter: 'goingToday',
-      name: 'Going Today',
-      values: [
-        {
-          filter: 'goingToday',
-          name: 'Yes',
-          value: true,
-        },
-        {
-          filter: 'goingToday',
-          name: 'No',
-          value: false,
-        },
-      ],
-    },
-    {
-      filter: 'workoutType',
-      name: 'Workout Type',
-      values: [
-        {
-          filter: 'workoutType',
-          name: 'Cardio',
-          value: 'cardio',
-        },
-        {
-          filter: 'workoutType',
-          name: 'Bench',
-          value: 'bench',
-        },
-        {
-          filter: 'workoutType',
-          name: 'Squat',
-          value: 'squat',
-        },
-      ],
-    },
-    {
-      filter: 'intensity',
-      name: 'Workout Intensity',
-      values: [
-        {
-          filter: 'intensity',
-          name: 'Low',
-          value: 'low',
-        },
-        {
-          filter: 'intensity',
-          name: 'Medium',
-          value: 'medium',
-        },
-        {
-          filter: 'intensity',
-          name: 'High',
-          value: 'high',
-        },
-      ],
-    },
-    {
-      filter: 'intensityyy',
-      name: 'Workout Intensity',
-      values: [
-        {
-          filter: 'intensityyy',
-          name: 'Low',
-          value: 'low',
-        },
-        {
-          filter: 'intensityyy',
-          name: 'Medium',
-          value: 'medium',
-        },
-        {
-          filter: 'intensityyy',
-          name: 'High',
-          value: 'high',
-        },
-      ],
-    },
-  ]);
+  const [filters, setFilters] = useState<Filter[]>(defaultFilters);
 
   return (
     <AuthContext.Provider

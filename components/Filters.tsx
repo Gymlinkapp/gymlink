@@ -4,11 +4,20 @@ import { FlatList } from 'react-native';
 import { Text } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { View } from 'react-native';
-import { Filter, FilterValue, defaultFilters } from '../utils/types/filter';
+import {
+  Filter,
+  FilterValue,
+  defaultFilters,
+  goingTodayValues,
+  intensityValues,
+  workoutTypeValues,
+} from '../utils/types/filter';
 import { useAuth } from '../utils/context';
 import { X } from 'phosphor-react-native';
 import Button from './button';
 import { BlurView } from 'expo-blur';
+import { useMutation } from 'react-query';
+import api from '../utils/axiosStore';
 
 export default function Filters() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -19,30 +28,66 @@ export default function Filters() {
 
   // every time a user clicks save, we want to update the filters in the context, the transform the filters and send them to the server.
 
-  const handleSave = () => {
-    // keep the filters that are not selected, change the filters name to the first/only value and values to the selected values
-    const newFilters = filters.map((filter) => {
-      const selectedValue = selectedValues.find(
-        (value) => value.filter === filter.filter
-      );
-      if (selectedValue) {
+  const filterFeed = useMutation(
+    async () => {
+      // request.body = { filters: [ { filter: "goingToday", value: true }, { filter: "workout", value: ["back"] }, { filter: "gender", value: ["male", "female"] } ] }
+
+      const transformedFilters = filters.map((filter) => {
         return {
-          ...filter,
-          name: selectedValue.name,
-          values: [selectedValue],
+          filter: filter.filter,
+          value: filter.values.map((value) => value.value),
         };
-      }
-      return filter;
+      });
+
+      console.log('transformedFilters', transformedFilters);
+
+      // try {
+      //   return await api.post('/feed/filter', {
+      //     filters: transformedFilters,
+      //   });
+      // } catch (error) {}
+    },
+    {
+      onSuccess: (data) => {
+        console.log('data', data);
+      },
+    }
+  );
+
+  const handleSave = () => {
+    console.log('selectedValues', selectedValues);
+    // console.log(
+    //   'filters',
+    //   filters.map((filter) => filter.values)
+    // );
+
+    selectedValues.map((value) => {
+      const filter = filters.find((filter) => filter.filter === value.filter);
+      setFilters((prev) => {
+        const index = prev.indexOf(filter);
+        prev[index].values = [
+          {
+            filter: value.filter,
+            value: value.value,
+            name: value.name,
+          },
+        ];
+        return prev;
+      });
     });
 
-    setFilters(newFilters);
+    filterFeed.mutate();
 
-    console.log('filters', selectedValues);
+    console.log('filters', filters);
 
     setModalVisible(false);
   };
 
-  console.log('filters', filters);
+  const clearFilters = () => {
+    setFilters(defaultFilters);
+    filterFeed.mutate();
+  };
+
   return (
     <View className='h-12 w-full py-2 pointer-events-none absolute top-0 z-50'>
       <FlatList
@@ -60,21 +105,33 @@ export default function Filters() {
                 onPress={() => {
                   // handleSelectOption(filter);
                   setModalVisible(true);
-                  setValues(filter.values);
+                  switch (filter.filter) {
+                    case 'goingToday':
+                      setValues(goingTodayValues);
+                      break;
+                    case 'workoutType':
+                      setValues(workoutTypeValues);
+                      break;
+                    case 'intensity':
+                      setValues(intensityValues);
+                      break;
+                    default:
+                      break;
+                  }
                   setModalTitle(filter.name);
                 }}
               >
                 <Text className='text-white font-MontserratMedium text-xs'>
-                  {filter.name}
+                  {filter.values.length > 0
+                    ? filter.values[0].name
+                    : filter.name}
                 </Text>
               </TouchableOpacity>
             </BlurView>
 
             {index === filters.length - 1 && (
               <TouchableOpacity
-                onPress={() => {
-                  setFilters(defaultFilters);
-                }}
+                onPress={() => clearFilters()}
                 className='flex flex-row items-center bg-primaryWhite mr-1 rounded-full px-4 py-0'
               >
                 <Text className='text-primaryDark font-MontserratMedium text-xs'>

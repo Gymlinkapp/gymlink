@@ -121,8 +121,6 @@ export default function HomeScreen({ navigation, route }) {
     return <Loading />;
   }
 
-  // BRB
-
   return (
     <Layout navigation={navigation}>
       <LinearGradient

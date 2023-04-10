@@ -42,21 +42,23 @@ export default function Filters({ options, handleSelectOption }: Props) {
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className='flex-1 bg-primaryDark justify-center p-12'>
-          {values.map((option: FilterValue) => (
-            <TouchableOpacity
-              className='py-4 px-8 bg-secondaryDark rounded-md mb-4'
-              key={option.name}
-              onPress={() => {
-                // handleSelectOption(option.name)
-                setModalVisible(false);
-              }}
-            >
-              <Text className='text-white font-MontserratMedium'>
-                {option.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View className='flex-1 justify-end items-end w-ful'>
+          <View className='bg-primaryDark flex-row flex-wrap w-full h-1/2 l p-12 rounded-2xl'>
+            {values.map((option: FilterValue) => (
+              <TouchableOpacity
+                className='py-4 px-8 bg-secondaryDark rounded-md m-2'
+                key={option.name}
+                onPress={() => {
+                  // handleSelectOption(option.name)
+                  setModalVisible(false);
+                }}
+              >
+                <Text className='text-white font-MontserratMedium'>
+                  {option.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </Modal>
     </View>

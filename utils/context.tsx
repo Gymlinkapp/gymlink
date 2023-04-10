@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState } from 'react';
 import { User } from './users';
 import { Socket } from 'socket.io-client';
+import { Filter } from './types/filter';
+import { exercises } from './split';
 
 // create me a context
 const AuthContext = createContext(
@@ -18,6 +20,8 @@ const AuthContext = createContext(
     setLat: React.Dispatch<React.SetStateAction<number>>;
     socket: Socket;
     setSocket: React.Dispatch<React.SetStateAction<Socket>>;
+    filters: Filter[];
+    setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
   }
 );
 
@@ -29,6 +33,76 @@ const AuthProvider = ({ children }) => {
   const [long, setLong] = useState(0);
   const [lat, setLat] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [filters, setFilters] = useState<Filter[]>([
+    {
+      filter: 'goingToday',
+      name: 'Going Today',
+      values: [
+        {
+          name: 'Yes',
+          value: true,
+        },
+        {
+          name: 'No',
+          value: false,
+        },
+      ],
+    },
+    {
+      filter: 'workoutType',
+      name: 'Workout Type',
+      values: [
+        {
+          name: 'Cardio',
+          value: 'cardio',
+        },
+        {
+          name: 'Bench',
+          value: 'bench',
+        },
+        {
+          name: 'Squat',
+          value: 'squat',
+        },
+      ],
+    },
+    {
+      filter: 'intensity',
+      name: 'Workout Intensity',
+      values: [
+        {
+          name: 'Low',
+          value: 'low',
+        },
+        {
+          name: 'Medium',
+          value: 'medium',
+        },
+        {
+          name: 'High',
+          value: 'high',
+        },
+      ],
+    },
+    {
+      filter: 'intensityyy',
+      name: 'Workout Intensity',
+      values: [
+        {
+          name: 'Low',
+          value: 'low',
+        },
+        {
+          name: 'Medium',
+          value: 'medium',
+        },
+        {
+          name: 'High',
+          value: 'high',
+        },
+      ],
+    },
+  ]);
 
   return (
     <AuthContext.Provider
@@ -45,6 +119,8 @@ const AuthProvider = ({ children }) => {
         setLat,
         socket,
         setSocket,
+        filters,
+        setFilters,
       }}
     >
       {children}

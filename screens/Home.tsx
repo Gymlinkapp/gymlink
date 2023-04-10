@@ -23,6 +23,9 @@ import { snapToInterval } from '../utils/snapToInterval';
 import { getFeedScrollIndex } from '../utils/getFeedScrollIndex';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { exercises } from '../utils/split';
+import { Filter, FilterValue } from '../utils/types/filter';
+import Filters from '../components/Filters';
 
 // const onScroll = async (e) => {
 //   const index = getFeedScrollIndex(e, height);
@@ -69,7 +72,7 @@ function splitArrayIntoColumns(array, numColumns) {
 
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_SCROLL_POSITION = 250;
-  const { token, user, setUser } = useAuth();
+  const { token, user, setUser, filters } = useAuth();
   const flatListRef = useRef(null);
   const [columnData, setColumnData] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
@@ -118,6 +121,8 @@ export default function HomeScreen({ navigation, route }) {
     return <Loading />;
   }
 
+  // BRB
+
   return (
     <Layout navigation={navigation}>
       <LinearGradient
@@ -126,6 +131,19 @@ export default function HomeScreen({ navigation, route }) {
         className='absolute -top-[100px] z-50 w-full h-80'
         start={[0, 0]}
         end={[0, 1]}
+      />
+
+      <Filters
+        options={filters}
+        handleSelectOption={(option: FilterValue) => {
+          // const newFilters = filters.map((filter) => {
+          //   if (filter.id === option.id) {
+          //     filter.selected = !filter.selected;
+          //   }
+          //   return filter;
+          // });
+          // setUser({ ...user, filters: newFilters });
+        }}
       />
       <FlatList
         ref={flatListRef}

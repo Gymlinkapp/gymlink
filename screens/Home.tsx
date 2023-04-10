@@ -37,13 +37,13 @@ function splitArrayIntoColumns(array, numColumns) {
 
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_SCROLL_POSITION = 250;
-  const { token, user, setUser, filters, setFilters } = useAuth();
+  const { token, user, setUser, filters, setFilters, feed, setFeed } =
+    useAuth();
   const flatListRef = useRef(null);
   const [columnData, setColumnData] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
   const { data: users } = useUsers(token);
-  const [feed, setFeed] = useState<User[]>(user?.feed || users);
-  // const [feed, setFeed] = useState<User[]>(users);
+
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
   const isLoading = !users;
@@ -53,6 +53,72 @@ export default function HomeScreen({ navigation, route }) {
   }
 
   useEffect(() => {
+    if (user) {
+      if (feed.length < 0 || user.feed.length < 0) {
+        setFeed(users);
+        console.log('reset feed');
+      }
+      console.log(user.feed.length);
+
+      // setFeed(user.feed);
+      setFilters([
+        {
+          filter: FilterType.GOING_TODAY,
+          name: 'Going Today',
+          values: [
+            {
+              name: user.filterGoingToday ? 'Yes' : 'No',
+              value: user.filterGoingToday,
+              filter: FilterType.GOING_TODAY,
+            },
+          ],
+        },
+        {
+          filter: FilterType.WORKOUT_TYPE,
+          name: 'Workout Type',
+          values: user.filterWorkout.map((workout) => {
+            return {
+              name: workout,
+              value: workout,
+              filter: FilterType.WORKOUT_TYPE,
+            };
+          }),
+        },
+        {
+          filter: FilterType.SKILL_LEVEL,
+          name: 'Skill Level',
+          values: user.filterSkillLevel.map((skill) => {
+            return {
+              name: skill,
+              value: skill,
+              filter: FilterType.SKILL_LEVEL,
+            };
+          }),
+        },
+        {
+          filter: FilterType.GENDER,
+          name: FilterType.GENDER,
+          values: user.filterGender.map((gender) => {
+            return {
+              name: gender,
+              value: gender,
+              filter: 'gender',
+            };
+          }),
+        },
+        {
+          filter: FilterType.GOALS,
+          name: 'Goals',
+          values: user.filterGoals.map((goal) => {
+            return {
+              name: goal,
+              value: goal,
+              filter: FilterType.GOALS,
+            };
+          }),
+        },
+      ]);
+    }
     if (!isLoading && users) {
       const numColumns = 3;
       const scrollFactors = Array.from({ length: numColumns }, (__, index) => {
@@ -62,66 +128,6 @@ export default function HomeScreen({ navigation, route }) {
           return Math.random() * 0.2 + 0.1;
         }
       });
-
-      if (user) {
-        setFilters([
-          {
-            filter: FilterType.GOING_TODAY,
-            name: 'Going Today',
-            values: [
-              {
-                name: user.filterGoingToday ? 'Yes' : 'No',
-                value: user.filterGoingToday,
-                filter: FilterType.GOING_TODAY,
-              },
-            ],
-          },
-          {
-            filter: FilterType.WORKOUT_TYPE,
-            name: 'Workout Type',
-            values: user.filterWorkout.map((workout) => {
-              return {
-                name: workout,
-                value: workout,
-                filter: FilterType.WORKOUT_TYPE,
-              };
-            }),
-          },
-          {
-            filter: FilterType.SKILL_LEVEL,
-            name: 'Skill Level',
-            values: user.filterSkillLevel.map((skill) => {
-              return {
-                name: skill,
-                value: skill,
-                filter: FilterType.SKILL_LEVEL,
-              };
-            }),
-          },
-          {
-            filter: FilterType.GENDER,
-            name: FilterType.GENDER,
-            values: user.filterGender.map((gender) => {
-              return {
-                name: gender,
-                value: gender,
-                filter: 'gender',
-              };
-            }),
-          },
-          {
-            filter: FilterType.GOALS,
-            name: 'Goals',
-            values: user.filterGoals.map((goal) => {
-              return {
-                name: goal,
-                value: goal,
-                filter: FilterType.GOALS,
-              };
-            }),
-          },
-        ]);
-      }
 
       const columns = splitArrayIntoColumns(feed, numColumns);
       const columnData = columns.map((column, index) => {

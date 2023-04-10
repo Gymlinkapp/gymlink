@@ -27,7 +27,7 @@ export default function Filters() {
   const [values, setValues] = useState<FilterValue[]>([]);
   const [modalTitle, setModalTitle] = useState('');
   const [selectedValues, setSelectedValues] = useState<FilterValue[]>([]);
-  const { setFilters, filters, token } = useAuth();
+  const { setFilters, filters, token, setFeed, feed } = useAuth();
 
   // every time a user clicks save, we want to update the filters in the context, the transform the filters and send them to the server.
 
@@ -42,8 +42,6 @@ export default function Filters() {
         };
       });
 
-      console.log('transformedFilters', transformedFilters);
-
       try {
         return await api.post('/users/filter', {
           token,
@@ -55,37 +53,37 @@ export default function Filters() {
     },
     {
       onSuccess: (data) => {
-        console.log('data', data);
+        setFeed(data.data.feed);
+        console.log(feed.map((user) => user.gender));
         queryClient.invalidateQueries('user');
       },
     }
   );
 
   const handleSave = () => {
-    console.log('selectedValues', selectedValues);
-    // console.log(
-    //   'filters',
-    //   filters.map((filter) => filter.values)
-    // );
+    const groupedSelectedValues = selectedValues.reduce((acc, value) => {
+      if (!acc[value.filter]) {
+        acc[value.filter] = [];
+      }
+      acc[value.filter].push(value);
+      return acc;
+    }, {});
 
-    selectedValues.map((value) => {
-      const filter = filters.find((filter) => filter.filter === value.filter);
-      setFilters((prev) => {
-        const index = prev.indexOf(filter);
-        prev[index].values = [
-          {
-            filter: value.filter,
-            value: value.value,
-            name: value.name,
-          },
-        ];
-        return prev;
+    setFilters((prev) => {
+      // Create a copy of the previous state
+      const newState = [...prev];
+
+      Object.entries(groupedSelectedValues).forEach(([filterName, values]) => {
+        const index = newState.findIndex((f) => f.filter === filterName);
+
+        // @ts-ignore
+        newState[index].values = values;
       });
+
+      return newState;
     });
 
     filterFeed.mutate();
-
-    console.log('filters', filters);
 
     setModalVisible(false);
   };

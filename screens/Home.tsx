@@ -131,18 +131,7 @@ export default function HomeScreen({ navigation, route }) {
         end={[0, 1]}
       />
 
-      <Filters
-        options={filters}
-        handleSelectOption={(option: FilterValue) => {
-          // const newFilters = filters.map((filter) => {
-          //   if (filter.id === option.id) {
-          //     filter.selected = !filter.selected;
-          //   }
-          //   return filter;
-          // });
-          // setUser({ ...user, filters: newFilters });
-        }}
-      />
+      <Filters />
       <FlatList
         ref={flatListRef}
         data={columnData}

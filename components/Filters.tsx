@@ -56,6 +56,7 @@ export default function Filters() {
         setFeed(data.data.feed);
         console.log(feed.map((user) => user.gender));
         queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('users');
       },
     }
   );

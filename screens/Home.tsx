@@ -1,33 +1,15 @@
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import Layout from '../layouts/layout';
-import { User } from '../utils/users';
 import React, { useEffect, useRef, useState } from 'react';
 import { useUsers } from '../hooks/useUsers';
 import Loading from '../components/Loading';
 import { useAuth } from '../utils/context';
-import { getFeedScrollIndex } from '../utils/getFeedScrollIndex';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import Filters from '../components/Filters';
 import { FilterType } from '../utils/types/filter';
 
-// const onScroll = async (e) => {
-//   const index = getFeedScrollIndex(e, height);
-
-//   if (index < currentIndex) {
-//     // seenUser.mutateAsync(feed[index - 1].id);
-
-//     // when the user scrolls, we want to not allow them to scroll back up
-//     flatListRef.current.scrollToIndex({
-//       index: currentIndex,
-//       animated: true,
-//       viewPosition: 0,
-//     });
-//   }
-//   setCurrentIndex(index);
-// };
-
-function splitArrayIntoColumns(array, numColumns) {
+function splitArrayIntoColumns(array: any[], numColumns: number) {
   const columnArrays = Array.from({ length: numColumns }, () => []);
   array.forEach((item, index) => {
     columnArrays[index % numColumns].push(item);
@@ -54,13 +36,6 @@ export default function HomeScreen({ navigation, route }) {
 
   useEffect(() => {
     if (user) {
-      if (feed.length < 0 || user.feed.length < 0) {
-        setFeed(users);
-        console.log('reset feed');
-      }
-      console.log(user.feed.length);
-
-      // setFeed(user.feed);
       setFilters([
         {
           filter: FilterType.GOING_TODAY,
@@ -120,6 +95,7 @@ export default function HomeScreen({ navigation, route }) {
       ]);
     }
     if (!isLoading && users) {
+      setFeed(users);
       const numColumns = 3;
       const scrollFactors = Array.from({ length: numColumns }, (__, index) => {
         if (index === 1) {

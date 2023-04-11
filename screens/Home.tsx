@@ -1,65 +1,15 @@
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Person from '../components/person';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import Layout from '../layouts/layout';
-import { User } from '../utils/users';
 import React, { useEffect, useRef, useState } from 'react';
-import { calculateCardHeight, calculateSnapInterval } from '../utils/ui';
 import { useUsers } from '../hooks/useUsers';
-import useToken from '../hooks/useToken';
 import Loading from '../components/Loading';
-import Button from '../components/button';
-import { ArrowBendDoubleUpLeft, ArrowBendLeftUp } from 'phosphor-react-native';
-import { useMutation, useQueryClient } from 'react-query';
-import api from '../utils/axiosStore';
 import { useAuth } from '../utils/context';
-import { snapToInterval } from '../utils/snapToInterval';
-import { getFeedScrollIndex } from '../utils/getFeedScrollIndex';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import Filters from '../components/Filters';
+import { FilterType } from '../utils/types/filter';
 
-// const onScroll = async (e) => {
-//   const index = getFeedScrollIndex(e, height);
-
-//   if (index < currentIndex) {
-//     // seenUser.mutateAsync(feed[index - 1].id);
-
-//     // when the user scrolls, we want to not allow them to scroll back up
-//     flatListRef.current.scrollToIndex({
-//       index: currentIndex,
-//       animated: true,
-//       viewPosition: 0,
-//     });
-//   }
-//   setCurrentIndex(index);
-// };
-
-const FeedColumn = ({ data, index }) => {
-  return (
-    <FlatList
-      data={data} // use the filtered arrays for each column
-      keyExtractor={(item) => item.id}
-      listKey={index + Math.random()}
-      className='flex-1'
-      renderItem={({ item: user, index }) => (
-        <View className='h-[250px] m-[0.5px] relative overflow-hidden rounded-3xl'>
-          <Image
-            source={{ uri: user.images[0] }}
-            className='absolute top-0 left-0 w-full h-full object-cover'
-          />
-        </View>
-      )}
-    />
-  );
-};
-
-function splitArrayIntoColumns(array, numColumns) {
+function splitArrayIntoColumns(array: any[], numColumns: number) {
   const columnArrays = Array.from({ length: numColumns }, () => []);
   array.forEach((item, index) => {
     columnArrays[index % numColumns].push(item);
@@ -69,13 +19,13 @@ function splitArrayIntoColumns(array, numColumns) {
 
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_SCROLL_POSITION = 250;
-  const { token, user, setUser } = useAuth();
+  const { token, user, setUser, filters, setFilters, feed, setFeed } =
+    useAuth();
   const flatListRef = useRef(null);
   const [columnData, setColumnData] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
   const { data: users } = useUsers(token);
-  const [feed, setFeed] = useState<User[]>(user?.feed || users);
-  // const [feed, setFeed] = useState<User[]>(users);
+
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
   const isLoading = !users;
@@ -85,7 +35,67 @@ export default function HomeScreen({ navigation, route }) {
   }
 
   useEffect(() => {
+    if (user) {
+      setFilters([
+        {
+          filter: FilterType.GOING_TODAY,
+          name: 'Going Today',
+          values: [
+            {
+              name: user.filterGoingToday ? 'Yes' : 'No',
+              value: user.filterGoingToday,
+              filter: FilterType.GOING_TODAY,
+            },
+          ],
+        },
+        {
+          filter: FilterType.WORKOUT_TYPE,
+          name: 'Workout Type',
+          values: user.filterWorkout.map((workout) => {
+            return {
+              name: workout,
+              value: workout,
+              filter: FilterType.WORKOUT_TYPE,
+            };
+          }),
+        },
+        {
+          filter: FilterType.SKILL_LEVEL,
+          name: 'Skill Level',
+          values: user.filterSkillLevel.map((skill) => {
+            return {
+              name: skill,
+              value: skill,
+              filter: FilterType.SKILL_LEVEL,
+            };
+          }),
+        },
+        {
+          filter: FilterType.GENDER,
+          name: FilterType.GENDER,
+          values: user.filterGender.map((gender) => {
+            return {
+              name: gender,
+              value: gender,
+              filter: 'gender',
+            };
+          }),
+        },
+        {
+          filter: FilterType.GOALS,
+          name: 'Goals',
+          values: user.filterGoals.map((goal) => {
+            return {
+              name: goal,
+              value: goal,
+              filter: FilterType.GOALS,
+            };
+          }),
+        },
+      ]);
+    }
     if (!isLoading && users) {
+      setFeed(users);
       const numColumns = 3;
       const scrollFactors = Array.from({ length: numColumns }, (__, index) => {
         if (index === 1) {
@@ -112,7 +122,7 @@ export default function HomeScreen({ navigation, route }) {
       }, 500);
       setColumnData(columnData);
     }
-  }, [isLoading, users, feed]);
+  }, [isLoading, users, feed, user]);
 
   if (isLoading) {
     return <Loading />;
@@ -127,6 +137,8 @@ export default function HomeScreen({ navigation, route }) {
         start={[0, 0]}
         end={[0, 1]}
       />
+
+      <Filters />
       <FlatList
         ref={flatListRef}
         data={columnData}

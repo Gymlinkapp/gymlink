@@ -26,6 +26,11 @@ export type User = {
   split: Split | null;
   feed: User[];
   seen: string[];
+  filterGoingToday: boolean;
+  filterWorkout: string[];
+  filterSkillLevel: string[];
+  filterGender: string[];
+  filterGoals: string[];
 };
 
 export type Split = {

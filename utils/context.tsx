@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState } from 'react';
 import { User } from './users';
 import { Socket } from 'socket.io-client';
+import { Filter, defaultFilters } from './types/filter';
+import { exercises } from './split';
 
 // create me a context
 const AuthContext = createContext(
@@ -18,6 +20,10 @@ const AuthContext = createContext(
     setLat: React.Dispatch<React.SetStateAction<number>>;
     socket: Socket;
     setSocket: React.Dispatch<React.SetStateAction<Socket>>;
+    filters: Filter[];
+    setFilters: React.Dispatch<React.SetStateAction<Filter[]>>;
+    feed: User[];
+    setFeed: React.Dispatch<React.SetStateAction<User[]>>;
   }
 );
 
@@ -29,6 +35,8 @@ const AuthProvider = ({ children }) => {
   const [long, setLong] = useState(0);
   const [lat, setLat] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [filters, setFilters] = useState<Filter[]>(defaultFilters);
+  const [feed, setFeed] = useState<User[]>([]);
 
   return (
     <AuthContext.Provider
@@ -45,6 +53,10 @@ const AuthProvider = ({ children }) => {
         setLat,
         socket,
         setSocket,
+        filters,
+        setFilters,
+        feed,
+        setFeed,
       }}
     >
       {children}

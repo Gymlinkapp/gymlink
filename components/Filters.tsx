@@ -81,6 +81,18 @@ export default function Filters() {
         newState[index].values = values;
       });
 
+      // check if the the filter is still selected as a value
+      newState.forEach((filter) => {
+        if (!groupedSelectedValues[filter.filter]) {
+          const filterIndex = newState.findIndex(
+            (f) => f.filter === filter.filter
+          );
+          if (filterIndex !== -1) {
+            newState[filterIndex].values = [];
+          }
+        }
+      });
+
       return newState;
     });
 
@@ -91,6 +103,7 @@ export default function Filters() {
 
   const clearFilters = () => {
     setFilters(defaultFilters);
+    console.log('filters', filters);
     filterFeed.mutate();
   };
 

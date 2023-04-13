@@ -8,4 +8,4 @@ export let URL =
 export let CHAT_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://10.0.1.198:3001'
-    : 'https://gymlink-chat.onrender.com';
+    : 'https://gymlink-service.onrender.com';

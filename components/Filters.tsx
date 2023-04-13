@@ -34,7 +34,6 @@ export default function Filters() {
   const filterFeed = useMutation(
     async () => {
       // request.body = { filters: [ { filter: "goingToday", value: true }, { filter: "workout", value: ["back"] }, { filter: "gender", value: ["male", "female"] } ] }
-
       const transformedFilters = filters.map((filter) => {
         return {
           filter: filter.filter,
@@ -43,7 +42,7 @@ export default function Filters() {
       });
 
       try {
-        return await api.post('/users/filter', {
+        return await api.post('/users/filterFeed', {
           token,
           filters: transformedFilters,
         });
@@ -52,7 +51,7 @@ export default function Filters() {
       }
     },
     {
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         setFeed(data.data.feed);
         console.log(feed.map((user) => user.gender));
         queryClient.invalidateQueries('user');
@@ -103,8 +102,9 @@ export default function Filters() {
 
   const clearFilters = () => {
     setFilters(defaultFilters);
-    console.log('filters', filters);
     filterFeed.mutate();
+
+    setModalVisible(false);
   };
 
   return (
@@ -250,11 +250,7 @@ export default function Filters() {
               <Button
                 variant='secondary'
                 className='flex-1'
-                onPress={() => {
-                  setSelectedValues([]);
-                  setFilters(defaultFilters);
-                  setModalVisible(false);
-                }}
+                onPress={() => clearFilters()}
               >
                 Clear
               </Button>

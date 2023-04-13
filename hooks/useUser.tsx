@@ -4,8 +4,8 @@ import api from '../utils/axiosStore';
 import { User } from '../utils/users';
 
 const fetchUser = async (token: string) => {
-  const { data } = await api.get(`/users/getByToken?token=${token}`);
-  return data;
+  const { data } = await api.post('/users/getByToken', { token });
+  return data.user;
 };
 
 const useUser = (token: string) => {

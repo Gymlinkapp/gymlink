@@ -38,7 +38,6 @@ export default function UserGymLocation({ navigation }) {
   const location = useLocation();
   const [nearGyms, setNearGyms] = useState([]);
   const { token, long, lat, setLat, setLong } = useAuth();
-  const [d, setD] = useState({});
 
   useEffect(() => {
     if (location) {
@@ -104,7 +103,6 @@ export default function UserGymLocation({ navigation }) {
     {
       onSuccess: async (data) => {
         if (data && (data.data.step === 5 || data.data.gymId)) {
-          setD(data.data);
         }
       },
       onError: (error) => {

@@ -5,8 +5,8 @@ import api from '../utils/axiosStore';
 import { User } from '../utils/users';
 
 const fetchChats = async (id: string) => {
-  const { data } = await api.get(`/chats/${id}`);
-  return data;
+  const { data } = await api.post(`/chats/getChats`, { userId: id });
+  return data.chats;
 };
 
 const useChats = (id: string) => {

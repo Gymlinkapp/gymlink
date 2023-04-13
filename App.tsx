@@ -6,8 +6,6 @@ import { COLORS } from './utils/colors';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import NotificationScreen from './screens/Notifications';
-import AccountScreen from './screens/Account';
-import UserAccountScreen from './screens/UserAccount';
 import SettingsScreen from './screens/Settings';
 import RegisterScreen from './screens/auth/Register';
 import { useEffect, useState } from 'react';
@@ -24,7 +22,6 @@ import * as Location from 'expo-location';
 import { io } from 'socket.io-client';
 import EmailLoginScreen from './screens/auth/EmailLoginScreen';
 import useToken from './hooks/useToken';
-import CreateChatScreen from './screens/CreateChat';
 import ChatScreen from './screens/Chat';
 import FriendsScreen from './screens/Friends';
 import { User } from './utils/users';
@@ -33,12 +30,13 @@ import { useUser } from './hooks/useUser';
 import Loading from './components/Loading';
 import Routes from './screens/routes';
 import { AuthProvider, useAuth } from './utils/context';
-import { URL } from './utils/url';
+import { CHAT_URL, URL } from './utils/url';
 
 const queryClient = new QueryClient();
 
 // needs to be this for ios not localhost
-const socket = io(URL);
+const socket = io(CHAT_URL);
+console.log(socket);
 console.log(URL);
 
 export default function App() {

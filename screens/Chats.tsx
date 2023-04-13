@@ -14,6 +14,8 @@ import {
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 import * as Haptics from 'expo-haptics';
+import { useChats } from '../hooks/useChats';
+import Loading from '../components/Loading';
 
 export type Message = {
   id?: string;
@@ -40,8 +42,9 @@ export default function Chats({ navigation, route }: any) {
   const [chatId, setChatId] = useState<string | null>(null);
 
   const { user, token } = useAuth();
+  const { data: chats, isLoading } = useChats(user.id);
 
-  const createLink = useMutation(
+  const deleteChat = useMutation(
     async ({ chatId }: { chatId: string }) => {
       const { data } = await api.delete(`/chats/${chatId}`);
       return data;
@@ -58,6 +61,8 @@ export default function Chats({ navigation, route }: any) {
       inputRange: [0, 50, 75, 100],
       outputRange: [0, 0, 0, 1],
     });
+
+    if (isLoading) return <Loading />;
 
     return (
       <RectButton>
@@ -76,7 +81,7 @@ export default function Chats({ navigation, route }: any) {
           <RNGHOpacity
             className='bg-primarydark p-4 rounded-full'
             onPress={() => {
-              createLink.mutate({
+              deleteChat.mutate({
                 chatId: chatId,
               });
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -91,11 +96,11 @@ export default function Chats({ navigation, route }: any) {
 
   return (
     <View className='flex-1'>
-      {user && user.chats && user.chats.length ? (
+      {user && chats && chats.length ? (
         <View>
           <FlatList
             className='p-4'
-            data={user.chats}
+            data={chats}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
               // chats don't have messages by default, so we need to check if they exist

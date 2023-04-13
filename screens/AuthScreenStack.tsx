@@ -114,11 +114,6 @@ export default function AuthStackScreen({ navigation, route }) {
           name='AssignExcercise'
           component={AssignExcercise}
           initialParams={{ setIsVerified }}
-          /* options={{ */
-          /*   contentStyle: { */
-          /*     backgroundColor: COLORS.secondaryDark, */
-          /*   }, */
-          /* }} */
         />
       </AuthStack.Group>
     </AuthStack.Navigator>

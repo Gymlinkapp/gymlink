@@ -40,6 +40,7 @@ export default function ProfileInfo({
   const { user: currUser } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  console.log(userSplit);
 
   const { data: gym, isLoading: gymLoading } = useGym(gymId);
 

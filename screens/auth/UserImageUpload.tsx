@@ -20,6 +20,7 @@ import { useMutation } from 'react-query';
 import useToken from '../../hooks/useToken';
 import { useAuth } from '../../utils/context';
 import AuthLayout from '../../layouts/AuthLayout';
+import { trpc } from '../../utils/trpc';
 
 const getPermissionAsync = async () => {
   if (Platform.OS !== 'web') {
@@ -35,7 +36,7 @@ export default function UserImageUpload({ navigation, route }) {
   const { token } = useAuth();
 
   const continueToNextScreen = async () => {
-    await api.post('/users/authSteps', { token, authSteps: 4 });
+    await api.post('/users/updateAuthStep', { token, authSteps: 4 });
   };
 
   const addImage = async () => {
@@ -61,11 +62,27 @@ export default function UserImageUpload({ navigation, route }) {
       );
 
       setImages([...images, base64.uri]);
-
-      await api.post('/users/images', {
-        image: base64.base64,
-        token: token,
-      });
+      try {
+        await api.post('/images/uploadUserImage', {
+          image: base64.base64,
+          token: token,
+        });
+        // await trpc.images.upload
+        //   .useMutation({
+        //     onSuccess: (data) => {
+        //       console.log(data);
+        //     },
+        //     onError: (error) => {
+        //       console.log(error);
+        //     },
+        //   })
+        //   .mutateAsync({
+        //     image: base64.base64,
+        //     // token: token
+        //   });
+      } catch (error) {
+        console.log(error);
+      }
     } catch (err) {
       console.log(
         'An error occurred uploading your image. Please try again later.',

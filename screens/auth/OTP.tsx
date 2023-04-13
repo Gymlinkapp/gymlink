@@ -17,10 +17,9 @@ let OTPSchema = z.object({
   otp: z.string().min(6).max(6),
 });
 export default function OTPScreen({ navigation, route }) {
-  const { phoneNumber } = route.params;
+  const [number, setNumber] = useState<string>('');
   const [incorrectCode, setIncorrectCode] = useState<Boolean>(false);
-  console.log('phoneNumber', phoneNumber);
-  const { setIsVerified } = useAuth();
+  const { setIsVerified, setToken, phoneNumber } = useAuth();
   const queryClient = useQueryClient();
 
   const {
@@ -39,7 +38,7 @@ export default function OTPScreen({ navigation, route }) {
     async () => {
       try {
         return await api.post(
-          '/auth/sendsms',
+          '/trpc/authentication.sendSMS',
           {
             phoneNumber: phoneNumber,
           },
@@ -65,7 +64,7 @@ export default function OTPScreen({ navigation, route }) {
     async (data: z.infer<typeof OTPSchema>) => {
       try {
         return await api.post(
-          '/auth/verificationcode',
+          '/auth/verifyotp',
           {
             phoneNumber: phoneNumber,
             verificationCode: data.otp,
@@ -77,6 +76,7 @@ export default function OTPScreen({ navigation, route }) {
           }
         );
       } catch (error) {
+        console.log(error);
         setIncorrectCode(true);
       }
     },
@@ -86,8 +86,9 @@ export default function OTPScreen({ navigation, route }) {
         if (data) {
           if (data.data.token) {
             setItemAsync('token', data.data.token);
+            setToken(data.data.token);
             setIsVerified(true);
-            queryClient.invalidateQueries('user');
+            // queryClient.invalidateQueries('user');
           } else {
             navigation.navigate('InitialUserDetails', {
               phoneNumber: phoneNumber,

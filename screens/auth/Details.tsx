@@ -68,6 +68,8 @@ const userDetailsSchema = z.object({
   bio: z.string().min(1).max(1000),
   email: z.string().email(),
   age: z.number().min(16).max(100),
+  // race: z.string().min(1).max(20),
+  // gender: z.string().min(1).max(20),
 });
 
 export default function InitialUserDetails({ route, navigation }) {
@@ -77,7 +79,7 @@ export default function InitialUserDetails({ route, navigation }) {
   const [genderError, setGenderError] = useState(false);
   const [race, setRace] = useState('');
   const [raceError, setRaceError] = useState(false);
-  const { token, setToken } = useAuth();
+  const { token, setToken, phoneNumber } = useAuth();
   const queryClient = useQueryClient();
   useEffect(() => {
     getItemAsync('long').then((long) => {
@@ -105,14 +107,16 @@ export default function InitialUserDetails({ route, navigation }) {
       age: 18,
     },
   });
-  const { code, phoneNumber } = route.params;
+
+  console.log(errors);
+
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
 
   const saveUserDetails = useMutation(
     async (data: z.infer<typeof userDetailsSchema>) => {
       try {
         return await api.post(
-          '/auth/details',
+          '/auth/initialUserDetails',
           {
             phoneNumber: phoneNumber,
             firstName: data.firstName,
@@ -139,7 +143,7 @@ export default function InitialUserDetails({ route, navigation }) {
       onSuccess: async (data) => {
         if (data) {
           try {
-            await setItemAsync('token', data.data.token);
+            await setItemAsync('token', data.data.result.data.token);
             queryClient.invalidateQueries('user');
             setToken(data.data.token);
           } catch (error) {

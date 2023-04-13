@@ -5,8 +5,8 @@ import { User } from '../utils/users';
 import { Gym } from '../utils/types/gym';
 
 const fetchGym = async (gymId: string) => {
-  const { data } = await api.get(`/gyms/${gymId}`);
-  return data;
+  const { data } = await api.post(`/gyms/getById`, { gymId });
+  return data.gym;
 };
 
 const useGym = (gymId: string) => {

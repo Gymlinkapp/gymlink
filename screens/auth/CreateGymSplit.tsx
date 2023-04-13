@@ -63,7 +63,7 @@ export default function CreateSplit({ navigation, route }) {
           );
           return;
         }
-        return await api.post('/users/split', {
+        return await api.post('/users/createSplit', {
           split: data,
           token,
           authSteps: route.params?.authStep ? route.params?.authStep : 6,
@@ -244,7 +244,7 @@ export default function CreateSplit({ navigation, route }) {
           className='flex-1'
           onPress={async () => {
             try {
-              await api.post(`/users/authSteps`, {
+              await api.post(`/users.updateAuthStep`, {
                 token,
                 authSteps: 6,
               });

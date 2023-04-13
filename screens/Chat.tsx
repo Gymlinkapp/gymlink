@@ -93,12 +93,11 @@ export default function ChatScreen({ route, navigation }) {
           content: message,
         },
       });
-    } else {
-      socket.emit('join-chat', {
-        roomName,
-        roomId,
-      });
     }
+    socket.emit('join-chat', {
+      roomName,
+      roomId,
+    });
     socket.on('messages', (data: Message[]) => {
       setMessages(data);
     });

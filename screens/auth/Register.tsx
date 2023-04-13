@@ -15,6 +15,8 @@ import api from '../../utils/axiosStore';
 import { useMutation } from 'react-query';
 import axios from 'axios';
 import { useState } from 'react';
+import { trpc } from '../../utils/trpc';
+import { useAuth } from '../../utils/context';
 
 let phoneNumberSchema = z.object({
   phoneNumber: z.string().min(10).max(10),
@@ -22,7 +24,7 @@ let phoneNumberSchema = z.object({
 });
 
 export default function RegisterScreen({ navigation }) {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { setPhoneNumber, phoneNumber } = useAuth();
   const {
     handleSubmit,
     control,
@@ -39,6 +41,8 @@ export default function RegisterScreen({ navigation }) {
   const sendSMS = useMutation(
     async (phoneNumber: string) => {
       setPhoneNumber(phoneNumber);
+
+      console.log(phoneNumber);
       try {
         return await api.post(
           '/auth/sendsms',
@@ -60,19 +64,17 @@ export default function RegisterScreen({ navigation }) {
         if (data) {
           navigation.navigate('OTPScreen', {
             code: data.data.code,
-            phoneNumber: data.data.phoneNumber,
+            phoneNumber: phoneNumber,
           });
         }
       },
     }
   );
   const onSubmit = async (data: z.infer<typeof phoneNumberSchema>) => {
-    console.log(data.callingCode + data.phoneNumber);
-    try {
-      return await sendSMS.mutateAsync(data.callingCode + data.phoneNumber);
-    } catch (error) {
-      console.log(error);
-    }
+    return await sendSMS.mutateAsync(data.callingCode + data.phoneNumber);
+    // mutation.mutate({
+    //   phoneNumber: data.callingCode + data.phoneNumber,
+    // });
   };
 
   return (

@@ -1,11 +1,5 @@
 import { useForm, Controller } from 'react-hook-form';
-import {
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, SafeAreaView, Text, View } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import PhoneInput from 'react-native-phone-number-input';
@@ -13,9 +7,6 @@ import { COLORS } from '../../utils/colors';
 import Button from '../../components/button';
 import api from '../../utils/axiosStore';
 import { useMutation } from 'react-query';
-import axios from 'axios';
-import { useState } from 'react';
-import { trpc } from '../../utils/trpc';
 import { useAuth } from '../../utils/context';
 
 let phoneNumberSchema = z.object({

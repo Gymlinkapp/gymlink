@@ -141,9 +141,10 @@ export default function InitialUserDetails({ route, navigation }) {
     },
     {
       onSuccess: async (data) => {
+        console.log(data.data);
         if (data) {
           try {
-            await setItemAsync('token', data.data.result.data.token);
+            await setItemAsync('token', data.data.token);
             queryClient.invalidateQueries('user');
             setToken(data.data.token);
           } catch (error) {
@@ -152,7 +153,7 @@ export default function InitialUserDetails({ route, navigation }) {
         }
       },
       onError: (error) => {
-        console.log(error);
+        console.log('uh', error);
       },
     }
   );

@@ -1,33 +1,25 @@
-import { getItemAsync } from 'expo-secure-store';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Dimensions,
   Image,
   KeyboardAvoidingView,
   SafeAreaView,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
   PanResponder,
+  Keyboard,
 } from 'react-native';
-import Loading from '../components/Loading';
-import { useUser } from '../hooks/useUser';
-import { COLORS } from '../utils/colors';
 import { useAuth } from '../utils/context';
 import {
-  Barbell,
+  CaretDown,
   CaretLeft,
   MapPin,
   PaperPlaneRight,
-  X,
 } from 'phosphor-react-native';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
-import Split from '../components/Split';
 import { WeekSplit } from '../utils/split';
-import Button from '../components/button';
 import { useGym } from '../hooks/useGym';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -96,6 +88,11 @@ export default function ProfileScreen({
   const queryClient = useQueryClient();
 
   const { data: gym, isLoading: gymLoading } = useGym(user.gymId);
+
+  const lowerKeyboard = () => {
+    setIsTyping(false);
+    Keyboard.dismiss();
+  };
 
   const createLink = useMutation(
     async ({
@@ -231,24 +228,31 @@ export default function ProfileScreen({
               behavior='height'
               className='flex-1 justify-end'
             >
-              <View>
-                <Text className='text-white font-MontserratRegular text-2xl mb-6'>
-                  {user.age}
-                </Text>
+              <View className='flex-row items-end justify-between'>
                 <View>
-                  <Text className='text-white font-MontserratBold text-5xl'>
-                    {user.firstName}
+                  <Text className='text-white font-MontserratRegular text-2xl mb-6'>
+                    {user.age}
                   </Text>
-                  <Text className='text-white font-MontserratBold text-5xl'>
-                    {user.lastName}
-                  </Text>
+                  <View>
+                    <Text className='text-white font-MontserratBold text-5xl'>
+                      {user.firstName}
+                    </Text>
+                    <Text className='text-white font-MontserratBold text-5xl'>
+                      {user.lastName}
+                    </Text>
+                  </View>
+                  <View className='flex-row items-center mb-6'>
+                    <MapPin color='#CCC9C9' weight='regular' size={16} />
+                    <Text className='text-secondaryWhite font-MontserratRegular text-md'>
+                      {gym?.name}
+                    </Text>
+                  </View>
                 </View>
-                <View className='flex-row items-center mb-6'>
-                  <MapPin color='#CCC9C9' weight='regular' size={16} />
-                  <Text className='text-secondaryWhite font-MontserratRegular text-md'>
-                    {gym?.name}
-                  </Text>
-                </View>
+                {isTyping && (
+                  <TouchableOpacity onPress={() => lowerKeyboard()}>
+                    <CaretDown color='#fff' style={{ paddingVertical: 24 }} />
+                  </TouchableOpacity>
+                )}
               </View>
               <View className='flex-row items-center'>
                 <View className='flex-1 overflow-hidden rounded-full mr-6'>

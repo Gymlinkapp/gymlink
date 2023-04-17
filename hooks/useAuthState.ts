@@ -21,6 +21,8 @@ export const useAuthState = () => {
       if (user.authSteps.toString() === AUTH_STEPS && user.tempJWT) {
         setItemAsync('authSteps', user.authSteps.toString());
         setIsVerified(true);
+
+        setUser(user);
       } else {
         setIsVerified(false);
       }

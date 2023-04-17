@@ -7,26 +7,30 @@ import { useAuth } from '../utils/context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import Filters from '../components/Filters';
-import { FilterType } from '../utils/types/filter';
-
-function splitArrayIntoColumns(array: any[] = [], numColumns: number) {
-  const columnArrays = Array.from({ length: numColumns }, () => []);
-  array.forEach((item, index) => {
-    columnArrays[index % numColumns].push(item);
-  });
-  return columnArrays;
-}
+import { FilterType, defaultFilters } from '../utils/types/filter';
+import { useMutation } from 'react-query';
+import api from '../utils/axiosStore';
 
 export default function HomeScreen({ navigation, route }) {
+  const LIMIT = 5;
   const INITIAL_SCROLL_POSITION = 250;
   const { token, user, setUser, filters, setFilters, feed, setFeed } =
     useAuth();
   const flatListRef = useRef(null);
   const [columnData, setColumnData] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
+  const [offset, setOffset] = useState(0);
   const { data: users } = useUsers(token);
 
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
+
+  function splitArrayIntoColumns(array: any[] = [], numColumns: number) {
+    const columnArrays = Array.from({ length: numColumns }, () => []);
+    array.forEach((item, index) => {
+      columnArrays[index % numColumns].push(item);
+    });
+    return columnArrays;
+  }
 
   const isLoading = !users;
 
@@ -36,83 +40,10 @@ export default function HomeScreen({ navigation, route }) {
 
   useEffect(() => {
     if (user) {
-      setFilters([
-        {
-          filter: FilterType.GOING_TODAY,
-          name: 'Going Today',
-          values: [
-            {
-              name: user.filterGoingToday ? 'Yes' : 'No',
-              value: user.filterGoingToday,
-              filter: FilterType.GOING_TODAY,
-            },
-          ],
-        },
-        {
-          filter: FilterType.WORKOUT_TYPE,
-          name: 'Workout Type',
-          values: user.filterWorkout.map((workout) => {
-            return {
-              name: workout,
-              value: workout,
-              filter: FilterType.WORKOUT_TYPE,
-            };
-          }),
-        },
-        {
-          filter: FilterType.SKILL_LEVEL,
-          name: 'Skill Level',
-          values: user.filterSkillLevel.map((skill) => {
-            return {
-              name: skill,
-              value: skill,
-              filter: FilterType.SKILL_LEVEL,
-            };
-          }),
-        },
-        {
-          filter: FilterType.GENDER,
-          name: FilterType.GENDER,
-          values: user.filterGender.map((gender) => {
-            return {
-              name: gender,
-              value: gender,
-              filter: 'gender',
-            };
-          }),
-        },
-        {
-          filter: FilterType.GOALS,
-          name: 'Goals',
-          values: user.filterGoals.map((goal) => {
-            return {
-              name: goal,
-              value: goal,
-              filter: FilterType.GOALS,
-            };
-          }),
-        },
-      ]);
+      setFilters(defaultFilters);
     }
     if (!isLoading && users) {
       setFeed(users);
-      const numColumns = 3;
-      const scrollFactors = Array.from({ length: numColumns }, (__, index) => {
-        if (index === 1) {
-          return Math.random() * 0.1 + 0.05;
-        } else {
-          return Math.random() * 0.2 + 0.1;
-        }
-      });
-
-      const columns = splitArrayIntoColumns(feed, numColumns);
-      const columnData = columns.map((column, index) => {
-        return {
-          data: column,
-          scrollFactor: scrollFactors[index],
-        };
-      });
-      setColumnData(columnData);
 
       setTimeout(() => {
         flatListRef.current?.scrollToOffset({
@@ -122,7 +53,69 @@ export default function HomeScreen({ navigation, route }) {
         setHasInitialScrolled(true);
       }, 500);
     }
-  }, [isLoading, users, feed, user]);
+  }, [isLoading, users, user]);
+
+  useEffect(() => {
+    const numColumns = 3;
+    const scrollFactors = Array.from({ length: numColumns }, (__, index) => {
+      if (index === 1) {
+        return Math.random() * 0.1 + 0.05;
+      } else {
+        return Math.random() * 0.2 + 0.1;
+      }
+    });
+
+    const columns = splitArrayIntoColumns(feed, numColumns);
+    const columnData = columns.map((column, index) => {
+      return {
+        data: column,
+        scrollFactor: scrollFactors[index],
+      };
+    });
+    setColumnData(columnData);
+  }, [feed]);
+
+  const updateFeed = (newData) => {
+    const updatedFeed = [...feed, ...newData];
+    setFeed(updatedFeed);
+    const updatedColumns = splitArrayIntoColumns(updatedFeed, 3);
+    const updatedColumnData = updatedColumns.map((column, index) => {
+      return {
+        data: column,
+        scrollFactor: columnData[index].scrollFactor,
+      };
+    });
+    setColumnData(updatedColumnData);
+  };
+
+  const loadMoreMutation = async () => {
+    try {
+      const response = await api.post(
+        '/users/findNearUsers',
+        {
+          token,
+          offset,
+          limit: LIMIT,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const newData = response.data.users;
+
+      if (newData.length === 0) {
+        console.log('no more');
+        return;
+      }
+      updateFeed(newData);
+      setOffset((prev) => prev + LIMIT);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -151,6 +144,8 @@ export default function HomeScreen({ navigation, route }) {
         removeClippedSubviews={true}
         showsVerticalScrollIndicator={false}
         className='min-h-full'
+        onEndReached={loadMoreMutation}
+        onEndReachedThreshold={0.1}
         renderItem={({ item: column, index }) => {
           return (
             <FlatList
@@ -214,4 +209,10 @@ export default function HomeScreen({ navigation, route }) {
       />
     </Layout>
   );
+}
+
+{
+  /* <TouchableOpacity>
+                <Text>Load More</Text>
+              </TouchableOpacity> */
 }

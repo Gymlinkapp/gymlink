@@ -7,6 +7,8 @@ const fetchUsers = async (token: string) => {
   // const { data } = await api.get(`/users/getNearByUsers?token=${token}`);
   const { data } = await api.post(`/users/findNearUsers`, {
     token,
+    offset: 0,
+    limit: 5,
   });
   return data.users;
 };

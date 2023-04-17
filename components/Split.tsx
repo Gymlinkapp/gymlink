@@ -22,7 +22,6 @@ export default function Split({
 }) {
   const { height, width } = Dimensions.get('window');
   const { user } = useAuth();
-  console.log(split);
 
   if (!split || split.length === 0)
     return (

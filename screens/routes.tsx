@@ -18,35 +18,17 @@ import AssignExcercise from './auth/AssignExcercise';
 import CreateSplit from './auth/CreateGymSplit';
 import EditAccount from './EditAccount';
 import ProfileInfo from './ProfileInfo';
+import { useAuthState } from '../hooks/useAuthState';
 
 const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
-  const { isVerified, setIsVerified, setToken, token, setUser, setSocket } =
-    useAuth();
-  const { data: user, isLoading } = useUser(token);
+  const { token } = useAuth();
+  const { isVerified, setIsVerified, isLoadingAuth } = useAuthState();
 
-  useEffect(() => {
-    getItemAsync('token').then((res) => {
-      setToken(res);
-    });
-
-    if (user) {
-      setUser(user);
-      if (user.authSteps === AUTH_STEPS && user.tempJWT) {
-        setIsVerified(true);
-      } else {
-        setIsVerified(false);
-      }
-    }
-    if (!token) {
-      setIsVerified(false);
-    }
-
-    if (socket) {
-      setSocket(socket);
-    }
-  }, [token, user, socket]);
+  if (isLoadingAuth) {
+    return <Loading />;
+  }
 
   // deleteItemAsync('token');
   return (

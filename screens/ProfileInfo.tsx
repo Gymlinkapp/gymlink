@@ -137,7 +137,11 @@ export default function ProfileInfo({
           </ProfileInfoSection>
         )}
         {userSplit.length > 0 && (
-          <Split split={userSplit} isEditable={user.id === currUser?.id} />
+          <Split
+            split={userSplit}
+            isEditable={user.id === currUser?.id}
+            navigation={navigation}
+          />
         )}
       </ScrollView>
     </View>

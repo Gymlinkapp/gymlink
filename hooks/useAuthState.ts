@@ -18,19 +18,30 @@ export const useAuthState = () => {
     });
 
     if (!isLoading && user) {
+      // if the user has a jwt (has an email) and has completed all auth steps
       if (user.authSteps.toString() === AUTH_STEPS && user.tempJWT) {
-        setItemAsync('authSteps', user.authSteps.toString());
+        // the user is verified to be logged in past the onboarding screens
         setIsVerified(true);
 
+        // store the auth steps in secure store
+        setItemAsync('authSteps', user.authSteps.toString());
+
+        // setting the user in context (should be better than store?)
         setUser(user);
       } else {
+        // if the user has not completed all auth steps, they are not verified and need to be tracked back to the remaining screens
         setIsVerified(false);
       }
+
+      // the user is not loading anymore
       setIsLoadingAuth(false);
     }
     if (!token) {
+      // if the user has no token, they are not verified
       setIsVerified(false);
     }
+
+    // instead of needing to fetch the user all over again, after the checks above, store the isVerified state in secure store
     setItemAsync('isVerified', isVerified.toString());
 
     if (socket) {

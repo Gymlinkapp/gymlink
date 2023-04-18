@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useQuery } from 'react-query';
 import api from '../utils/axiosStore';
 import { User } from '../utils/users';
@@ -9,7 +8,6 @@ type Response = {
 };
 
 const fetchUsers = async (token: string, offset: number = 0, limit: number) => {
-  // const { data } = await api.get(`/users/getNearByUsers?token=${token}`);
   const { data } = await api.post(`/users/findNearUsers`, {
     token,
     offset: offset,

@@ -12,7 +12,7 @@ import { useMutation } from 'react-query';
 import api from '../utils/axiosStore';
 
 export default function HomeScreen({ navigation, route }) {
-  const LIMIT = 5;
+  const LIMIT = 9;
   const INITIAL_SCROLL_POSITION = 250;
   const { token, user, setUser, filters, setFilters, feed, setFeed } =
     useAuth();
@@ -21,6 +21,7 @@ export default function HomeScreen({ navigation, route }) {
   const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
   const [offset, setOffset] = useState(0);
   const { data: users } = useUsers(token);
+  const [isOffsetFeedLoading, setIsOffsetFeedLoading] = useState(false);
 
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
 
@@ -88,34 +89,51 @@ export default function HomeScreen({ navigation, route }) {
     setColumnData(updatedColumnData);
   };
 
-  const loadMoreMutation = async () => {
-    try {
-      const response = await api.post(
-        '/users/findNearUsers',
-        {
-          token,
-          offset,
-          limit: LIMIT,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
+  const loadMoreMutation = useMutation(
+    async () => {
+      try {
+        return await api.post(
+          '/users/findNearUsers',
+          {
+            token,
+            offset,
+            limit: LIMIT,
           },
-        }
-      );
-
-      const newData = response.data.users;
-
-      if (newData.length === 0) {
-        console.log('no more');
-        return;
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
       }
-      updateFeed(newData);
-      setOffset((prev) => prev + LIMIT);
-    } catch (error) {
-      console.log(error);
+    },
+    {
+      onSuccess: async (data) => {
+        if (data) {
+          try {
+            const newData = data.data.users;
+            if (newData.length === 0) {
+              console.log('no more');
+              return;
+            }
+
+            if (newData.length < LIMIT) {
+              console.log('less than limit');
+            }
+            updateFeed(newData);
+            setOffset((prev) => prev + LIMIT);
+          } catch (error) {
+            console.log('here', error);
+          }
+        }
+      },
+      onError: (error) => {
+        console.log('uh', error);
+      },
     }
-  };
+  );
 
   if (isLoading) {
     return <Loading />;
@@ -144,7 +162,13 @@ export default function HomeScreen({ navigation, route }) {
         removeClippedSubviews={true}
         showsVerticalScrollIndicator={false}
         className='min-h-full'
-        onEndReached={loadMoreMutation}
+        onEndReached={() => {
+          if (hasInitialScrolled) {
+            setIsOffsetFeedLoading(true);
+            loadMoreMutation.mutate();
+          }
+        }}
+        ListFooterComponent={() => loadMoreMutation.isLoading && <Loading />}
         onEndReachedThreshold={0.1}
         renderItem={({ item: column, index }) => {
           return (

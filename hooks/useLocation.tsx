@@ -47,22 +47,19 @@ export const useLocation = () => {
 
       // getting location
       let location = await Location.getCurrentPositionAsync({});
-
-      // setting location to state
       setLocation(location);
-    })();
 
-    if (error) {
-      console.log('error: ', error);
-      return null;
-    } else if (location) {
-      // saving the longitude and latitude to secure store
-      setItemAsync('long', location.coords.longitude.toString());
-      setItemAsync('lat', location.coords.latitude.toString());
-      setLong(location.coords.longitude);
-      setLat(location.coords.latitude);
-    }
-    console.log('location: ', location);
+      if (error) {
+        console.log('error: ', error);
+      } else if (location) {
+        // saving the longitude and latitude to secure store
+        setItemAsync('long', location.coords.longitude.toString());
+        setItemAsync('lat', location.coords.latitude.toString());
+        setLong(location.coords.longitude);
+        setLat(location.coords.latitude);
+      }
+      console.log('location: ', location);
+    })();
   }, []);
 
   return location;

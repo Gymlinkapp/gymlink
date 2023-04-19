@@ -13,9 +13,11 @@ export const useAuthState = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    getItemAsync('token').then((res) => {
-      setToken(res);
-    });
+    if (!token) {
+      setIsLoadingAuth(false);
+
+      return;
+    }
 
     if (!isLoading && user) {
       // if the user has a jwt (has an email) and has completed all auth steps
@@ -49,5 +51,5 @@ export const useAuthState = () => {
     }
   }, [token, user, isLoading, socket]);
 
-  return { isVerified, setIsVerified, setSocket, isLoadingAuth };
+  return { isVerified, setIsVerified, setSocket, isLoadingAuth, token };
 };

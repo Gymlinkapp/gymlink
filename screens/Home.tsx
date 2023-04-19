@@ -15,11 +15,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import Filters from '../components/Filters';
 import { defaultFilters } from '../utils/types/filter';
+import FeedLoading from '../components/FeedLoading';
 
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_COL_OFFSETS = [50, 150, 100];
   const LIMIT = 9;
   const INITIAL_SCROLL_POSITION = 250;
+  const USER_HEIGHT = 250;
   const { token, user, setUser, filters, setFilters, feed, setFeed } =
     useAuth();
   const flatListRef = useRef(null);
@@ -103,7 +105,7 @@ export default function HomeScreen({ navigation, route }) {
   // };
 
   if (isLoading) {
-    return <Loading />;
+    return <FeedLoading />;
   }
 
   return (

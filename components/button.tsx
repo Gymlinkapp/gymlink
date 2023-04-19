@@ -1,6 +1,8 @@
 import { cva, VariantProps } from 'class-variance-authority';
 import React from 'react';
 import { Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import * as Progress from 'react-native-progress';
+import { COLORS } from '../utils/colors';
 
 const buttonStyle = cva(
   'py-3 px-5 rounded-full flex-row items-center justify-evenly',
@@ -48,6 +50,7 @@ interface ButtonProps
   variant: 'primary' | 'secondary' | 'menu' | 'danger' | 'ghost';
   icon?: React.ReactNode;
   textSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
+  isLoading?: boolean;
 }
 
 export default function Button({
@@ -55,12 +58,26 @@ export default function Button({
   variant,
   icon,
   textSize,
+  isLoading,
   ...props
 }: ButtonProps) {
   return (
     <TouchableOpacity {...props} className={buttonStyle({ variant })}>
-      {icon && icon}
-      <Text className={buttonTextStyle({ variant, textSize })}>{children}</Text>
+      {isLoading ? (
+        <Progress.Circle
+          size={25}
+          indeterminate={true}
+          color={COLORS.primaryDark}
+          shouldRasterizeIOS
+        />
+      ) : (
+        <>
+          {icon && icon}
+          <Text className={buttonTextStyle({ variant, textSize })}>
+            {children}
+          </Text>
+        </>
+      )}
     </TouchableOpacity>
   );
 }

@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
 import OnboardingStack from './OnboardingStack';
-import Home from './RootHomeScreen';
+import RootHomeScreen from './RootHomeScreen';
 import NotificationScreen from './Notifications';
 import ChatScreen from './Chat';
 import SettingsScreen from './Settings';
@@ -70,7 +70,7 @@ export default function Routes({ socket }: { socket: any }) {
           headerShown: false,
         }}
         name='Home'
-        component={Home}
+        component={RootHomeScreen}
         initialParams={{ socket }}
       />
 

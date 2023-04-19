@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { deleteItemAsync, getItemAsync, setItemAsync } from 'expo-secure-store';
-import AuthStackScreen from './AuthScreenStack';
+import OnboardingStack from './OnboardingStack';
 import Home from './RootHomeScreen';
 import NotificationScreen from './Notifications';
 import ChatScreen from './Chat';
@@ -23,7 +23,8 @@ import { useAuthState } from '../hooks/useAuthState';
 const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
-  const { isVerified, setIsVerified, isLoadingAuth, token } = useAuthState();
+  const { isVerified, setIsVerified, isLoadingAuth, token, isTokenChecked } =
+    useAuthState();
   const { setSocket } = useAuth();
 
   // saving socket to context inititally
@@ -35,28 +36,44 @@ export default function Routes({ socket }: { socket: any }) {
     return <Loading />;
   }
 
+  if (token && !isVerified) {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name='Onboarding'
+          component={OnboardingStack}
+          initialParams={{ setIsVerified }}
+        />
+      </Stack.Navigator>
+    );
+  }
+
+  if (!token) {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name='Onboarding'
+          component={OnboardingStack}
+          initialParams={{ setIsVerified }}
+        />
+      </Stack.Navigator>
+    );
+  }
+
   // deleteItemAsync('token');
   return (
     <Stack.Navigator>
-      {!isVerified ? (
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name='Auth'
-          component={AuthStackScreen}
-          initialParams={{ setIsVerified }}
-        />
-      ) : (
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name='Home'
-          component={Home}
-          initialParams={{ socket }}
-        />
-      )}
+      <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+        name='Home'
+        component={Home}
+        initialParams={{ socket }}
+      />
+
       <Stack.Screen
         name='Notifications'
         component={NotificationScreen}

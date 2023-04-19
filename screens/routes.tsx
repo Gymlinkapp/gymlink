@@ -32,7 +32,8 @@ export default function Routes({ socket }: { socket: any }) {
     setSocket(socket);
   }, []);
 
-  if (isLoadingAuth) {
+  // deleteItemAsync('token');
+  if (isLoadingAuth || (token && !isTokenChecked)) {
     return <Loading />;
   }
 
@@ -49,7 +50,7 @@ export default function Routes({ socket }: { socket: any }) {
     );
   }
 
-  if (!token) {
+  if (!token || !isTokenChecked) {
     return (
       <Stack.Navigator>
         <Stack.Screen
@@ -62,7 +63,6 @@ export default function Routes({ socket }: { socket: any }) {
     );
   }
 
-  // deleteItemAsync('token');
   return (
     <Stack.Navigator>
       <Stack.Screen

@@ -10,7 +10,7 @@ export const useAuthState = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isTokenChecked, setIsTokenChecked] = useState(false);
-  const { data: user, isLoading } = useUser(token);
+  const { data: user, isLoading, isError } = useUser(token);
 
   useEffect(() => {
     getItemAsync('token').then((token) => {
@@ -26,7 +26,15 @@ export const useAuthState = () => {
 
       setUser(user);
       setIsLoadingAuth(false);
+    } else if (!isLoading && !user) {
+      setIsLoadingAuth(false);
     }
+
+    if (isLoading || isError) {
+      setIsLoadingAuth(true);
+    }
+
+    if (socket) setSocket(socket);
   }, [token, user, isLoading, socket]);
 
   return {

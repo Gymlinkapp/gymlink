@@ -43,20 +43,22 @@ export default function HomeScreen({ navigation, route }) {
     return columnArrays;
   }
 
+  const handleFlatListLayout = () => {
+    if (!hasInitialScrolled) {
+      flatListRef.current?.scrollToOffset({
+        offset: INITIAL_SCROLL_POSITION - 200,
+        animated: true,
+      });
+      setHasInitialScrolled(true);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setFilters(defaultFilters);
     }
     if (!isLoading && data && data.users) {
       setFeed(data.users);
-
-      setTimeout(() => {
-        flatListRef.current?.scrollToOffset({
-          offset: INITIAL_SCROLL_POSITION - 200,
-          animated: true,
-        });
-        setHasInitialScrolled(true);
-      }, 500);
     }
   }, [isLoading, data, user]);
 
@@ -110,12 +112,13 @@ export default function HomeScreen({ navigation, route }) {
         data={columnData}
         keyExtractor={(item) => item.id}
         numColumns={3}
+        onLayout={handleFlatListLayout}
         columnWrapperStyle={{ flex: 1 }}
         initialScrollIndex={0}
         initialNumToRender={10}
         removeClippedSubviews={true}
         showsVerticalScrollIndicator={false}
-        className='min-h-full'
+        className='h-full'
         onEndReached={() => {
           if (hasInitialScrolled && offset < data.totalUsers) {
             setOffset((prev) => prev + LIMIT);
@@ -132,7 +135,7 @@ export default function HomeScreen({ navigation, route }) {
               keyExtractor={(item) => item.id}
               onScroll={(event) => handleScroll(event, index)}
               scrollEventThrottle={128}
-              className='flex-1'
+              className='flex-1 h-full'
               listKey={`column-${index}-${column.id}-${Date.now()}`}
               renderItem={({ item: user, index }) => (
                 <TouchableOpacity

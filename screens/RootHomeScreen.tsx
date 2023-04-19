@@ -16,7 +16,7 @@ import { useAuth } from '../utils/context';
 
 const Tab = createBottomTabNavigator();
 
-export default function Home({ route, navigation }) {
+export default function RootHomeScreen({ route, navigation }) {
   const { socket } = route.params;
   const { user } = useAuth();
   const glowEffect = (focused: boolean) => {

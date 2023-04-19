@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  ScrollView,
 } from 'react-native';
 import { useMutation, useQueryClient } from 'react-query';
 import { z } from 'zod';
@@ -179,157 +180,238 @@ export default function InitialUserDetails({ route, navigation }) {
       title='Setup your Account'
       description='Enter your details to continue'
     >
-      <FlatList
-        className='bg-primaryDark flex-1'
-        data={[1]}
-        renderItem={() => (
-          <>
-            <Controller
-              control={control}
-              name='firstName'
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error, isTouched },
-              }) => (
-                <View className='my-2'>
+      {Platform.OS === 'ios' ? (
+        <>
+          <FlatList
+            className='bg-primaryDark flex-1'
+            data={[1]}
+            renderItem={() => (
+              <>
+                <Controller
+                  control={control}
+                  name='firstName'
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error, isTouched },
+                  }) => (
+                    <View className='my-2'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        First Name
+                      </Text>
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                          isTouched && 'border-2 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(value) => onChange(value)}
+                      />
+                      {error && (
+                        <Text className='text-red-500 font-MontserratRegular'>
+                          {error.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name='lastName'
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error, isTouched },
+                  }) => (
+                    <View className='my-2'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        Last Name
+                      </Text>
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                          isTouched && 'border-2 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(value) => onChange(value)}
+                      />
+                      {error && (
+                        <Text className='text-red-500 font-MontserratRegular'>
+                          {error.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name='bio'
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error, isTouched },
+                  }) => (
+                    <View className='my-2'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        Bio
+                      </Text>
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                          isTouched && 'border-2 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        multiline
+                        numberOfLines={10}
+                        onChangeText={onChange}
+                        returnKeyType='done'
+                        returnKeyLabel='done'
+                        enablesReturnKeyAutomatically
+                      />
+                      {error && (
+                        <Text className='text-red-500 font-MontserratRegular'>
+                          {error.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
+
+                <View className='my-2 mr-1 flex-[1.5]'>
                   <Text className='text-white py-2 text-l font-MontserratMedium'>
-                    First Name
+                    Gender
                   </Text>
-                  <TextInput
-                    className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                      isTouched && 'border-2 border-tertiaryDark'
-                    }`}
-                    cursorColor={COLORS.mainWhite}
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={(value) => onChange(value)}
-                  />
-                  {error && (
+                  <View className='flex-row'>
+                    <UserGenderBox
+                      gender='Male'
+                      isSelected={gender === 'Male'}
+                      setSelected={setGender}
+                    />
+                    <UserGenderBox
+                      gender='Female'
+                      isSelected={gender === 'Female'}
+                      setSelected={setGender}
+                    />
+                    <UserGenderBox
+                      gender='Other'
+                      isSelected={gender === 'Other'}
+                      setSelected={setGender}
+                    />
+                  </View>
+
+                  {genderError && (
                     <Text className='text-red-500 font-MontserratRegular'>
-                      {error.message}
+                      Must be selected
                     </Text>
                   )}
                 </View>
-              )}
-            />
-            <Controller
-              control={control}
-              name='lastName'
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error, isTouched },
-              }) => (
-                <View className='my-2'>
+
+                <View className='my-2 ml-1 flex-1'>
                   <Text className='text-white py-2 text-l font-MontserratMedium'>
-                    Last Name
+                    Race
                   </Text>
-                  <TextInput
-                    className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                      isTouched && 'border-2 border-tertiaryDark'
-                    }`}
-                    cursorColor={COLORS.mainWhite}
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={(value) => onChange(value)}
+                  <CustomSelect
+                    options={races}
+                    onSelect={(option) => {
+                      setRace(option.value);
+                    }}
                   />
-                  {error && (
+                  {raceError && (
                     <Text className='text-red-500 font-MontserratRegular'>
-                      {error.message}
+                      Must be selected
                     </Text>
                   )}
                 </View>
-              )}
-            />
-            <Controller
-              control={control}
-              name='bio'
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error, isTouched },
-              }) => (
-                <View className='my-2'>
-                  <Text className='text-white py-2 text-l font-MontserratMedium'>
-                    Bio
-                  </Text>
-                  <TextInput
-                    className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                      isTouched && 'border-2 border-tertiaryDark'
-                    }`}
-                    cursorColor={COLORS.mainWhite}
-                    value={value}
-                    onBlur={onBlur}
-                    multiline
-                    numberOfLines={10}
-                    onChangeText={onChange}
-                    returnKeyType='done'
-                    returnKeyLabel='done'
-                    enablesReturnKeyAutomatically
+                <View className='flex-row'>
+                  <Controller
+                    control={control}
+                    name='email'
+                    render={({
+                      field: { onChange, onBlur, value },
+                      fieldState: { isTouched, error },
+                    }) => (
+                      <View className='my-2 flex-1 mr-2'>
+                        <Text className='text-white py-2 text-l font-MontserratMedium'>
+                          Email
+                        </Text>
+                        <TextInput
+                          className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                            isTouched && 'border-2 border-tertiaryDark'
+                          }`}
+                          cursorColor={COLORS.mainWhite}
+                          value={value}
+                          onBlur={onBlur}
+                          onChangeText={(value) => onChange(value)}
+                        />
+                        {error && (
+                          <Text className='text-red-500 font-MontserratRegular'>
+                            {error.message}
+                          </Text>
+                        )}
+                      </View>
+                    )}
                   />
-                  {error && (
-                    <Text className='text-red-500 font-MontserratRegular'>
-                      {error.message}
-                    </Text>
-                  )}
+                  <Controller
+                    control={control}
+                    name='age'
+                    render={({
+                      field: { onChange, onBlur, value },
+                      fieldState: { isTouched, error },
+                    }) => (
+                      <View className='my-2 w-1/4'>
+                        <Text className='text-white py-2 text-l font-MontserratMedium'>
+                          Age
+                        </Text>
+                        <TextInput
+                          className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                            isTouched && 'border-2 border-tertiaryDark'
+                          }`}
+                          cursorColor={COLORS.mainWhite}
+                          value={value.toString() || ''}
+                          onBlur={onBlur}
+                          onChangeText={(value) =>
+                            onChange(parseInt(value) || 0)
+                          }
+                          keyboardType='numeric'
+                        />
+                        {error && (
+                          <Text className='text-red-500 font-MontserratRegular'>
+                            {error.message}
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                  />
                 </View>
-              )}
-            />
-
-            <View className='my-2 mr-1 flex-[1.5]'>
-              <Text className='text-white py-2 text-l font-MontserratMedium'>
-                Gender
-              </Text>
-              <View className='flex-row'>
-                <UserGenderBox
-                  gender='Male'
-                  isSelected={gender === 'Male'}
-                  setSelected={setGender}
-                />
-                <UserGenderBox
-                  gender='Female'
-                  isSelected={gender === 'Female'}
-                  setSelected={setGender}
-                />
-                <UserGenderBox
-                  gender='Other'
-                  isSelected={gender === 'Other'}
-                  setSelected={setGender}
-                />
-              </View>
-
-              {genderError && (
-                <Text className='text-red-500 font-MontserratRegular'>
-                  Must be selected
-                </Text>
-              )}
-            </View>
-
-            <View className='my-2 ml-1 flex-1'>
-              <Text className='text-white py-2 text-l font-MontserratMedium'>
-                Race
-              </Text>
-              <CustomSelect
-                options={races}
-                onSelect={(option) => {
-                  setRace(option.value);
-                }}
-              />
-              {raceError && (
-                <Text className='text-red-500 font-MontserratRegular'>
-                  Must be selected
-                </Text>
-              )}
-            </View>
-            <View className='flex-row'>
+              </>
+            )}
+          />
+          <Button
+            variant='primary'
+            isLoading={saveUserDetails.isLoading}
+            onPress={handleSubmit(onSubmit)}
+          >
+            Continue
+          </Button>
+        </>
+      ) : (
+        <KeyboardAvoidingView behavior='height' style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+            }}
+          >
+            <>
               <Controller
                 control={control}
-                name='email'
+                name='firstName'
                 render={({
                   field: { onChange, onBlur, value },
-                  fieldState: { isTouched, error },
+                  fieldState: { error, isTouched },
                 }) => (
-                  <View className='my-2 flex-1 mr-2'>
+                  <View className='my-2'>
                     <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      Email
+                      First Name
                     </Text>
                     <TextInput
                       className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
@@ -350,24 +432,23 @@ export default function InitialUserDetails({ route, navigation }) {
               />
               <Controller
                 control={control}
-                name='age'
+                name='lastName'
                 render={({
                   field: { onChange, onBlur, value },
-                  fieldState: { isTouched, error },
+                  fieldState: { error, isTouched },
                 }) => (
-                  <View className='my-2 w-1/4'>
+                  <View className='my-2'>
                     <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      Age
+                      Last Name
                     </Text>
                     <TextInput
                       className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
                         isTouched && 'border-2 border-tertiaryDark'
                       }`}
                       cursorColor={COLORS.mainWhite}
-                      value={value.toString() || ''}
+                      value={value}
                       onBlur={onBlur}
-                      onChangeText={(value) => onChange(parseInt(value) || 0)}
-                      keyboardType='numeric'
+                      onChangeText={(value) => onChange(value)}
                     />
                     {error && (
                       <Text className='text-red-500 font-MontserratRegular'>
@@ -377,17 +458,155 @@ export default function InitialUserDetails({ route, navigation }) {
                   </View>
                 )}
               />
-            </View>
-          </>
-        )}
-      />
-      <Button
-        variant='primary'
-        isLoading={saveUserDetails.isLoading}
-        onPress={handleSubmit(onSubmit)}
-      >
-        Continue
-      </Button>
+              <Controller
+                control={control}
+                name='bio'
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error, isTouched },
+                }) => (
+                  <View className='my-2'>
+                    <Text className='text-white py-2 text-l font-MontserratMedium'>
+                      Bio
+                    </Text>
+                    <TextInput
+                      className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                        isTouched && 'border-2 border-tertiaryDark'
+                      }`}
+                      cursorColor={COLORS.mainWhite}
+                      value={value}
+                      onBlur={onBlur}
+                      multiline
+                      numberOfLines={10}
+                      onChangeText={onChange}
+                      returnKeyType='done'
+                      returnKeyLabel='done'
+                      enablesReturnKeyAutomatically
+                    />
+                    {error && (
+                      <Text className='text-red-500 font-MontserratRegular'>
+                        {error.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              />
+
+              <View className='my-2 mr-1 flex-[1.5]'>
+                <Text className='text-white py-2 text-l font-MontserratMedium'>
+                  Gender
+                </Text>
+                <View className='flex-row'>
+                  <UserGenderBox
+                    gender='Male'
+                    isSelected={gender === 'Male'}
+                    setSelected={setGender}
+                  />
+                  <UserGenderBox
+                    gender='Female'
+                    isSelected={gender === 'Female'}
+                    setSelected={setGender}
+                  />
+                  <UserGenderBox
+                    gender='Other'
+                    isSelected={gender === 'Other'}
+                    setSelected={setGender}
+                  />
+                </View>
+
+                {genderError && (
+                  <Text className='text-red-500 font-MontserratRegular'>
+                    Must be selected
+                  </Text>
+                )}
+              </View>
+
+              <View className='my-2 ml-1 flex-1'>
+                <Text className='text-white py-2 text-l font-MontserratMedium'>
+                  Race
+                </Text>
+                <CustomSelect
+                  options={races}
+                  onSelect={(option) => {
+                    setRace(option.value);
+                  }}
+                />
+                {raceError && (
+                  <Text className='text-red-500 font-MontserratRegular'>
+                    Must be selected
+                  </Text>
+                )}
+              </View>
+              <View className='flex-row'>
+                <Controller
+                  control={control}
+                  name='email'
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { isTouched, error },
+                  }) => (
+                    <View className='my-2 flex-1 mr-2'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        Email
+                      </Text>
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                          isTouched && 'border-2 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(value) => onChange(value)}
+                      />
+                      {error && (
+                        <Text className='text-red-500 font-MontserratRegular'>
+                          {error.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name='age'
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { isTouched, error },
+                  }) => (
+                    <View className='my-2 w-1/4'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        Age
+                      </Text>
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                          isTouched && 'border-2 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value.toString() || ''}
+                        onBlur={onBlur}
+                        onChangeText={(value) => onChange(parseInt(value) || 0)}
+                        keyboardType='numeric'
+                      />
+                      {error && (
+                        <Text className='text-red-500 font-MontserratRegular'>
+                          {error.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
+              </View>
+            </>
+          </ScrollView>
+          <Button
+            variant='primary'
+            isLoading={saveUserDetails.isLoading}
+            onPress={handleSubmit(onSubmit)}
+          >
+            Continue
+          </Button>
+        </KeyboardAvoidingView>
+      )}
     </AuthLayout>
   );
 }

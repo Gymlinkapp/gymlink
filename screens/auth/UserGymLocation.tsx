@@ -122,81 +122,167 @@ export default function UserGymLocation({ navigation }) {
       title='What is your home gym?'
       description='Put in your home gym to find gym buddies.'
     >
-      <FlatList
-        className='bg-primaryDark'
-        data={[1]}
-        renderItem={() => (
-          <Controller
-            control={control}
-            name='enteredGymLocation'
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { isTouched, error },
-            }) => (
-              <View className='my-2 w-full h-full flex-1'>
-                <View className='flex-1 w-full'>
-                  <Text className='text-white py-2 text-l font-MontserratMedium'>
-                    What gym you at?
-                  </Text>
-                  <TextInput
-                    className={`bg-secondaryDark rounded-md p-4 flex-1 text-white font-[MontserratMedium] ${
-                      (value.length > 1 || isTouched) &&
-                      'rounded-b-none border-2 border-b-0 border-tertiaryDark'
-                    } ${
-                      nearGyms.length < 1 &&
-                      'border-b-2 border-tertiaryDark rounded-md'
-                    }`}
-                    cursorColor={COLORS.mainWhite}
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={(value) => {
-                      onChange(value);
-                      autoCompleteGymLocations(value);
-                    }}
-                  />
-                </View>
-                {nearGyms.length > 0 && (
-                  <View className='bg-secondaryDark rounded-b-md border-2 border-tertiaryDark'>
-                    <FlatList
-                      data={nearGyms}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity
-                          className='px-2 py-6'
-                          onPress={() => {
-                            setValue('gymLocation', {
-                              name: item.description,
-                              longitude: long,
-                              latitude: lat,
-                            });
-                            setValue(
-                              'enteredGymLocation',
-                              getValues('gymLocation').name
-                            );
-                            setNearGyms([]);
-                          }}
-                        >
-                          <Text className='text-white font-MontserratMedium'>
-                            {item.description}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    />
+      {Platform.OS === 'ios' ? (
+        <>
+          <FlatList
+            className='bg-primaryDark'
+            data={[1]}
+            renderItem={() => (
+              <Controller
+                control={control}
+                name='enteredGymLocation'
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { isTouched, error },
+                }) => (
+                  <View className='my-2 w-full h-full flex-1'>
+                    <View className='flex-1 w-full'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        What gym you at?
+                      </Text>
+                      <TextInput
+                        className={`bg-secondaryDark rounded-md p-4 flex-1 text-white font-[MontserratMedium] ${
+                          (value.length > 1 || isTouched) &&
+                          'rounded-b-none border-2 border-b-0 border-tertiaryDark'
+                        } ${
+                          nearGyms.length < 1 &&
+                          'border-b-2 border-tertiaryDark rounded-md'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(value) => {
+                          onChange(value);
+                          autoCompleteGymLocations(value);
+                        }}
+                      />
+                    </View>
+                    {nearGyms.length > 0 && (
+                      <View className='bg-secondaryDark rounded-b-md border-2 border-tertiaryDark'>
+                        <FlatList
+                          data={nearGyms}
+                          renderItem={({ item }) => (
+                            <TouchableOpacity
+                              className='px-2 py-6'
+                              onPress={() => {
+                                setValue('gymLocation', {
+                                  name: item.description,
+                                  longitude: long,
+                                  latitude: lat,
+                                });
+                                setValue(
+                                  'enteredGymLocation',
+                                  getValues('gymLocation').name
+                                );
+                                setNearGyms([]);
+                              }}
+                            >
+                              <Text className='text-white font-MontserratMedium'>
+                                {item.description}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      </View>
+                    )}
+
+                    {error && (
+                      <Text className='text-red-500 font-MontserratRegular'>
+                        {error.message}
+                      </Text>
+                    )}
                   </View>
                 )}
-
-                {error && (
-                  <Text className='text-red-500 font-MontserratRegular'>
-                    {error.message}
-                  </Text>
-                )}
-              </View>
+              />
             )}
           />
-        )}
-      />
 
-      {Object.keys(errors).length === 0 && (
-        <View className='flex-1 justify-end'>
+          {Object.keys(errors).length === 0 && (
+            <View className='flex-1 justify-end'>
+              <Button
+                variant='primary'
+                isLoading={saveUserGymLocation.isLoading}
+                onPress={handleSubmit(onSubmit)}
+              >
+                Continue
+              </Button>
+            </View>
+          )}
+        </>
+      ) : (
+        <KeyboardAvoidingView behavior='height' style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+            }}
+          >
+            <Controller
+              control={control}
+              name='enteredGymLocation'
+              render={({
+                field: { onChange, onBlur, value },
+                fieldState: { isTouched, error },
+              }) => (
+                <View className='my-2 w-full h-full flex-1'>
+                  <View className='flex-1 w-full'>
+                    <Text className='text-white py-2 text-l font-MontserratMedium'>
+                      What gym you at?
+                    </Text>
+                    <TextInput
+                      className={`bg-secondaryDark rounded-md p-4 flex-1 text-white font-[MontserratMedium] ${
+                        (value.length > 1 || isTouched) &&
+                        'rounded-b-none border-2 border-b-0 border-tertiaryDark'
+                      } ${
+                        nearGyms.length < 1 &&
+                        'border-b-2 border-tertiaryDark rounded-md'
+                      }`}
+                      cursorColor={COLORS.mainWhite}
+                      value={value}
+                      onBlur={onBlur}
+                      onChangeText={(value) => {
+                        onChange(value);
+                        autoCompleteGymLocations(value);
+                      }}
+                    />
+                  </View>
+                  {nearGyms.length > 0 && (
+                    <View className='bg-secondaryDark rounded-b-md border-2 border-tertiaryDark'>
+                      <FlatList
+                        data={nearGyms}
+                        renderItem={({ item }) => (
+                          <TouchableOpacity
+                            className='px-2 py-6'
+                            onPress={() => {
+                              setValue('gymLocation', {
+                                name: item.description,
+                                longitude: long,
+                                latitude: lat,
+                              });
+                              setValue(
+                                'enteredGymLocation',
+                                getValues('gymLocation').name
+                              );
+                              setNearGyms([]);
+                            }}
+                          >
+                            <Text className='text-white font-MontserratMedium'>
+                              {item.description}
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      />
+                    </View>
+                  )}
+
+                  {error && (
+                    <Text className='text-red-500 font-MontserratRegular'>
+                      {error.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+          </ScrollView>
           <Button
             variant='primary'
             isLoading={saveUserGymLocation.isLoading}
@@ -204,7 +290,7 @@ export default function UserGymLocation({ navigation }) {
           >
             Continue
           </Button>
-        </View>
+        </KeyboardAvoidingView>
       )}
     </AuthLayout>
   );

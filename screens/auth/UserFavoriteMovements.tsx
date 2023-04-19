@@ -17,6 +17,7 @@ import { COLORS } from '../../utils/colors';
 import api from '../../utils/axiosStore';
 import { getItemAsync } from 'expo-secure-store';
 import { useAuth } from '../../utils/context';
+import { useQueryClient } from 'react-query';
 
 type Movement = {
   label: string;
@@ -30,6 +31,8 @@ const UserFavoriteMovementSchema = z.object({
 
 export default function UserFavoriteMovements({ route, navigation }) {
   const { token, setIsVerified } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
   const {
     handleSubmit,
     control,
@@ -42,14 +45,19 @@ export default function UserFavoriteMovements({ route, navigation }) {
       favoriteMovments: [],
     },
   });
-  const onSubmit = (data: z.infer<typeof UserFavoriteMovementSchema>) => {
-    api.post(`/users/update`, {
-      tags: data.favoriteMovments,
-      authSteps: 7,
-      tempJWT: token,
-      token: token,
-    });
-    setIsVerified(true);
+  const onSubmit = async (data: z.infer<typeof UserFavoriteMovementSchema>) => {
+    setIsLoading(true);
+    try {
+      await api.post(`/users/update`, {
+        tags: data.favoriteMovments,
+        authSteps: 7,
+        tempJWT: token,
+        token: token,
+      });
+      setIsLoading(false);
+      queryClient.invalidateQueries('user');
+      setIsVerified(true);
+    } catch (error) {}
   };
   const [items, setItems] = useState<Movement[]>([
     { label: 'Bench Press', value: 'bench-press', selected: false },
@@ -184,7 +192,11 @@ export default function UserFavoriteMovements({ route, navigation }) {
               {getValues('favoriteMovments').length}/5 Movements
             </Text>
           </TouchableOpacity>
-          <Button onPress={handleSubmit(onSubmit)} variant='primary'>
+          <Button
+            onPress={handleSubmit(onSubmit)}
+            variant='primary'
+            isLoading={isLoading}
+          >
             Next
           </Button>
         </View>

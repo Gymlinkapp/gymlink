@@ -116,7 +116,11 @@ export default function RegisterScreen({ navigation }) {
               </View>
             )}
           />
-          <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+          <Button
+            variant='primary'
+            isLoading={sendSMS.isLoading}
+            onPress={handleSubmit(onSubmit)}
+          >
             Send code
           </Button>
           <Button

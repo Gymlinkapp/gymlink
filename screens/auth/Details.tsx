@@ -141,12 +141,19 @@ export default function InitialUserDetails({ route, navigation }) {
     },
     {
       onSuccess: async (data) => {
-        console.log(data.data);
-        if (data) {
+        console.log('data', data.data);
+        if (data.data.authStep === 3) {
           try {
-            await setItemAsync('token', data.data.token);
-            queryClient.invalidateQueries('user');
-            setToken(data.data.token);
+            setItemAsync('token', data.data.token)
+              .then(() => {
+                setToken(data.data.token);
+                if (token) {
+                  queryClient.invalidateQueries('user');
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           } catch (error) {
             console.log('here', error);
           }
@@ -374,7 +381,11 @@ export default function InitialUserDetails({ route, navigation }) {
           </>
         )}
       />
-      <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+      <Button
+        variant='primary'
+        isLoading={saveUserDetails.isLoading}
+        onPress={handleSubmit(onSubmit)}
+      >
         Continue
       </Button>
     </AuthLayout>

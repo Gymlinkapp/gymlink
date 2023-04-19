@@ -16,11 +16,10 @@ import {
 import Button from '../../components/button';
 import { Camera, X } from 'phosphor-react-native';
 import { COLORS } from '../../utils/colors';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import useToken from '../../hooks/useToken';
 import { useAuth } from '../../utils/context';
 import AuthLayout from '../../layouts/AuthLayout';
-import { trpc } from '../../utils/trpc';
 
 const getPermissionAsync = async () => {
   if (Platform.OS !== 'web') {
@@ -32,11 +31,22 @@ const getPermissionAsync = async () => {
 };
 
 export default function UserImageUpload({ navigation, route }) {
+  const queryClient = useQueryClient();
   const [images, setImages] = useState<string[] | []>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { token } = useAuth();
 
   const continueToNextScreen = async () => {
-    await api.post('/users/updateAuthStep', { token, authSteps: 4 });
+    setIsLoading(true);
+    try {
+      await api.post('/users/updateAuthStep', { token, authSteps: 4 });
+
+      queryClient.invalidateQueries('user');
+
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const addImage = async () => {
@@ -143,6 +153,7 @@ export default function UserImageUpload({ navigation, route }) {
       <View>
         {images && images.length > 0 && (
           <Button
+            isLoading={isLoading}
             variant='primary'
             onPress={async () => await continueToNextScreen()}
           >

@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { getItemAsync } from 'expo-secure-store';
 import axios from 'axios';
 import { useAuth } from '../../utils/context';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { useLocation } from '../../hooks/useLocation';
 import AuthLayout from '../../layouts/AuthLayout';
 
@@ -38,6 +38,7 @@ export default function UserGymLocation({ navigation }) {
   const location = useLocation();
   const [nearGyms, setNearGyms] = useState([]);
   const { token, long, lat, setLat, setLong } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (location) {
@@ -102,7 +103,8 @@ export default function UserGymLocation({ navigation }) {
     },
     {
       onSuccess: async (data) => {
-        if (data && (data.data.step === 5 || data.data.gymId)) {
+        if (data) {
+          queryClient.invalidateQueries('user');
         }
       },
       onError: (error) => {
@@ -195,7 +197,11 @@ export default function UserGymLocation({ navigation }) {
 
       {Object.keys(errors).length === 0 && (
         <View className='flex-1 justify-end'>
-          <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+          <Button
+            variant='primary'
+            isLoading={saveUserGymLocation.isLoading}
+            onPress={handleSubmit(onSubmit)}
+          >
             Continue
           </Button>
         </View>

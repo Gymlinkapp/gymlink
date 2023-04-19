@@ -23,8 +23,7 @@ import { useAuthState } from '../hooks/useAuthState';
 const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
-  const { token } = useAuth();
-  const { isVerified, setIsVerified, isLoadingAuth } = useAuthState();
+  const { isVerified, setIsVerified, isLoadingAuth, token } = useAuthState();
 
   if (isLoadingAuth) {
     return <Loading />;

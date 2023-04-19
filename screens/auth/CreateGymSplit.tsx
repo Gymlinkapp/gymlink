@@ -16,7 +16,7 @@ import {
   checkIfEmptyDays,
 } from '../../utils/split';
 import * as Haptics from 'expo-haptics';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import api from '../../utils/axiosStore';
 import Button from '../../components/button';
 import { useAuth } from '../../utils/context';
@@ -30,6 +30,8 @@ export default function CreateSplit({ navigation, route }) {
   const [error, setError] = useState<string>('');
 
   const [weekSplit, setWeekSplit] = useState<WeekSplit[]>(PushPullLegsSplit);
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (route.params?.assignExercise) {
@@ -73,6 +75,11 @@ export default function CreateSplit({ navigation, route }) {
       }
     },
     {
+      onSuccess: (data) => {
+        if (data) {
+          queryClient.invalidateQueries('user');
+        }
+      },
       onError: (error) => {
         console.log(error);
       },
@@ -233,6 +240,7 @@ export default function CreateSplit({ navigation, route }) {
         <Button
           variant='primary'
           className='flex-1 mb-1'
+          isLoading={saveSplit.isLoading}
           onPress={() => {
             saveSplit.mutate(weekSplit);
           }}

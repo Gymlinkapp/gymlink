@@ -1,10 +1,17 @@
 import { ArrowCounterClockwise, ChatsTeardrop, X } from 'phosphor-react-native';
-import { Animated, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Animated,
+  Easing,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { User } from '../utils/users';
 import EmptyScreen from '../components/EmptyScreen';
 import { useAuth } from '../utils/context';
 import { Image } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { truncate } from '../utils/ui';
 import {
   RectButton,
@@ -45,6 +52,32 @@ export default function Chats({ navigation, route }: any) {
 
   const { user, token } = useAuth();
   const { data: chats, isLoading } = useChats(user.id);
+
+  const spinAnim = useRef(new Animated.Value(0)).current;
+
+  const startSpinAnimation = () => {
+    spinAnim.setValue(0);
+    Animated.timing(spinAnim, {
+      toValue: 1,
+      duration: 1000,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  useEffect(() => {
+    startSpinAnimation();
+  }, []);
+
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '-360deg'],
+  });
+
+  const handleSpin = () => {
+    startSpinAnimation();
+    queryClient.invalidateQueries('chats');
+  };
 
   const deleteChat = useMutation(
     async ({ chatId }: { chatId: string }) => {
@@ -114,10 +147,16 @@ export default function Chats({ navigation, route }: any) {
           <View className='w-full flex-row justify-end px-4'>
             <TouchableOpacity
               onPress={() => {
-                queryClient.invalidateQueries('chats');
+                handleSpin();
               }}
             >
-              <ArrowCounterClockwise color='#fff' weight='fill' />
+              <Animated.View
+                style={{
+                  transform: [{ rotate: spin }],
+                }}
+              >
+                <ArrowCounterClockwise color='#fff' weight='fill' />
+              </Animated.View>
             </TouchableOpacity>
           </View>
           <FlatList

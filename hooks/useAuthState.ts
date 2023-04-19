@@ -15,6 +15,8 @@ export const useAuthState = () => {
     getItemAsync('token').then((token) => {
       if (token) {
         setToken(token);
+
+        setIsLoadingAuth(false);
       }
     });
 

@@ -118,9 +118,11 @@ export default function Chats({ navigation, route }: any) {
           <RNGHOpacity
             className='bg-primarydark p-4 rounded-full'
             onPress={() => {
-              deleteChat.mutate({
-                chatId: chatId,
-              });
+              if (chatId) {
+                deleteChat.mutate({
+                  chatId: chatId,
+                });
+              }
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
@@ -228,12 +230,29 @@ export default function Chats({ navigation, route }: any) {
           />
         </View>
       ) : (
-        <EmptyScreen
-          icon={
-            <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
-          }
-          text='You have no chats yet'
-        />
+        <>
+          <View className='w-full flex-row justify-end px-4'>
+            <TouchableOpacity
+              onPress={() => {
+                handleSpin();
+              }}
+            >
+              <Animated.View
+                style={{
+                  transform: [{ rotate: spin }],
+                }}
+              >
+                <ArrowCounterClockwise color='#fff' weight='fill' />
+              </Animated.View>
+            </TouchableOpacity>
+          </View>
+          <EmptyScreen
+            icon={
+              <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
+            }
+            text='You have no chats yet'
+          />
+        </>
       )}
     </View>
   );

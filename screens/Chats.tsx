@@ -60,7 +60,7 @@ export default function Chats({ navigation, route }: any) {
     Animated.timing(spinAnim, {
       toValue: 1,
       duration: 1000,
-      easing: Easing.linear,
+      easing: Easing.inOut(Easing.sin),
       useNativeDriver: true,
     }).start();
   };

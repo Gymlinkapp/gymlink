@@ -13,8 +13,10 @@ const useUser = (token: string) => {
     enabled: !!token,
 
     // could be okay, but not sure on long term/with more data
-    staleTime: 1000,
-    refetchInterval: 1000,
+
+    // was the solution to help chats and messages update
+    // staleTime: 1000,
+    // refetchInterval: 1000,
   });
 };
 

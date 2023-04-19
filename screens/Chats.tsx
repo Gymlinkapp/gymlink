@@ -89,6 +89,7 @@ export default function Chats({ navigation, route }: any) {
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('chats');
+        queryClient.invalidateQueries('users');
       },
     }
   );

@@ -26,6 +26,8 @@ import { BlurView } from 'expo-blur';
 import { keyboardVerticalOffset } from '../utils/ui';
 import * as Haptics from 'expo-haptics';
 import { User } from '../utils/users';
+import * as Progress from 'react-native-progress';
+import { COLORS } from '../utils/colors';
 
 export function ProfileHeader({
   user,
@@ -78,7 +80,7 @@ export default function ProfileScreen({
   navigation?: any;
   route?: any;
 }) {
-  const { user, isFriend } = route.params;
+  const { user } = route.params;
   const { user: currUser, socket, token } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
@@ -111,7 +113,6 @@ export default function ProfileScreen({
     },
     {
       onSuccess: (data) => {
-        console.log('chat', data.chat);
         navigation.navigate('Chat', {
           socket: socket,
           user: currUser,
@@ -123,6 +124,7 @@ export default function ProfileScreen({
           message,
         });
         queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('users');
       },
     }
   );
@@ -278,14 +280,25 @@ export default function ProfileScreen({
                     );
                   }}
                 >
-                  <PaperPlaneRight
-                    color='#CCC9C9'
-                    weight='regular'
-                    size={18}
-                    style={{
-                      flex: 0.25,
-                    }}
-                  />
+                  <>
+                    {createLink.isLoading ? (
+                      <Progress.Circle
+                        size={18}
+                        indeterminate={true}
+                        color={COLORS.mainWhite}
+                        shouldRasterizeIOS
+                      />
+                    ) : (
+                      <PaperPlaneRight
+                        color='#CCC9C9'
+                        weight='regular'
+                        size={18}
+                        style={{
+                          flex: 0.25,
+                        }}
+                      />
+                    )}
+                  </>
                 </TouchableOpacity>
               </View>
             </KeyboardAvoidingView>

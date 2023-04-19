@@ -6,18 +6,19 @@ import { useAuth } from '../utils/context';
 const AUTH_STEPS = '7';
 
 export const useAuthState = () => {
-  const { setToken, token, setUser } = useAuth();
+  const { setToken, token, setUser, setSocket, socket } = useAuth();
   const [isVerified, setIsVerified] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const { data: user, isLoading } = useUser(token);
-  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (!token) {
-      setIsLoadingAuth(false);
+    getItemAsync('token').then((token) => {
+      if (token) {
+        setToken(token);
 
-      return;
-    }
+        setIsLoadingAuth(false);
+      }
+    });
 
     if (!isLoading && user) {
       // if the user has a jwt (has an email) and has completed all auth steps

@@ -1,10 +1,17 @@
-import { ChatsTeardrop, Check, X } from 'phosphor-react-native';
-import { Animated, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { ArrowCounterClockwise, ChatsTeardrop, X } from 'phosphor-react-native';
+import {
+  Animated,
+  Easing,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { User } from '../utils/users';
 import EmptyScreen from '../components/EmptyScreen';
 import { useAuth } from '../utils/context';
 import { Image } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { truncate } from '../utils/ui';
 import {
   RectButton,
@@ -16,6 +23,8 @@ import api from '../utils/axiosStore';
 import * as Haptics from 'expo-haptics';
 import { useChats } from '../hooks/useChats';
 import Loading from '../components/Loading';
+import * as Progress from 'react-native-progress';
+import { COLORS } from '../utils/colors';
 
 export type Message = {
   id?: string;
@@ -44,14 +53,43 @@ export default function Chats({ navigation, route }: any) {
   const { user, token } = useAuth();
   const { data: chats, isLoading } = useChats(user.id);
 
+  const spinAnim = useRef(new Animated.Value(0)).current;
+
+  const startSpinAnimation = () => {
+    spinAnim.setValue(0);
+    Animated.timing(spinAnim, {
+      toValue: 1,
+      duration: 1000,
+      easing: Easing.inOut(Easing.sin),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  useEffect(() => {
+    startSpinAnimation();
+  }, []);
+
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '-360deg'],
+  });
+
+  const handleSpin = () => {
+    startSpinAnimation();
+    queryClient.invalidateQueries('chats');
+  };
+
   const deleteChat = useMutation(
     async ({ chatId }: { chatId: string }) => {
-      const { data } = await api.delete(`/chats/${chatId}`);
+      const { data } = await api.post(`/chats/deleteChat`, {
+        chatId: chatId,
+      });
       return data;
     },
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('chats');
+        queryClient.invalidateQueries('users');
       },
     }
   );
@@ -81,13 +119,24 @@ export default function Chats({ navigation, route }: any) {
           <RNGHOpacity
             className='bg-primarydark p-4 rounded-full'
             onPress={() => {
-              deleteChat.mutate({
-                chatId: chatId,
-              });
+              if (chatId) {
+                deleteChat.mutate({
+                  chatId: chatId,
+                });
+              }
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
-            <X color='#fff' weight='fill' />
+            {deleteChat.isLoading ? (
+              <Progress.Circle
+                size={25}
+                indeterminate={true}
+                color={COLORS.mainWhite}
+                shouldRasterizeIOS
+              />
+            ) : (
+              <X color='#fff' weight='fill' />
+            )}
           </RNGHOpacity>
         </Animated.View>
       </RectButton>
@@ -97,7 +146,22 @@ export default function Chats({ navigation, route }: any) {
   return (
     <View className='flex-1'>
       {user && chats && chats.length ? (
-        <View>
+        <View className='w-full'>
+          <View className='w-full flex-row justify-end px-4'>
+            <TouchableOpacity
+              onPress={() => {
+                handleSpin();
+              }}
+            >
+              <Animated.View
+                style={{
+                  transform: [{ rotate: spin }],
+                }}
+              >
+                <ArrowCounterClockwise color='#fff' weight='fill' />
+              </Animated.View>
+            </TouchableOpacity>
+          </View>
           <FlatList
             className='p-4'
             data={chats}
@@ -105,8 +169,8 @@ export default function Chats({ navigation, route }: any) {
             renderItem={({ item }) => {
               // chats don't have messages by default, so we need to check if they exist
               let recentMessage: Message | undefined;
-              if (item.messages && item.messages.length) {
-                recentMessage = item.messages[item.messages.length - 1];
+              if (item.messages && item.messages.length > 0) {
+                recentMessage = item.messages[0];
               }
               const otherUser = item.participants.find(
                 (u: User) => u.id !== user.id
@@ -167,12 +231,29 @@ export default function Chats({ navigation, route }: any) {
           />
         </View>
       ) : (
-        <EmptyScreen
-          icon={
-            <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
-          }
-          text='You have no chats yet'
-        />
+        <>
+          <View className='w-full flex-row justify-end px-4'>
+            <TouchableOpacity
+              onPress={() => {
+                handleSpin();
+              }}
+            >
+              <Animated.View
+                style={{
+                  transform: [{ rotate: spin }],
+                }}
+              >
+                <ArrowCounterClockwise color='#fff' weight='fill' />
+              </Animated.View>
+            </TouchableOpacity>
+          </View>
+          <EmptyScreen
+            icon={
+              <ChatsTeardrop weight='fill' color='rgb(204,201,201)' size={48} />
+            }
+            text='You have no chats yet'
+          />
+        </>
       )}
     </View>
   );

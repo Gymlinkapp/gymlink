@@ -1,21 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
   KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import Button from '../components/button';
-import { useChat } from '../hooks/useChat';
 import { keyboardVerticalOffset } from '../utils/ui';
 import { User } from '../utils/users';
 import { Message } from './Chats';
-import { useQueryClient } from 'react-query';
-import Loading from '../components/Loading';
 import { TouchableOpacity } from 'react-native';
 import { CaretLeft } from 'phosphor-react-native';
 
@@ -62,42 +58,27 @@ export default function ChatScreen({ route, navigation }) {
     sender: user,
     content: '',
   });
-  const [messages, setMessages] = useState<MessageData[] | Message[]>(
-    message
-      ? [
-          {
-            roomName: roomName,
-            roomId: roomId,
-            sender: user,
-            content: message,
-          },
-        ]
-      : []
-  );
+  const [messages, setMessages] = useState<MessageData[] | Message[]>([]);
   const flatListRef = useRef(null);
-  const sendMessage = async () => {
-    await socket.emit('chat-message', messageData);
-    setMessages((messages) => [...messages, messageData]);
-    setMessageData({ ...messageData, content: '' });
-  };
 
   useEffect(() => {
-    if (message) {
-      socket.emit('join-chat', {
+    const joinRoomAndSendMessage = async () => {
+      const joinChatData: any = {
         roomName,
         roomId,
-        message: {
-          roomName,
-          roomId,
-          sender: user,
-          content: message,
-        },
-      });
-    }
-    socket.emit('join-chat', {
-      roomName,
-      roomId,
-    });
+      };
+
+      // Check if there's an initial message before adding it to the joinChatData object
+      if (message) {
+        joinChatData.initialMessage = message;
+        joinChatData.sender = user;
+      }
+
+      socket.emit('join-chat', joinChatData);
+    };
+
+    joinRoomAndSendMessage();
+
     socket.on('messages', (data: Message[]) => {
       setMessages(data);
     });
@@ -116,7 +97,17 @@ export default function ChatScreen({ route, navigation }) {
       socket.off('disconnect');
       socket.off('recieve-message');
     };
-  }, [socket, roomName, roomId]);
+  }, [socket, roomName, roomId, message, user]);
+
+  const addMessage = useCallback((newMessage) => {
+    setMessages((messages) => [...messages, newMessage]);
+  }, []);
+  const sendMessage = async () => {
+    const currentMessage = { ...messageData, content: messageData.content };
+    await socket.emit('chat-message', currentMessage);
+    setMessages((messages) => [...messages, currentMessage]);
+    setMessageData({ ...messageData, content: '' });
+  };
 
   const typingIndicator = async (isTyping: boolean) => {
     await socket.emit('typing', { roomName, isTyping });

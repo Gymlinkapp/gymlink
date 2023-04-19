@@ -15,16 +15,8 @@ export const useAuthState = () => {
     getItemAsync('token').then((token) => {
       if (token) {
         setToken(token);
-
-        setIsLoadingAuth(false);
       }
     });
-
-    if (!token) {
-      setIsLoadingAuth(false);
-
-      return;
-    }
 
     if (!isLoading && user) {
       // if the user has a jwt (has an email) and has completed all auth steps

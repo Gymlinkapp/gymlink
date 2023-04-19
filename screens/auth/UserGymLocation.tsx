@@ -283,13 +283,15 @@ export default function UserGymLocation({ navigation }) {
               )}
             />
           </ScrollView>
-          <Button
-            variant='primary'
-            isLoading={saveUserGymLocation.isLoading}
-            onPress={handleSubmit(onSubmit)}
-          >
-            Continue
-          </Button>
+          {location && (
+            <Button
+              variant='primary'
+              isLoading={saveUserGymLocation.isLoading || !location}
+              onPress={handleSubmit(onSubmit)}
+            >
+              Continue
+            </Button>
+          )}
         </KeyboardAvoidingView>
       )}
     </AuthLayout>

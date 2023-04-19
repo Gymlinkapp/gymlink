@@ -24,6 +24,12 @@ const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
   const { isVerified, setIsVerified, isLoadingAuth, token } = useAuthState();
+  const { setSocket } = useAuth();
+
+  // saving socket to context inititally
+  useEffect(() => {
+    setSocket(socket);
+  }, []);
 
   if (isLoadingAuth) {
     return <Loading />;

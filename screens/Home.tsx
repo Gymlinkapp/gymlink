@@ -16,6 +16,7 @@ import { BlurView } from 'expo-blur';
 import Filters from '../components/Filters';
 import { defaultFilters } from '../utils/types/filter';
 import FeedLoading from '../components/FeedLoading';
+import * as Haptics from 'expo-haptics';
 
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_COL_OFFSETS = [50, 150, 100];
@@ -89,21 +90,6 @@ export default function HomeScreen({ navigation, route }) {
     animatedScrolls[columnIndex].setValue(offsetY);
   };
 
-  // const updateFeed = (newData: User[]) => {
-  //   const updatedFeed = newData.filter((incomingUser) => {
-  //     return !feed.find((user) => user.id === incomingUser.id);
-  //   });
-  //   setFeed(updatedFeed);
-  //   const updatedColumns = splitArrayIntoColumns(updatedFeed, 3);
-  //   const updatedColumnData = updatedColumns.map((column, index) => {
-  //     return {
-  //       data: column,
-  //       scrollFactor: columnData[index].scrollFactor,
-  //     };
-  //   });
-  //   setColumnData(updatedColumnData);
-  // };
-
   if (isLoading) {
     return <FeedLoading />;
   }
@@ -153,6 +139,7 @@ export default function HomeScreen({ navigation, route }) {
                   key={index}
                   className='h-[250px] m-[0.5px] relative bg-transparent  justify-end'
                   onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     navigation.navigate('Profile', {
                       user: user,
                     });
@@ -210,10 +197,4 @@ export default function HomeScreen({ navigation, route }) {
       />
     </Layout>
   );
-}
-
-{
-  /* <TouchableOpacity>
-                <Text>Load More</Text>
-              </TouchableOpacity> */
 }

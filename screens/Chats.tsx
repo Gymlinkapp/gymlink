@@ -1,4 +1,4 @@
-import { ChatsTeardrop, Check, X } from 'phosphor-react-native';
+import { ArrowCounterClockwise, ChatsTeardrop, X } from 'phosphor-react-native';
 import { Animated, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { User } from '../utils/users';
 import EmptyScreen from '../components/EmptyScreen';
@@ -16,6 +16,8 @@ import api from '../utils/axiosStore';
 import * as Haptics from 'expo-haptics';
 import { useChats } from '../hooks/useChats';
 import Loading from '../components/Loading';
+import * as Progress from 'react-native-progress';
+import { COLORS } from '../utils/colors';
 
 export type Message = {
   id?: string;
@@ -46,12 +48,14 @@ export default function Chats({ navigation, route }: any) {
 
   const deleteChat = useMutation(
     async ({ chatId }: { chatId: string }) => {
-      const { data } = await api.delete(`/chats/${chatId}`);
+      const { data } = await api.post(`/chats/deleteChat`, {
+        chatId: chatId,
+      });
       return data;
     },
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('chats');
       },
     }
   );
@@ -87,7 +91,16 @@ export default function Chats({ navigation, route }: any) {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
-            <X color='#fff' weight='fill' />
+            {deleteChat.isLoading ? (
+              <Progress.Circle
+                size={25}
+                indeterminate={true}
+                color={COLORS.mainWhite}
+                shouldRasterizeIOS
+              />
+            ) : (
+              <X color='#fff' weight='fill' />
+            )}
           </RNGHOpacity>
         </Animated.View>
       </RectButton>
@@ -97,7 +110,16 @@ export default function Chats({ navigation, route }: any) {
   return (
     <View className='flex-1'>
       {user && chats && chats.length ? (
-        <View>
+        <View className='w-full'>
+          <View className='w-full flex-row justify-end px-4'>
+            <TouchableOpacity
+              onPress={() => {
+                queryClient.invalidateQueries('chats');
+              }}
+            >
+              <ArrowCounterClockwise color='#fff' weight='fill' />
+            </TouchableOpacity>
+          </View>
           <FlatList
             className='p-4'
             data={chats}

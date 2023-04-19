@@ -79,6 +79,8 @@ export default function Chats({ navigation, route }: any) {
     queryClient.invalidateQueries('chats');
   };
 
+  console.log('chat 1', chats[0]);
+
   const deleteChat = useMutation(
     async ({ chatId }: { chatId: string }) => {
       const { data } = await api.post(`/chats/deleteChat`, {
@@ -166,8 +168,8 @@ export default function Chats({ navigation, route }: any) {
             renderItem={({ item }) => {
               // chats don't have messages by default, so we need to check if they exist
               let recentMessage: Message | undefined;
-              if (item.messages && item.messages.length) {
-                recentMessage = item.messages[item.messages.length - 1];
+              if (item.messages && item.messages.length > 0) {
+                recentMessage = item.messages[0];
               }
               const otherUser = item.participants.find(
                 (u: User) => u.id !== user.id

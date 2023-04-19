@@ -79,8 +79,6 @@ export default function Chats({ navigation, route }: any) {
     queryClient.invalidateQueries('chats');
   };
 
-  console.log('chat 1', chats[0]);
-
   const deleteChat = useMutation(
     async ({ chatId }: { chatId: string }) => {
       const { data } = await api.post(`/chats/deleteChat`, {

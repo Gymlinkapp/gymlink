@@ -124,6 +124,7 @@ export default function ProfileScreen({
           message,
         });
         queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('users');
       },
     }
   );

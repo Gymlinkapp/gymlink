@@ -90,6 +90,8 @@ export default function UserGymLocation({ navigation }) {
             gym: data.gymLocation,
             tempJWT: token,
             token: token,
+            longitude: long,
+            latitude: lat,
           },
           {
             headers: {

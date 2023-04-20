@@ -1,11 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import {
-  Dimensions,
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -21,8 +19,9 @@ import { getItemAsync } from 'expo-secure-store';
 import axios from 'axios';
 import { useAuth } from '../../utils/context';
 import { useMutation, useQueryClient } from 'react-query';
-import { useLocation } from '../../hooks/useLocation';
 import AuthLayout from '../../layouts/AuthLayout';
+import useLocation from '../../hooks/useLocation';
+import * as Location from 'expo-location';
 
 const userGymLocationSchema = z.object({
   // experience: z.string().min(1).max(20),
@@ -35,17 +34,26 @@ const userGymLocationSchema = z.object({
 });
 
 export default function UserGymLocation({ navigation }) {
-  const location = useLocation();
+  const { promptForPermission, permissionStatus } = useLocation();
   const [nearGyms, setNearGyms] = useState([]);
-  const { token, long, lat, setLat, setLong } = useAuth();
+  const { token, setLat, setLong, long, lat } = useAuth();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (location) {
-      setLat(location.coords.latitude);
-      setLong(location.coords.longitude);
+    if (permissionStatus === 'denied' || permissionStatus === 'undetermined') {
+      promptForPermission();
     }
-  }, [location]);
+
+    if (permissionStatus === 'granted') {
+      (async () => {
+        const { coords } = await Location.getCurrentPositionAsync();
+
+        const { latitude, longitude } = coords;
+        setLat(latitude);
+        setLong(longitude);
+      })();
+    }
+  }, [permissionStatus]);
 
   const {
     handleSubmit,
@@ -61,8 +69,6 @@ export default function UserGymLocation({ navigation }) {
       gymLocation: null,
     },
   });
-  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
-  const bottomOfScreen = Dimensions.get('window').height - 100;
 
   const autoCompleteGymLocations = async (input: string) => {
     // const apiKey = process.env.GOOGLE_API_KEY;
@@ -285,13 +291,17 @@ export default function UserGymLocation({ navigation }) {
               )}
             />
           </ScrollView>
-          {location && (
+          {!long || !lat ? (
             <Button
               variant='primary'
               isLoading={saveUserGymLocation.isLoading || !location}
               onPress={handleSubmit(onSubmit)}
             >
               Continue
+            </Button>
+          ) : (
+            <Button variant='primary' onPress={() => promptForPermission()}>
+              Retry
             </Button>
           )}
         </KeyboardAvoidingView>

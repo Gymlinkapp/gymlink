@@ -34,8 +34,8 @@ const AuthProvider = ({ children }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [token, setToken] = useState('');
   const [user, setUser] = useState<User | null>(null);
-  const [long, setLong] = useState(0);
-  const [lat, setLat] = useState(0);
+  const [long, setLong] = useState(null);
+  const [lat, setLat] = useState(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [filters, setFilters] = useState<Filter[]>(defaultFilters);
   const [feed, setFeed] = useState<User[]>([]);

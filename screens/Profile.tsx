@@ -64,13 +64,13 @@ export function ProfileHeader({
           </View>
         </Pressable>
       </BlurView>
-      <BlurView
-        className='flex-row justify-self-center items-center rounded-full overflow-hidden px-6 h-8 bg-primaryDark/20'
-        intensity={20}
-      >
-        {/* indicator of images */}
-        {user.images.length > 1 &&
-          user.images.map((_, index) => (
+      {/* indicator of images */}
+      {user.images.length > 1 && (
+        <BlurView
+          className='flex-row justify-self-center items-center rounded-full overflow-hidden px-6 h-8 bg-primaryDark/20'
+          intensity={20}
+        >
+          {user.images.map((_, index) => (
             <View
               key={index}
               className={`w-2 h-2 mx-1 rounded-full ${
@@ -78,7 +78,8 @@ export function ProfileHeader({
               }`}
             ></View>
           ))}
-      </BlurView>
+        </BlurView>
+      )}
     </View>
   );
 }
@@ -189,15 +190,15 @@ export default function ProfileScreen({
             isTyping ? 'h-[15%]' : 'h-[75%]'
           }`}
         >
-          <View className='z-40 w-full h-full'>
+          <View className='z-40 flex-row w-full h-full'>
             <TouchableOpacity
               className='flex-1 z-40'
               onPress={() => {
                 setCurrentImageIndex((prev) => {
-                  if (prev === user.images.length - 1) {
-                    return 0;
+                  if (prev === 0) {
+                    return user.images.length - 1;
                   }
-                  return prev + 1;
+                  return prev - 1;
                 });
 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -207,10 +208,10 @@ export default function ProfileScreen({
               className='flex-1 z-40'
               onPress={() => {
                 setCurrentImageIndex((prev) => {
-                  if (prev === 0) {
-                    return user.images.length - 1;
+                  if (prev === user.images.length - 1) {
+                    return 0;
                   }
-                  return prev - 1;
+                  return prev + 1;
                 });
 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

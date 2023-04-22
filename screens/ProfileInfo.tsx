@@ -11,6 +11,7 @@ import { WeekSplit } from '../utils/split';
 import { useEffect, useState } from 'react';
 import { useGym } from '../hooks/useGym';
 import { useAuth } from '../utils/context';
+import UserPrompt from '../components/UserPrompt';
 
 const ProfileInfoSection = ({
   title,
@@ -37,9 +38,11 @@ export default function ProfileInfo({
   navigation: any;
 }) {
   const { user, gymId } = route.params;
-  const { user: currUser } = useAuth();
+  const { user: currUser, prompt } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const [recentPrompt, setRecentPrompt] = useState('');
 
   const { data: gym, isLoading: gymLoading } = useGym(gymId);
 
@@ -52,14 +55,11 @@ export default function ProfileInfo({
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentImageIndex < user?.images.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else {
-        setCurrentImageIndex(0);
-      }
-    }, 5000);
-    return () => clearInterval(interval);
+    if (currUser.userPrompts) {
+      const mostRecentPrompt =
+        currUser.userPrompts[currUser.userPrompts.length - 1];
+      setRecentPrompt(mostRecentPrompt.answer);
+    }
   }, [currentImageIndex]);
 
   useEffect(() => {
@@ -114,6 +114,9 @@ export default function ProfileInfo({
         />
       </View>
       <ScrollView className='mt-2 mb-52'>
+        <View className='my-4'>
+          <UserPrompt answer={recentPrompt} prompt={prompt} />
+        </View>
         <ProfileInfoSection title='About'>
           <Text className='text-md text-secondaryWhite font-MontserratRegular'>
             {user.bio}

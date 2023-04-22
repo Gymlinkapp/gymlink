@@ -4,6 +4,7 @@ import { User } from './users';
 import { Socket } from 'socket.io-client';
 import { Filter, defaultFilters } from './types/filter';
 import { exercises } from './split';
+import { Prompt } from './types/prompt';
 
 // create me a context
 const AuthContext = createContext(
@@ -28,8 +29,8 @@ const AuthContext = createContext(
     setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
     canAnswerPrompt: boolean;
     setCanAnswerPrompt: React.Dispatch<React.SetStateAction<boolean>>;
-    prompt: string;
-    setPrompt: React.Dispatch<React.SetStateAction<string>>;
+    prompt: Prompt;
+    setPrompt: React.Dispatch<React.SetStateAction<Prompt>>;
   }
 );
 
@@ -45,7 +46,7 @@ const AuthProvider = ({ children }) => {
   const [feed, setFeed] = useState<User[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [canAnswerPrompt, setCanAnswerPrompt] = useState(true);
-  const [prompt, setPrompt] = useState<string>('');
+  const [prompt, setPrompt] = useState<Prompt | null>(null);
 
   return (
     <AuthContext.Provider

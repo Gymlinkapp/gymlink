@@ -19,6 +19,7 @@ import CreateSplit from './auth/CreateGymSplit';
 import EditAccount from './EditAccount';
 import ProfileInfo from './ProfileInfo';
 import { useAuthState } from '../hooks/useAuthState';
+import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,24 +34,27 @@ export default function Routes({ socket }: { socket: any }) {
 
     // i want to check if the most recent userPrompts was answered yet
     if (user) {
-      const lastPrompt = user.userPrompts[user.userPrompts.length - 1];
+      const lastPrompt = getMostRecentPrompt(user);
+      console.log('lastPrompt', lastPrompt);
       if (lastPrompt && lastPrompt.hasAnswered === false) {
         setCanAnswerPrompt(true);
-        const res = api.post('/social/getPromptById', {
-          promptId: lastPrompt.promptId,
-        });
-
-        res
-          .then((res) => {
-            console.log('prompt', res.data.prompt.prompt);
-            setPrompt(res.data.prompt.prompt);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+      } else {
+        setCanAnswerPrompt(false);
       }
+      const res = api.post('/social/getPromptById', {
+        promptId: lastPrompt.promptId,
+      });
+
+      res
+        .then((res) => {
+          console.log('prompt', res.data.prompt.prompt);
+          setPrompt(res.data.prompt);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }, [user]);
+  }, [user, socket]);
 
   // deleteItemAsync('token');
   if (isLoadingAuth || (token && !isTokenChecked)) {

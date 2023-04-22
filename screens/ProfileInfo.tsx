@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useGym } from '../hooks/useGym';
 import { useAuth } from '../utils/context';
 import UserPrompt from '../components/UserPrompt';
+import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 
 const ProfileInfoSection = ({
   title,
@@ -56,9 +57,8 @@ export default function ProfileInfo({
 
   useEffect(() => {
     if (currUser.userPrompts) {
-      const mostRecentPrompt =
-        currUser.userPrompts[currUser.userPrompts.length - 1];
-      setRecentPrompt(mostRecentPrompt.answer);
+      const lastPrompt = getMostRecentPrompt(currUser);
+      setRecentPrompt(lastPrompt.answer);
     }
   }, [currentImageIndex]);
 

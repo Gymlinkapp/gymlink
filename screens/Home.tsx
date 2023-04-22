@@ -20,9 +20,10 @@ import { defaultFilters } from '../utils/types/filter';
 import FeedLoading from '../components/FeedLoading';
 import * as Haptics from 'expo-haptics';
 import UserPrompt from '../components/UserPrompt';
+import { useMutation, useQueryClient } from 'react-query';
+import api from '../utils/axiosStore';
 
 export default function HomeScreen({ navigation, route }) {
-  const INITIAL_COL_OFFSETS = [50, 150, 100];
   const LIMIT = 9;
   const {
     token,
@@ -34,8 +35,27 @@ export default function HomeScreen({ navigation, route }) {
     canAnswerPrompt,
     prompt,
   } = useAuth();
+  const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
+  const [userPromptAnswer, setUserPromptAnswer] = useState('');
   const { data, isLoading, isFetching } = useUsers(token, offset, LIMIT);
+
+  const answerPromptMutation = useMutation(
+    (answer: string) =>
+      api.post('/social/answerPrompt', {
+        answer,
+        userId: user.id,
+        promptId: prompt.id,
+      }),
+    {
+      onSuccess: (data) => {
+        console.log('data', data);
+        // setCanAnswerPrompt(false);
+        queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('users');
+      },
+    }
+  );
 
   useEffect(() => {
     if (user) {
@@ -68,18 +88,29 @@ export default function HomeScreen({ navigation, route }) {
       />
 
       {/* <Filters /> */}
-      {canAnswerPrompt && (
+      {prompt && canAnswerPrompt && (
         <View className=' z-50 border-[1px] border-dashed border-tertiaryDark rounded-3xl'>
           <View className='px-6 pt-4'>
             <Text className='font-ProstoOne text-tertiaryDark'>
               Let people know your Vibe
             </Text>
-            <Text className='font-ProstoOne text-white'>{prompt}</Text>
+            <Text className='font-ProstoOne text-white'>{prompt.prompt}</Text>
 
-            <TextInput className='w-full p-4 bg-secondaryDark rounded-md mt-4 text-white' />
+            <TextInput
+              className='w-full p-4 bg-secondaryDark rounded-md mt-4 text-white'
+              onChangeText={(text) => setUserPromptAnswer(text)}
+            />
           </View>
 
-          <TouchableOpacity className='w-full border-t-[1px] border-secondaryDark items-center mt-4 py-4'>
+          <TouchableOpacity
+            className='w-full border-t-[1px] border-secondaryDark items-center mt-4 py-4'
+            onPress={() => {
+              answerPromptMutation.mutate(userPromptAnswer);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
+            }}
+          >
             <Text className='font-ProstoOne text-white'>Share</Text>
           </TouchableOpacity>
         </View>
@@ -143,7 +174,7 @@ export default function HomeScreen({ navigation, route }) {
                   {user.firstName}
                 </Text>
               </TouchableOpacity>
-              {mostRecentPrompt && (
+              {prompt && mostRecentPrompt && (
                 <UserPrompt answer={mostRecentPrompt.answer} prompt={prompt} />
               )}
             </View>

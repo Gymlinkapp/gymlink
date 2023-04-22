@@ -26,6 +26,10 @@ const AuthContext = createContext(
     setFeed: React.Dispatch<React.SetStateAction<User[]>>;
     phoneNumber: string;
     setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
+    canAnswerPrompt: boolean;
+    setCanAnswerPrompt: React.Dispatch<React.SetStateAction<boolean>>;
+    prompt: string;
+    setPrompt: React.Dispatch<React.SetStateAction<string>>;
   }
 );
 
@@ -40,6 +44,8 @@ const AuthProvider = ({ children }) => {
   const [filters, setFilters] = useState<Filter[]>(defaultFilters);
   const [feed, setFeed] = useState<User[]>([]);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [canAnswerPrompt, setCanAnswerPrompt] = useState(true);
+  const [prompt, setPrompt] = useState<string>('');
 
   return (
     <AuthContext.Provider
@@ -62,6 +68,10 @@ const AuthProvider = ({ children }) => {
         setFeed,
         phoneNumber,
         setPhoneNumber,
+        canAnswerPrompt,
+        setCanAnswerPrompt,
+        prompt,
+        setPrompt,
       }}
     >
       {children}

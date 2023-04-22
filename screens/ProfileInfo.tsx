@@ -56,7 +56,11 @@ export default function ProfileInfo({
   };
 
   useEffect(() => {
-    if (currUser.userPrompts) {
+    if (user) {
+      console.log('true');
+      const lastPrompt = getMostRecentPrompt(user);
+      setRecentPrompt(lastPrompt.answer);
+    } else {
       const lastPrompt = getMostRecentPrompt(currUser);
       setRecentPrompt(lastPrompt.answer);
     }

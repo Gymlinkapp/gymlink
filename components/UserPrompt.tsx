@@ -13,7 +13,13 @@ export default function UserPrompt({
       <Text className='font-ProstoOne text-secondaryWhite text-md'>
         {prompt.prompt}
       </Text>
-      <Text className='font-ProstoOne text-white text-xl'>{answer}</Text>
+      {answer ? (
+        <Text className='font-ProstoOne text-white text-xl'>{answer}</Text>
+      ) : (
+        <Text className='font-ProstoOne text-tertiaryDark text-xl'>
+          No vibes here, yet... stay tuned...
+        </Text>
+      )}
     </View>
   );
 }

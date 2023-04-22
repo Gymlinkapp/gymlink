@@ -174,7 +174,7 @@ export default function HomeScreen({ navigation, route }) {
                   {user.firstName}
                 </Text>
               </TouchableOpacity>
-              {prompt && mostRecentPrompt && (
+              {prompt.id === mostRecentPrompt.promptId && (
                 <UserPrompt answer={mostRecentPrompt.answer} prompt={prompt} />
               )}
             </View>

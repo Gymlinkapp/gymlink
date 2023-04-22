@@ -1,5 +1,4 @@
 export type User = {
-  chats: any;
   id: string;
   email: string;
   phoneNumber: string;
@@ -8,29 +7,30 @@ export type User = {
   password: string;
   age: number;
   bio: string | null;
-  gender: string;
-  race: string;
+  gender: string | null;
+  race: string | null;
   images: string[];
   tags: string[];
   longitude: number | null;
   latitude: number | null;
-  tempJWT: string | null;
-  verificationCode: string | null;
-  verified: boolean | null;
-  gymId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  chatId: string | null;
   authSteps: number;
-  splitId: string | null;
-  split: Split | null;
-  feed: User[];
-  seen: string[];
+  isBot: boolean;
   filterGoingToday: boolean;
   filterWorkout: string[];
   filterSkillLevel: string[];
   filterGender: string[];
   filterGoals: string[];
+  streak: number;
+  tempJWT: string | null;
+  verificationCode: string | null;
+  verified: boolean | null;
+  gymId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  chatId: string | null;
+  splitId: string | null;
+  userId: string | null;
+  userPrompts: UserPrompt[];
 };
 
 export type Split = {
@@ -43,6 +43,16 @@ export type Split = {
   saturday: string[];
   sunday: string[];
   User: User;
+};
+
+export type UserPrompt = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  promptId: string;
+  answer: string;
+  hasAnswered: boolean;
 };
 
 export const AUTH_STEPS = 7;

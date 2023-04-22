@@ -19,6 +19,7 @@ export default function App() {
     MontserratRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/fonts/Montserrat-Medium.ttf'),
     MontserratBold: require('./assets/fonts/Montserrat-Bold.ttf'),
+    ProstoOne: require('./assets/fonts/ProstoOne-Regular.ttf'),
   });
   if (!fontsLoaded) {
     return null;

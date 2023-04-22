@@ -19,7 +19,7 @@ export default function Header({ route, navigation }) {
       }}
     >
       <View className='pb-7 w-full flex-row justify-between flex px-8'>
-        <Text className='text-white text-center font-[MontserratBold] text-xl'>
+        <Text className='text-white text-center font-ProstoOne text-xl'>
           Gymlink
         </Text>
         <View className='flex-row justify-evenly'>

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Animated,
+  ScrollView,
 } from 'react-native';
 import Layout from '../layouts/layout';
 import React, { useEffect, useRef, useState } from 'react';
@@ -21,37 +22,10 @@ import * as Haptics from 'expo-haptics';
 export default function HomeScreen({ navigation, route }) {
   const INITIAL_COL_OFFSETS = [50, 150, 100];
   const LIMIT = 9;
-  const INITIAL_SCROLL_POSITION = 250;
-  const USER_HEIGHT = 250;
   const { token, user, setUser, filters, setFilters, feed, setFeed } =
     useAuth();
-  const flatListRef = useRef(null);
-  const [columnData, setColumnData] = useState([]);
-  const [scrollPosition, setScrollPosition] = useState(INITIAL_SCROLL_POSITION);
   const [offset, setOffset] = useState(0);
   const { data, isLoading, isFetching } = useUsers(token, offset, LIMIT);
-  const [animatedScrolls, setAnimatedScrolls] = useState(
-    INITIAL_COL_OFFSETS.map((offset) => new Animated.Value(offset))
-  );
-  const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
-
-  function splitArrayIntoColumns(array: any[] = [], numColumns: number) {
-    const columnArrays = Array.from({ length: numColumns }, () => []);
-    array.forEach((item, index) => {
-      columnArrays[index % numColumns].push(item);
-    });
-    return columnArrays;
-  }
-
-  const handleFlatListLayout = () => {
-    if (!hasInitialScrolled) {
-      flatListRef.current?.scrollToOffset({
-        offset: INITIAL_SCROLL_POSITION - 200,
-        animated: true,
-      });
-      setHasInitialScrolled(true);
-    }
-  };
 
   useEffect(() => {
     if (user) {
@@ -61,36 +35,6 @@ export default function HomeScreen({ navigation, route }) {
       setFeed(data.users);
     }
   }, [isLoading, data, user]);
-
-  useEffect(() => {
-    const numColumns = 3;
-    const scrollFactors = Array.from({ length: numColumns }, (__, index) => {
-      if (index === 1) {
-        return Math.random() * 0.1 + 0.05;
-      } else {
-        return Math.random() * 0.2 + 0.1;
-      }
-    });
-
-    const columns = splitArrayIntoColumns(feed, numColumns);
-    const columnData = columns.map((column, index) => {
-      return {
-        data: column,
-        scrollFactor: scrollFactors[index],
-      };
-    });
-    setColumnData(columnData);
-
-    const newAnimatedScrolls = columnData.map(
-      (column) => new Animated.Value(0)
-    );
-    setAnimatedScrolls(newAnimatedScrolls);
-  }, [feed, data, isFetching]);
-
-  const handleScroll = (event, columnIndex) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    animatedScrolls[columnIndex].setValue(offsetY);
-  };
 
   if (isLoading) {
     return <FeedLoading />;
@@ -105,98 +49,81 @@ export default function HomeScreen({ navigation, route }) {
         start={[0, 0]}
         end={[0, 1]}
       />
+      <LinearGradient
+        pointerEvents='none'
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,1)']}
+        className='absolute bottom-0 z-50 w-full h-80'
+        start={[0, 0]}
+        end={[0, 1]}
+      />
 
-      <Filters />
+      {/* <Filters /> */}
       <FlatList
-        ref={flatListRef}
-        data={columnData}
+        contentContainerStyle={{ paddingVertical: 100 }}
+        data={feed}
         keyExtractor={(item) => item.id}
-        numColumns={3}
-        onLayout={handleFlatListLayout}
-        columnWrapperStyle={{ flex: 1 }}
-        initialScrollIndex={0}
-        initialNumToRender={10}
-        removeClippedSubviews={true}
         showsVerticalScrollIndicator={false}
-        className='h-full'
-        onEndReached={() => {
-          if (hasInitialScrolled && offset < data.totalUsers) {
-            setOffset((prev) => prev + LIMIT);
-          }
-        }}
-        ListFooterComponent={() => isFetching && <Loading />}
+        // onEndReached={() => {
+        //   setOffset(offset + LIMIT);
+        // }}
         onEndReachedThreshold={0.1}
-        renderItem={({ item: column, index }) => {
-          const scrollY = animatedScrolls[index];
-
-          return (
-            <Animated.FlatList
-              data={column.data} // use the filtered arrays for each column
-              keyExtractor={(item) => item.id}
-              onScroll={(event) => handleScroll(event, index)}
-              scrollEventThrottle={128}
-              className='flex-1 h-full'
-              listKey={`column-${index}-${column.id}-${Date.now()}`}
-              renderItem={({ item: user, index }) => (
-                <TouchableOpacity
-                  key={index}
-                  className='h-[250px] m-[0.5px] relative bg-transparent  justify-end'
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    navigation.navigate('Profile', {
-                      user: user,
-                    });
-                  }}
-                >
-                  <Animated.View
-                    className='h-full overflow-hidden justify-end rounded-3xl'
-                    style={{
-                      transform: [
-                        {
-                          translateY: scrollY.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [0, -column.scrollFactor],
-                          }),
-                        },
-                      ],
-                    }}
-                  >
-                    <View className='z-50 p-4'>
-                      <View className='overflow-hidden rounded-full w-8 h-8'>
-                        <BlurView
-                          className='bg-primaryDark/20 w-full h-full rounded-full justify-center items-center'
-                          intensity={25}
-                        >
-                          <Text className=' text-white font-MontserratRegular'>
-                            {user.age}
-                          </Text>
-                        </BlurView>
-                      </View>
-                      <Text className='text-white font-MontserratBold text-xl'>
-                        {user.firstName}
+        renderItem={({ item: user }) => (
+          <View className='my-4'>
+            <TouchableOpacity
+              activeOpacity={1}
+              className='h-60 w-full relative overflow-hidden rounded-[50px]'
+              onPress={() => {
+                navigation.navigate('Profile', { user });
+              }}
+            >
+              <Image
+                source={{ uri: user.images[0] }}
+                className='object-cover w-full h-full'
+              />
+              <ScrollView
+                horizontal
+                className='absolute bottom-5 left-2 flex-row z-20'
+              >
+                {user.tags.length > 0 &&
+                  user.tags.map((tag, idx) => (
+                    <BlurView
+                      key={idx}
+                      className='bg-primaryDark/20 px-4 py-2 mx-2 rounded-full overflow-hidden border-[0.5px] border-tertiaryDark'
+                      intensity={25}
+                    >
+                      <Text className='font-ProstoOne text-white text-xs '>
+                        {tag}
                       </Text>
-                    </View>
-                    <View className='absolute top-0 left-0 w-full h-full'>
-                      <LinearGradient
-                        pointerEvents='none'
-                        colors={['rgba(0,0,0,1)', 'rgba(0,0,0,0)']}
-                        className='absolute bottom-0 left-0 z-50 w-full h-full'
-                        locations={[0, 0.5]}
-                        // bottom to top
-                        start={[0, 1]}
-                        end={[1, 0]}
-                      />
-                      <Image
-                        source={{ uri: user.images[0] }}
-                        className='w-full h-full object-cover'
-                      />
-                    </View>
-                  </Animated.View>
-                </TouchableOpacity>
-              )}
-            />
-          );
-        }}
+                    </BlurView>
+                  ))}
+              </ScrollView>
+              <LinearGradient
+                colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.8)']}
+                className='absolute bottom-0 w-full h-60 z-10'
+                start={[0, 0]}
+                end={[0, 1]}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity className='flex-row items-center my-2'>
+              <View className='rounded-full bg-secondaryDark px-2 py-2 mr-2'>
+                <Text className='font-prostoOne text-white text-md'>
+                  {user.age}
+                </Text>
+              </View>
+              <Text className='font-ProstoOne text-white text-3xl'>
+                {user.firstName}
+              </Text>
+            </TouchableOpacity>
+            <View className='border-[1px] border-dashed border-tertiaryDark rounded-[15px] p-6 mt-4'>
+              <Text className='font-ProstoOne text-secondaryWhite text-md'>
+                Why you here?
+              </Text>
+              <Text className='font-ProstoOne text-white text-xl'>
+                I'm bored of always lifting alone!
+              </Text>
+            </View>
+          </View>
+        )}
       />
     </Layout>
   );

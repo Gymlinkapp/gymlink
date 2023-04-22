@@ -93,6 +93,7 @@ export default function Routes({ socket }: { socket: any }) {
         name='Profile'
         component={ProfileScreen}
         options={{
+          animation: 'fade_from_bottom',
           headerShown: false,
         }}
       />

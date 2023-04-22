@@ -21,6 +21,7 @@ module.exports = {
         MontserratBold: ['MontserratBold'],
         MontserratMedium: ['MontserratMedium'],
         MontserratRegular: ['MontserratRegular'],
+        ProstoOne: ['ProstoOne'],
       },
     },
   },

@@ -60,7 +60,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    schedulePushNotification();
+    if (!__DEV__) {
+      schedulePushNotification();
+    }
   }, []);
 
   if (!fontsLoaded) {

@@ -59,6 +59,10 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    schedulePushNotification();
+  }, []);
+
   if (!fontsLoaded) {
     return null;
   }
@@ -80,7 +84,6 @@ export default function App() {
           }}
         >
           <Routes socket={socket} />
-          <Button onPress={() => schedulePromptNotification()} title='Press' />
           <NotificationHandler />
         </NavigationContainer>
       </AuthProvider>
@@ -96,7 +99,26 @@ async function scheduleNotification(notification) {
   await Notifications.scheduleNotificationAsync(notification);
 }
 
-async function schedulePromptNotification() {
+async function schedulePushNotification() {
+  const currentDate = new Date();
+  const targetDate = new Date();
+
+  const randomHour = getRandomTime(18, 24); // 1 PM EST is 6 PM in UTC, 7 PM EST is 12 AM in UTC
+  const randomMinute = getRandomTime(0, 59);
+
+  targetDate.setHours(randomHour);
+  targetDate.setMinutes(randomMinute);
+  targetDate.setSeconds(0);
+
+  // If the current time is past the random time, schedule for the next day
+  if (currentDate > targetDate) {
+    targetDate.setDate(targetDate.getDate() + 1);
+  }
+
+  const secondsUntilTarget = Math.floor(
+    (targetDate.getTime() - currentDate.getTime()) / 1000
+  );
+
   const { data } = await api.get('/social/generatePrompt');
 
   const prompt = data.prompt;
@@ -106,60 +128,10 @@ async function schedulePromptNotification() {
       body: prompt,
       data: { actionId: 'open_home' },
     },
-    trigger: {
-      /* scheduling details for the first notification */
-    },
+    trigger: { seconds: secondsUntilTarget, repeats: true },
   };
-
   await Notifications.scheduleNotificationAsync(notification);
 }
-
-const notifications = [
-  {
-    content: {
-      title: '?',
-      body: 'This is the first notification',
-      data: { data: 'goes here' },
-    },
-    trigger: {
-      /* scheduling details for the first notification */
-    },
-  },
-];
-
-async function scheduleAllNotifications() {
-  for (const notification of notifications) {
-    await scheduleNotification(notification);
-  }
-}
-
-// async function schedulePushNotification() {
-//   const currentDate = new Date();
-//   const targetDate = new Date();
-
-//   const randomHour = getRandomTime(18, 24); // 1 PM EST is 6 PM in UTC, 7 PM EST is 12 AM in UTC
-//   const randomMinute = getRandomTime(0, 59);
-
-//   targetDate.setHours(randomHour);
-//   targetDate.setMinutes(randomMinute);
-//   targetDate.setSeconds(0);
-
-//   // If the current time is past the random time, schedule for the next day
-//   if (currentDate > targetDate) {
-//     targetDate.setDate(targetDate.getDate() + 1);
-//   }
-
-//   const secondsUntilTarget = Math.floor((targetDate - currentDate) / 1000);
-
-//   await Notifications.scheduleNotificationAsync({
-//     content: {
-//       title: 'Daily reminder',
-//       body: 'This is your daily reminder!',
-//       data: { data: 'goes here' },
-//     },
-//     trigger: { seconds: secondsUntilTarget, repeats: true },
-//   });
-// }
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -194,3 +166,22 @@ async function registerForPushNotificationsAsync() {
 
   return token;
 }
+
+// const notifications = [
+//   {
+//     content: {
+//       title: '?',
+//       body: 'This is the first notification',
+//       data: { data: 'goes here' },
+//     },
+//     trigger: {
+//       /* scheduling details for the first notification */
+//     },
+//   },
+// ];
+
+// async function scheduleAllNotifications() {
+//   for (const notification of notifications) {
+//     await scheduleNotification(notification);
+//   }
+// }

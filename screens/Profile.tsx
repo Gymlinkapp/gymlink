@@ -176,7 +176,6 @@ export default function ProfileScreen({
       setUserSplit(userSplit);
     }
   }, [user]);
-  //
   return (
     <View className='relative w-full h-full'>
       <ProfileHeader

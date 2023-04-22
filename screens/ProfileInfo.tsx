@@ -11,6 +11,10 @@ import { WeekSplit } from '../utils/split';
 import { useEffect, useState } from 'react';
 import { useGym } from '../hooks/useGym';
 import { useAuth } from '../utils/context';
+import UserPrompt from '../components/UserPrompt';
+import getMostRecentPrompt from '../utils/getMostRecentPrompt';
+import { useUser } from '../hooks/useUser';
+import Loading from '../components/Loading';
 
 const ProfileInfoSection = ({
   title,
@@ -37,11 +41,16 @@ export default function ProfileInfo({
   navigation: any;
 }) {
   const { user, gymId } = route.params;
-  const { user: currUser } = useAuth();
+  const { prompt, token } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const [recentPrompt, setRecentPrompt] = useState('');
+
+  const { data: currUser, isLoading: isUserLoading } = useUser(token);
   const { data: gym, isLoading: gymLoading } = useGym(gymId);
+
+  if (isUserLoading) return <Loading />;
 
   const transformTag = (tag: string) => {
     const words = tag.split('-');
@@ -52,14 +61,13 @@ export default function ProfileInfo({
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentImageIndex < user?.images.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else {
-        setCurrentImageIndex(0);
-      }
-    }, 5000);
-    return () => clearInterval(interval);
+    if (user) {
+      const lastPrompt = getMostRecentPrompt(user);
+      setRecentPrompt(lastPrompt.answer);
+    } else {
+      const lastPrompt = getMostRecentPrompt(currUser);
+      setRecentPrompt(lastPrompt.answer);
+    }
   }, [currentImageIndex]);
 
   useEffect(() => {
@@ -77,7 +85,7 @@ export default function ProfileInfo({
   }, [user]);
   return (
     <View className='relative'>
-      {currUser.id !== user.id && (
+      {currUser?.id !== user.id && (
         <View className='px-6 absolute z-50 w-52 h-52 justify-between'>
           <BackButton navigation={navigation} />
         </View>
@@ -114,6 +122,9 @@ export default function ProfileInfo({
         />
       </View>
       <ScrollView className='mt-2 mb-52'>
+        <View className='my-4'>
+          <UserPrompt answer={recentPrompt} prompt={prompt} />
+        </View>
         <ProfileInfoSection title='About'>
           <Text className='text-md text-secondaryWhite font-MontserratRegular'>
             {user.bio}

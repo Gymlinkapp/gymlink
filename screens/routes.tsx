@@ -19,18 +19,42 @@ import CreateSplit from './auth/CreateGymSplit';
 import EditAccount from './EditAccount';
 import ProfileInfo from './ProfileInfo';
 import { useAuthState } from '../hooks/useAuthState';
+import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 
 const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
   const { isVerified, setIsVerified, isLoadingAuth, token, isTokenChecked } =
     useAuthState();
-  const { setSocket } = useAuth();
+  const { setSocket, user, setCanAnswerPrompt, setPrompt } = useAuth();
 
   // saving socket to context inititally
   useEffect(() => {
     setSocket(socket);
-  }, []);
+
+    // i want to check if the most recent userPrompts was answered yet
+    if (user) {
+      const lastPrompt = getMostRecentPrompt(user);
+      console.log('lastPrompt', lastPrompt);
+      if (lastPrompt && lastPrompt.hasAnswered === false) {
+        setCanAnswerPrompt(true);
+      } else {
+        setCanAnswerPrompt(false);
+      }
+      const res = api.post('/social/getPromptById', {
+        promptId: lastPrompt.promptId,
+      });
+
+      res
+        .then((res) => {
+          console.log('prompt', res.data.prompt.prompt);
+          setPrompt(res.data.prompt);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [user, socket, setCanAnswerPrompt, setPrompt, setSocket, token]);
 
   // deleteItemAsync('token');
   if (isLoadingAuth || (token && !isTokenChecked)) {

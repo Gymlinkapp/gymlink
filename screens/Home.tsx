@@ -22,6 +22,7 @@ import * as Haptics from 'expo-haptics';
 import UserPrompt from '../components/UserPrompt';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
+import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 
 export default function HomeScreen({ navigation, route }) {
   const LIMIT = 9;
@@ -34,6 +35,7 @@ export default function HomeScreen({ navigation, route }) {
     setFeed,
     canAnswerPrompt,
     prompt,
+    setCanAnswerPrompt,
   } = useAuth();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
@@ -49,8 +51,7 @@ export default function HomeScreen({ navigation, route }) {
       }),
     {
       onSuccess: (data) => {
-        console.log('data', data);
-        // setCanAnswerPrompt(false);
+        setCanAnswerPrompt(false);
         queryClient.invalidateQueries('user');
         queryClient.invalidateQueries('users');
       },
@@ -125,8 +126,7 @@ export default function HomeScreen({ navigation, route }) {
         // }}
         onEndReachedThreshold={0.1}
         renderItem={({ item: user }) => {
-          const mostRecentPrompt =
-            user.userPrompts && user.userPrompts[user.userPrompts.length - 1];
+          const mostRecentPrompt = getMostRecentPrompt(user);
           return (
             <View className='my-4'>
               <TouchableOpacity
@@ -174,7 +174,7 @@ export default function HomeScreen({ navigation, route }) {
                   {user.firstName}
                 </Text>
               </TouchableOpacity>
-              {prompt.id === mostRecentPrompt.promptId && (
+              {mostRecentPrompt.hasAnswered && (
                 <UserPrompt answer={mostRecentPrompt.answer} prompt={prompt} />
               )}
             </View>

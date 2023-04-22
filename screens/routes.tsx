@@ -54,7 +54,7 @@ export default function Routes({ socket }: { socket: any }) {
           console.log(err);
         });
     }
-  }, [user, socket]);
+  }, [user, socket, setCanAnswerPrompt, setPrompt, setSocket, token]);
 
   // deleteItemAsync('token');
   if (isLoadingAuth || (token && !isTokenChecked)) {

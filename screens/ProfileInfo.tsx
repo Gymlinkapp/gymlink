@@ -13,6 +13,8 @@ import { useGym } from '../hooks/useGym';
 import { useAuth } from '../utils/context';
 import UserPrompt from '../components/UserPrompt';
 import getMostRecentPrompt from '../utils/getMostRecentPrompt';
+import { useUser } from '../hooks/useUser';
+import Loading from '../components/Loading';
 
 const ProfileInfoSection = ({
   title,
@@ -39,13 +41,16 @@ export default function ProfileInfo({
   navigation: any;
 }) {
   const { user, gymId } = route.params;
-  const { user: currUser, prompt } = useAuth();
+  const { prompt, token } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [recentPrompt, setRecentPrompt] = useState('');
 
+  const { data: currUser, isLoading: isUserLoading } = useUser(token);
   const { data: gym, isLoading: gymLoading } = useGym(gymId);
+
+  if (isUserLoading) return <Loading />;
 
   const transformTag = (tag: string) => {
     const words = tag.split('-');
@@ -57,7 +62,6 @@ export default function ProfileInfo({
 
   useEffect(() => {
     if (user) {
-      console.log('true');
       const lastPrompt = getMostRecentPrompt(user);
       setRecentPrompt(lastPrompt.answer);
     } else {
@@ -81,7 +85,7 @@ export default function ProfileInfo({
   }, [user]);
   return (
     <View className='relative'>
-      {currUser.id !== user.id && (
+      {currUser?.id !== user.id && (
         <View className='px-6 absolute z-50 w-52 h-52 justify-between'>
           <BackButton navigation={navigation} />
         </View>

@@ -63,13 +63,19 @@ export default function HomeScreen({ navigation, route }) {
       setFilters(defaultFilters);
     }
     if (!isLoading && data && data.users) {
-      setFeed(data.users);
+      setFeed((prevFeed) => [...prevFeed, ...data.users]);
     }
   }, [isLoading, data, user]);
 
   if (isLoading) {
     return <FeedLoading />;
   }
+
+  const fetchMore = () => {
+    if (isLoading || isFetching) return;
+    if (data.users.length < LIMIT) return;
+    setOffset((prevOffset) => prevOffset + LIMIT);
+  };
 
   return (
     <Layout navigation={navigation}>
@@ -117,13 +123,14 @@ export default function HomeScreen({ navigation, route }) {
         </View>
       )}
       <FlatList
-        contentContainerStyle={{ paddingTop: 50, paddingBottom: 500 }}
+        contentContainerStyle={{ paddingTop: 50, paddingBottom: 200 }}
         data={feed}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, idx) => `${item.id}_${idx}`}
         showsVerticalScrollIndicator={false}
-        // onEndReached={() => {
-        //   setOffset(offset + LIMIT);
-        // }}
+        onEndReached={fetchMore}
+        ListFooterComponent={() =>
+          isLoading || isFetching ? <Loading /> : null
+        }
         onEndReachedThreshold={0.1}
         renderItem={({ item: user }) => {
           const mostRecentPrompt = getMostRecentPrompt(user);
@@ -174,7 +181,7 @@ export default function HomeScreen({ navigation, route }) {
                   {user.firstName}
                 </Text>
               </TouchableOpacity>
-              {mostRecentPrompt.hasAnswered && (
+              {mostRecentPrompt?.hasAnswered && (
                 <UserPrompt answer={mostRecentPrompt.answer} prompt={prompt} />
               )}
             </View>

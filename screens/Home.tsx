@@ -62,24 +62,29 @@ export default function HomeScreen({ navigation, route }) {
         onEndReachedThreshold={0.1}
         renderItem={({ item: user }) => (
           <View className='my-4'>
-            <TouchableOpacity className='h-60 w-full relative overflow-hidden rounded-[50px]'>
+            <TouchableOpacity
+              className='h-60 w-full relative overflow-hidden rounded-[50px]'
+              onPress={() => {
+                navigation.navigate('Profile', { user });
+              }}
+            >
               <Image
                 source={{ uri: user.images[0] }}
                 className='object-cover w-full h-full'
               />
             </TouchableOpacity>
             <TouchableOpacity className='flex-row items-center my-2'>
-              <View className='rounded-full bg-secondaryDark px-3 py-2 mr-2'>
-                <Text className='font-prostoOne text-white text-2xl'>
+              <View className='rounded-full bg-secondaryDark px-2 py-2 mr-2'>
+                <Text className='font-prostoOne text-white text-md'>
                   {user.age}
                 </Text>
               </View>
-              <Text className='font-ProstoOne text-white text-2xl'>
+              <Text className='font-ProstoOne text-white text-3xl'>
                 {user.firstName}
               </Text>
             </TouchableOpacity>
-            <View className='border-[1px] border-dashed border-tertiaryDark rounded-[15px] p-6'>
-              <Text className='font-ProstoOne text-secondaryWhite text-xl'>
+            <View className='border-[1px] border-dashed border-tertiaryDark rounded-[15px] p-6 mt-4'>
+              <Text className='font-ProstoOne text-secondaryWhite text-md'>
                 Why you here?
               </Text>
               <Text className='font-ProstoOne text-white text-xl'>

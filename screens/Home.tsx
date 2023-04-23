@@ -138,7 +138,7 @@ export default function HomeScreen({ navigation, route }) {
             <View className='my-4'>
               <TouchableOpacity
                 activeOpacity={1}
-                className='h-60 w-full relative overflow-hidden rounded-[50px]'
+                className='h-80 w-full relative overflow-hidden rounded-[50px]'
                 onPress={() => {
                   navigation.navigate('Profile', { user });
                 }}

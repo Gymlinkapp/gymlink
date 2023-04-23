@@ -1,47 +1,65 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Easing, View } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 
-const SkeletonUserCard = ({
-  translate,
-  animationValue,
-}: {
-  translate: number;
-  animationValue: Animated.Value;
-}) => {
+const SkeletonUserCard = ({ animationValue }) => {
   const animatedStyle = {
     opacity: animationValue.interpolate({
       inputRange: [0, 0.5, 1],
       outputRange: [1, 0.5, 1],
     }),
-    transform: [
-      {
-        translateY: animationValue.interpolate({
-          inputRange: [0, 0.5, 1],
-          outputRange: [0, translate, 0],
-        }),
-      },
-    ],
   };
 
   return (
-    <Animated.View
-      style={[
-        {
-          flex: 1,
-          marginHorizontal: 0.5,
-          borderRadius: 32,
-          height: 250,
-          backgroundColor: 'rgba(255,255,255,0.1)',
-        },
-        animatedStyle,
-      ]}
-    />
+    <Animated.View style={[card.cardContainer, animatedStyle]}>
+      <Animated.View style={[card.roundedLarge, animatedStyle]} />
+      <Animated.View style={card.row}>
+        <Animated.View
+          style={[card.roundedSmall, card.marginRight, animatedStyle]}
+        />
+        <Animated.View style={[card.halfWidth, card.pill, animatedStyle]} />
+      </Animated.View>
+    </Animated.View>
   );
 };
 
+const card = StyleSheet.create({
+  cardContainer: {
+    width: '100%',
+    height: 450,
+    paddingHorizontal: 5,
+  },
+  roundedLarge: {
+    height: '75%',
+    borderRadius: 75,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+
+  row: {
+    flexDirection: 'row',
+    marginVertical: 20,
+  },
+  roundedSmall: {
+    height: 50,
+    width: 50,
+    marginRight: 10,
+    borderRadius: 9999,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  pill: {
+    height: 50,
+    width: 200,
+    borderRadius: 9999,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  marginRight: {
+    marginRight: 2,
+  },
+  halfWidth: {
+    width: '50%',
+  },
+});
+
 export default function FeedLoading() {
-  const translateOne = 60;
-  const translateTwo = 20;
   const animationValue = useRef(new Animated.Value(0)).current;
 
   const startPulsingAnimation = () => {
@@ -60,49 +78,19 @@ export default function FeedLoading() {
   }, []);
 
   return (
-    <View className='flex-1 h-full w-full justify-center items-center bg-primaryDark'>
-      <View className='w-full flex-row'>
-        <SkeletonUserCard
-          translate={translateOne}
-          animationValue={animationValue}
-        />
-        <SkeletonUserCard
-          translate={translateTwo}
-          animationValue={animationValue}
-        />
-        <SkeletonUserCard
-          translate={translateOne}
-          animationValue={animationValue}
-        />
-      </View>
-      <View className='w-full flex-row'>
-        <SkeletonUserCard
-          translate={translateOne}
-          animationValue={animationValue}
-        />
-        <SkeletonUserCard
-          translate={translateTwo}
-          animationValue={animationValue}
-        />
-        <SkeletonUserCard
-          translate={translateOne}
-          animationValue={animationValue}
-        />
-      </View>
-      <View className='w-full flex-row'>
-        <SkeletonUserCard
-          translate={translateOne}
-          animationValue={animationValue}
-        />
-        <SkeletonUserCard
-          translate={translateTwo}
-          animationValue={animationValue}
-        />
-        <SkeletonUserCard
-          translate={translateOne}
-          animationValue={animationValue}
-        />
-      </View>
+    <View style={feedcard.fullScreen}>
+      <SkeletonUserCard animationValue={animationValue} />
+      <SkeletonUserCard animationValue={animationValue} />
+      <SkeletonUserCard animationValue={animationValue} />
     </View>
   );
 }
+
+const feedcard = StyleSheet.create({
+  fullScreen: {
+    flex: 1,
+    alignItems: 'center',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.1)',
+  },
+});

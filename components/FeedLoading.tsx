@@ -5,7 +5,7 @@ const SkeletonUserCard = ({ animationValue }) => {
   const animatedStyle = {
     opacity: animationValue.interpolate({
       inputRange: [0, 0.5, 1],
-      outputRange: [1, 0.5, 1],
+      outputRange: [0.5, 0.25, 0.5],
     }),
   };
 

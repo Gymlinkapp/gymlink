@@ -23,6 +23,7 @@ import UserPrompt from '../components/UserPrompt';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 import getMostRecentPrompt from '../utils/getMostRecentPrompt';
+import { MapPin, NavigationArrow } from 'phosphor-react-native';
 
 export default function HomeScreen({ navigation, route }) {
   const LIMIT = 9;
@@ -89,7 +90,7 @@ export default function HomeScreen({ navigation, route }) {
       <LinearGradient
         pointerEvents='none'
         colors={['rgba(0,0,0,0)', 'rgba(0,0,0,1)']}
-        className='absolute bottom-0 z-50 w-full h-80'
+        className='absolute bottom-0 z-50r w-full h-80'
         start={[0, 0]}
         end={[0, 1]}
       />
@@ -171,6 +172,12 @@ export default function HomeScreen({ navigation, route }) {
                   end={[0, 1]}
                 />
               </TouchableOpacity>
+              <View className='flex-row items-center mt-2'>
+                <MapPin weight='fill' color='#fff' size={16} />
+                <Text className='text-white text-xl font-ProstoOne ml-2'>
+                  {user.gym.name}
+                </Text>
+              </View>
               <TouchableOpacity className='flex-row items-center my-2'>
                 <View className='rounded-full bg-secondaryDark px-2 py-2 mr-2'>
                   <Text className='font-prostoOne text-white text-md'>

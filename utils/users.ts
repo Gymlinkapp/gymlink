@@ -31,6 +31,9 @@ export type User = {
   splitId: string | null;
   userId: string | null;
   userPrompts: UserPrompt[];
+  gym: {
+    name: string;
+  };
 };
 
 export type Split = {

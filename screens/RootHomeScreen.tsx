@@ -46,6 +46,7 @@ export default function RootHomeScreen({ route, navigation }) {
           elevation: 0,
           position: 'absolute',
         },
+        tabBarLabel: () => null,
       })}
     >
       <Tab.Screen

@@ -247,20 +247,20 @@ export default function ProfileScreen({
               >
                 <View className='flex-row items-end justify-between'>
                   <View>
-                    <Text className='text-white font-MontserratRegular text-2xl mb-6'>
+                    <Text className='text-white font-ProstoOne text-2xl mb-6'>
                       {user.age}
                     </Text>
                     <View>
-                      <Text className='text-white font-MontserratBold text-5xl'>
+                      <Text className='text-white font-ProstoOne text-5xl'>
                         {user.firstName}
                       </Text>
-                      <Text className='text-white font-MontserratBold text-5xl'>
+                      <Text className='text-white font-ProstoOne text-5xl'>
                         {user.lastName}
                       </Text>
                     </View>
                     <View className='flex-row items-center mb-6'>
                       <MapPin color='#CCC9C9' weight='regular' size={16} />
-                      <Text className='text-secondaryWhite font-MontserratRegular text-md'>
+                      <Text className='text-secondaryWhite font-ProstoOne text-md'>
                         {gym?.name}
                       </Text>
                     </View>

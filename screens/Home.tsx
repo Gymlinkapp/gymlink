@@ -181,7 +181,7 @@ export default function HomeScreen({ navigation, route }) {
                 </View>
                 <TouchableOpacity className='flex-row items-center my-2'>
                   <View className='rounded-full bg-secondaryDark px-2 py-2 mr-2'>
-                    <Text className='font-prostoOne text-white text-md'>
+                    <Text className='font-ProstoOne text-white text-md'>
                       {user.age}
                     </Text>
                   </View>

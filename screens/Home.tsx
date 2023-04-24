@@ -172,25 +172,30 @@ export default function HomeScreen({ navigation, route }) {
                   end={[0, 1]}
                 />
               </TouchableOpacity>
-              <View className='flex-row items-center mt-2'>
-                <MapPin weight='fill' color='#fff' size={16} />
-                <Text className='text-white text-xl font-ProstoOne ml-2'>
-                  {user.gym.name}
-                </Text>
-              </View>
-              <TouchableOpacity className='flex-row items-center my-2'>
-                <View className='rounded-full bg-secondaryDark px-2 py-2 mr-2'>
-                  <Text className='font-prostoOne text-white text-md'>
-                    {user.age}
+              <View className='px-4'>
+                <View className='flex-row items-center mt-2'>
+                  <MapPin weight='fill' color='#fff' size={16} />
+                  <Text className='text-white text-xl font-ProstoOne ml-2'>
+                    {user.gym.name}
                   </Text>
                 </View>
-                <Text className='font-ProstoOne text-white text-3xl'>
-                  {user.firstName}
-                </Text>
-              </TouchableOpacity>
-              {mostRecentPrompt?.hasAnswered && (
-                <UserPrompt answer={mostRecentPrompt.answer} prompt={prompt} />
-              )}
+                <TouchableOpacity className='flex-row items-center my-2'>
+                  <View className='rounded-full bg-secondaryDark px-2 py-2 mr-2'>
+                    <Text className='font-prostoOne text-white text-md'>
+                      {user.age}
+                    </Text>
+                  </View>
+                  <Text className='font-ProstoOne text-white text-3xl'>
+                    {user.firstName}
+                  </Text>
+                </TouchableOpacity>
+                {mostRecentPrompt?.hasAnswered && (
+                  <UserPrompt
+                    answer={mostRecentPrompt.answer}
+                    prompt={prompt}
+                  />
+                )}
+              </View>
             </View>
           );
         }}

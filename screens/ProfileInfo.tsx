@@ -16,6 +16,7 @@ import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 import { useUser } from '../hooks/useUser';
 import Loading from '../components/Loading';
 import { transformTag } from '../utils/transformTags';
+import { useQueryClient } from 'react-query';
 
 const ProfileInfoSection = ({
   title,
@@ -39,6 +40,7 @@ export default function ProfileInfo({
   route: any;
   navigation: any;
 }) {
+  const queryClient = useQueryClient();
   const { user, gymId } = route.params;
   const { prompt, token } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
@@ -49,11 +51,13 @@ export default function ProfileInfo({
   const { data: currUser, isLoading: isUserLoading } = useUser(token);
   const { data: gym, isLoading: gymLoading } = useGym(gymId);
 
-  if (isUserLoading) return <Loading />;
+  useEffect(() => {
+    queryClient.invalidateQueries('user');
+  }, []);
 
   useEffect(() => {
     if (user.userPrompts.length < 1) return;
-    if (user) {
+    if (user.id !== currUser?.id) {
       const lastPrompt = getMostRecentPrompt(user);
       setRecentPrompt(lastPrompt.answer);
     } else {
@@ -75,6 +79,7 @@ export default function ProfileInfo({
       setUserSplit(userSplit);
     }
   }, [user]);
+  if (isUserLoading) return <Loading />;
   return (
     <View className='relative'>
       {currUser?.id !== user.id && (

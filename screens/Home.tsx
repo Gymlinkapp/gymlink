@@ -24,6 +24,8 @@ import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 import { MapPin, NavigationArrow } from 'phosphor-react-native';
+import { transformTag } from '../utils/transformTags';
+import { DisplayGymName } from '../utils/displayGymName';
 
 export default function HomeScreen({ navigation, route }) {
   const LIMIT = 9;
@@ -138,7 +140,6 @@ export default function HomeScreen({ navigation, route }) {
         onEndReachedThreshold={0.1}
         renderItem={({ item: user }) => {
           const mostRecentPrompt = getMostRecentPrompt(user);
-          console.log(user.firstName, mostRecentPrompt);
           return (
             <View className='my-4'>
               <TouchableOpacity
@@ -164,7 +165,7 @@ export default function HomeScreen({ navigation, route }) {
                         intensity={25}
                       >
                         <Text className='font-ProstoOne text-white text-xs '>
-                          {tag}
+                          {transformTag(tag)}
                         </Text>
                       </BlurView>
                     ))}
@@ -179,8 +180,8 @@ export default function HomeScreen({ navigation, route }) {
               <View className='px-4'>
                 <View className='flex-row items-center mt-2'>
                   <MapPin weight='fill' color='#fff' size={16} />
-                  <Text className='text-white text-md font-ProstoOne ml-2'>
-                    {user.gym.name}
+                  <Text className='text-white text-sm font-ProstoOne ml-2'>
+                    {DisplayGymName(user.gym.name)}
                   </Text>
                 </View>
                 <TouchableOpacity className='flex-row items-center my-2'>

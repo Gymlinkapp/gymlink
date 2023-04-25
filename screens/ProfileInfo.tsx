@@ -15,6 +15,7 @@ import UserPrompt from '../components/UserPrompt';
 import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 import { useUser } from '../hooks/useUser';
 import Loading from '../components/Loading';
+import { transformTag } from '../utils/transformTags';
 
 const ProfileInfoSection = ({
   title,
@@ -25,9 +26,7 @@ const ProfileInfoSection = ({
 }) => {
   return (
     <View className='bg-secondaryDark p-6 rounded-2xl mb-2'>
-      <Text className='text-white text-2xl font-MontserratBold mb-1'>
-        {title}
-      </Text>
+      <Text className='text-white text-2xl font-ProstoOne mb-1'>{title}</Text>
       {children}
     </View>
   );
@@ -51,14 +50,6 @@ export default function ProfileInfo({
   const { data: gym, isLoading: gymLoading } = useGym(gymId);
 
   if (isUserLoading) return <Loading />;
-
-  const transformTag = (tag: string) => {
-    const words = tag.split('-');
-    const transformedWords = words.map((word) => {
-      return word[0].toUpperCase() + word.slice(1);
-    });
-    return transformedWords.join(' ');
-  };
 
   useEffect(() => {
     if (user.userPrompts.length < 1) return;
@@ -96,15 +87,15 @@ export default function ProfileInfo({
           <Text className='text-white font-MontserratRegular text-lg mb-2'>
             {user.age}
           </Text>
-          <Text className='text-white font-MontserratBold text-4xl'>
+          <Text className='text-white font-ProstoOne text-4xl'>
             {user.firstName}
           </Text>
-          <Text className='text-white font-MontserratBold text-4xl'>
+          <Text className='text-white font-ProstoOne text-4xl'>
             {user.lastName}
           </Text>
           <View className='flex-row items-center mb-2'>
             <MapPin color='#CCC9C9' weight='regular' size={14} />
-            <Text className='text-secondaryWhite font-MontserratRegular text-md'>
+            <Text className='text-secondaryWhite font-ProstoOne text-md'>
               {gym?.name}
             </Text>
           </View>

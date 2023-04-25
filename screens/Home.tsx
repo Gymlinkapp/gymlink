@@ -165,7 +165,7 @@ export default function HomeScreen({ navigation, route }) {
                         intensity={25}
                       >
                         <Text className='font-ProstoOne text-white text-xs '>
-                          {transformTag(tag)}
+                          {transformTag(tag) || 'Boring'}
                         </Text>
                       </BlurView>
                     ))}

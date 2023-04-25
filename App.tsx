@@ -13,12 +13,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Platform } from 'react-native';
 import api from './utils/axiosStore';
 import NotificationHandler from './utils/NotificationHandler';
+import { getItemAsync, setItemAsync } from 'expo-secure-store';
+import { logStoredTime } from './utils/logStoredNotificationTime';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: false,
-    shouldSetBadge: false,
+    shouldSetBadge: true,
   }),
 });
 
@@ -87,6 +89,9 @@ export default function App() {
         >
           <Routes socket={socket} />
           <NotificationHandler />
+          {__DEV__ && (
+            <Button onPress={logStoredTime} title='Check Stored Time' />
+          )}
         </NavigationContainer>
       </AuthProvider>
     </QueryClientProvider>
@@ -102,11 +107,20 @@ async function scheduleNotification(notification) {
 }
 
 async function schedulePushNotification() {
+  console.log('Scheduling push notification...'); // Add this line
+
   const currentDate = new Date();
   const targetDate = new Date();
 
-  const randomHour = getRandomTime(18, 24); // 1 PM EST is 6 PM in UTC, 7 PM EST is 12 AM in UTC
+  // in a minute
+  // const randomHour = currentDate.getHours();
+  // const randomMinute = currentDate.getMinutes() + 1;
+
+  const randomHour = getRandomTime(17, 23); // 7pm - 8pm
   const randomMinute = getRandomTime(0, 59);
+
+  console.log('Random hour:', randomHour); // Add this line
+  console.log('Random minute:', randomMinute); // Add this line
 
   targetDate.setHours(randomHour);
   targetDate.setMinutes(randomMinute);
@@ -133,6 +147,10 @@ async function schedulePushNotification() {
     trigger: { seconds: secondsUntilTarget, repeats: true },
   };
   await Notifications.scheduleNotificationAsync(notification);
+
+  // Store the randomHour and randomMinute values
+  await setItemAsync('randomHour', randomHour.toString());
+  await setItemAsync('randomMinute', randomMinute.toString());
 }
 
 async function registerForPushNotificationsAsync() {

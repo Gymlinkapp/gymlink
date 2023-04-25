@@ -69,7 +69,7 @@ export default function ProfileInfo({
       const lastPrompt = getMostRecentPrompt(currUser);
       setRecentPrompt(lastPrompt.answer);
     }
-  }, [currentImageIndex]);
+  }, [user, currUser]);
 
   useEffect(() => {
     if (user.split) {

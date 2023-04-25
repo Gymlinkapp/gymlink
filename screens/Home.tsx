@@ -105,7 +105,7 @@ export default function HomeScreen({ navigation, route }) {
             <Text className='font-ProstoOne text-white'>{prompt.prompt}</Text>
 
             <TextInput
-              className='w-full p-4 bg-secondaryDark rounded-md mt-4 text-white'
+              className='w-full p-4 bg-secondaryDark rounded-md mt-4 font-MontserratMedium text-white'
               onChangeText={(text) => setUserPromptAnswer(text)}
             />
           </View>

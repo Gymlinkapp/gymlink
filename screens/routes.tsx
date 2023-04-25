@@ -33,7 +33,7 @@ export default function Routes({ socket }: { socket: any }) {
     setSocket(socket);
 
     // i want to check if the most recent userPrompts was answered yet
-    if (user) {
+    if (user && isVerified) {
       const lastPrompt = getMostRecentPrompt(user);
       console.log('lastPrompt', lastPrompt);
       if (lastPrompt && lastPrompt.hasAnswered === false) {

@@ -126,15 +126,19 @@ export default function HomeScreen({ navigation, route }) {
       <FlatList
         contentContainerStyle={{ paddingTop: 50, paddingBottom: 200 }}
         data={feed}
+        windowSize={5}
+        maxToRenderPerBatch={5}
+        removeClippedSubviews
         keyExtractor={(item, idx) => `${item.id}_${idx}`}
         showsVerticalScrollIndicator={false}
         onEndReached={fetchMore}
         ListFooterComponent={() =>
-          isLoading || isFetching ? <Loading /> : null
+          isLoading || isFetching ? <Loading /> : <Text>No more Users</Text>
         }
         onEndReachedThreshold={0.1}
         renderItem={({ item: user }) => {
           const mostRecentPrompt = getMostRecentPrompt(user);
+          console.log(user.firstName, mostRecentPrompt);
           return (
             <View className='my-4'>
               <TouchableOpacity
@@ -175,7 +179,7 @@ export default function HomeScreen({ navigation, route }) {
               <View className='px-4'>
                 <View className='flex-row items-center mt-2'>
                   <MapPin weight='fill' color='#fff' size={16} />
-                  <Text className='text-white text-xl font-ProstoOne ml-2'>
+                  <Text className='text-white text-md font-ProstoOne ml-2'>
                     {user.gym.name}
                   </Text>
                 </View>
@@ -192,7 +196,7 @@ export default function HomeScreen({ navigation, route }) {
                 {mostRecentPrompt?.hasAnswered && (
                   <UserPrompt
                     answer={mostRecentPrompt.answer}
-                    prompt={prompt}
+                    prompt={mostRecentPrompt.prompt.prompt}
                   />
                 )}
               </View>

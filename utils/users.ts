@@ -53,9 +53,12 @@ export type UserPrompt = {
   createdAt: Date;
   updatedAt: Date;
   userId: string;
-  promptId: string;
   answer: string;
+  prompt: {
+    prompt: string;
+  };
   hasAnswered: boolean;
+  promptId: string;
 };
 
 export const AUTH_STEPS = 7;

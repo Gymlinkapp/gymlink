@@ -135,18 +135,20 @@ async function schedulePushNotification() {
     (targetDate.getTime() - currentDate.getTime()) / 1000
   );
 
-  const { data } = await api.get('/social/generatePrompt');
+  if (!__DEV__ && process.env.NODE_ENV !== 'development') {
+    const { data } = await api.get('/social/generatePrompt');
 
-  const prompt = data.prompt;
-  const notification = {
-    content: {
-      title: '?',
-      body: prompt,
-      data: { actionId: 'open_home' },
-    },
-    trigger: { seconds: secondsUntilTarget, repeats: true },
-  };
-  await Notifications.scheduleNotificationAsync(notification);
+    const prompt = data.prompt;
+    const notification = {
+      content: {
+        title: '?',
+        body: prompt,
+        data: { actionId: 'open_home' },
+      },
+      trigger: { seconds: secondsUntilTarget, repeats: true },
+    };
+    await Notifications.scheduleNotificationAsync(notification);
+  }
 
   // Store the randomHour and randomMinute values
   await setItemAsync('randomHour', randomHour.toString());

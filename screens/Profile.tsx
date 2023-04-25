@@ -30,6 +30,7 @@ import * as Haptics from 'expo-haptics';
 import { User } from '../utils/users';
 import * as Progress from 'react-native-progress';
 import { COLORS } from '../utils/colors';
+import { DisplayGymName } from '../utils/displayGymName';
 
 export function ProfileHeader({
   user,
@@ -247,7 +248,7 @@ export default function ProfileScreen({
               >
                 <View className='flex-row items-end justify-between'>
                   <View>
-                    <Text className='text-white font-ProstoOne text-2xl mb-6'>
+                    <Text className='text-white font-ProstoOne text-2xl'>
                       {user.age}
                     </Text>
                     <View>
@@ -258,12 +259,21 @@ export default function ProfileScreen({
                         {user.lastName}
                       </Text>
                     </View>
-                    <View className='flex-row items-center mb-6'>
-                      <MapPin color='#CCC9C9' weight='regular' size={16} />
-                      <Text className='text-secondaryWhite font-ProstoOne text-md'>
-                        {gym?.name}
-                      </Text>
-                    </View>
+                    {gymLoading ? (
+                      <Progress.Circle
+                        size={18}
+                        indeterminate={true}
+                        color={COLORS.mainWhite}
+                        shouldRasterizeIOS
+                      />
+                    ) : (
+                      <View className='flex-row items-center mb-6'>
+                        <MapPin color='#CCC9C9' weight='regular' size={16} />
+                        <Text className='text-secondaryWhite font-ProstoOne text-md'>
+                          {DisplayGymName(gym?.name)}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                   {isTyping && (
                     <TouchableOpacity onPress={() => lowerKeyboard()}>

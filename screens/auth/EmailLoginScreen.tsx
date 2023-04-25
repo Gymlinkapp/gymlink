@@ -22,7 +22,7 @@ const userLoginSchema = z.object({
 });
 
 export default function EmailLoginScreen({ navigation }) {
-  const { setIsVerified } = useAuth();
+  const { setIsVerified, setToken } = useAuth();
   const queryClient = useQueryClient();
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
   const {
@@ -50,6 +50,7 @@ export default function EmailLoginScreen({ navigation }) {
       onSuccess: (data) => {
         if (data) {
           setItemAsync('token', data.data.token);
+          setToken(data.data.token);
           setIsVerified(true);
           queryClient.invalidateQueries('user');
         }
@@ -122,6 +123,7 @@ export default function EmailLoginScreen({ navigation }) {
                       Password
                     </Text>
                     <TextInput
+                      secureTextEntry
                       className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
                         isTouched && 'border-2 border-tertiaryDark'
                       }`}
@@ -142,7 +144,11 @@ export default function EmailLoginScreen({ navigation }) {
           )}
         />
 
-        <Button variant='primary' onPress={handleSubmit(onSubmit)}>
+        <Button
+          isLoading={signIn.isLoading}
+          variant='primary'
+          onPress={handleSubmit(onSubmit)}
+        >
           Login
         </Button>
       </KeyboardAvoidingView>

@@ -38,7 +38,7 @@ export default function OTPScreen({ navigation, route }) {
     async () => {
       try {
         return await api.post(
-          '/trpc/authentication.sendSMS',
+          '/auth/sendsms',
           {
             phoneNumber: phoneNumber,
           },

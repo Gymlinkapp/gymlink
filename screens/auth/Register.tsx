@@ -30,7 +30,7 @@ export default function RegisterScreen({ navigation }) {
     },
   });
   const sendSMS = useMutation(
-    async (phoneNumber: string) => {
+    async () => {
       setPhoneNumber(phoneNumber);
 
       console.log(phoneNumber);
@@ -61,80 +61,87 @@ export default function RegisterScreen({ navigation }) {
       },
     }
   );
+
   const onSubmit = async (data: z.infer<typeof phoneNumberSchema>) => {
-    return await sendSMS.mutateAsync(data.callingCode + data.phoneNumber);
+    return await sendSMS.mutateAsync();
     // mutation.mutate({
     //   phoneNumber: data.callingCode + data.phoneNumber,
     // });
   };
 
   return (
-    <View className='px-4'>
-      <SafeAreaView>
-        <KeyboardAvoidingView className='justify-center h-3/4 '>
-          <Controller
-            control={control}
-            name='phoneNumber'
-            rules={{ maxLength: 10 }}
-            render={({ field: { onChange, onBlur, value, name } }) => (
-              <View>
-                <Text className='text-white font-[MontserratBold] text-l pb-4'>
-                  Sign up with your phone number
+    <SafeAreaView className='justify-between h-full'>
+      <KeyboardAvoidingView className='justify-center mt-20 p-4'>
+        <Controller
+          control={control}
+          name='phoneNumber'
+          rules={{ maxLength: 10 }}
+          render={({ field: { onChange, onBlur, value, name } }) => (
+            <View>
+              <Text className='text-white font-[MontserratBold] text-l pb-4'>
+                Sign up with your phone number
+              </Text>
+              <PhoneInput
+                onChangeCountry={(country) => {
+                  setValue('callingCode', country.callingCode[0]);
+                }}
+                value={value}
+                onChangeText={(val) => {
+                  setValue('phoneNumber', val);
+                }}
+                defaultCode='US'
+                withDarkTheme
+                placeholder='902 291 011'
+                codeTextStyle={{ color: COLORS.mainWhite }}
+                disableArrowIcon
+                containerStyle={{
+                  borderRadius: 999,
+                  width: '100%',
+                  backgroundColor: COLORS.secondaryDark,
+                }}
+                textInputStyle={{
+                  color: COLORS.mainWhite,
+                  fontFamily: 'MontserratRegular',
+                }}
+                textContainerStyle={{
+                  backgroundColor: COLORS.secondaryDark,
+                  borderRadius: 999,
+                }}
+              />
+              {errors.phoneNumber && (
+                <Text className='text-red-500 text-sm'>
+                  {errors.phoneNumber.message}
                 </Text>
-                <PhoneInput
-                  onChangeCountry={(country) => {
-                    setValue('callingCode', country.callingCode[0]);
-                  }}
-                  value={value}
-                  onChangeText={(val) => {
-                    setValue('phoneNumber', val);
-                  }}
-                  defaultCode='US'
-                  withDarkTheme
-                  placeholder='902 291 011'
-                  codeTextStyle={{ color: COLORS.mainWhite }}
-                  disableArrowIcon
-                  containerStyle={{
-                    borderRadius: 999,
-                    width: '100%',
-                    backgroundColor: COLORS.secondaryDark,
-                  }}
-                  textInputStyle={{
-                    color: COLORS.mainWhite,
-                    fontFamily: 'MontserratRegular',
-                  }}
-                  textContainerStyle={{
-                    backgroundColor: COLORS.secondaryDark,
-                    borderRadius: 999,
-                  }}
-                />
-                {errors.phoneNumber && (
-                  <Text className='text-red-500 text-sm'>
-                    {errors.phoneNumber.message}
-                  </Text>
-                )}
-              </View>
-            )}
-          />
-          <Button
-            variant='primary'
-            isLoading={sendSMS.isLoading}
-            onPress={handleSubmit(onSubmit)}
-          >
-            Send code
-          </Button>
-          {process.env.NODE_ENV === 'development' && (
-            <Button
-              variant='secondary'
-              onPress={() => {
-                navigation.navigate('EmailLoginScreen');
-              }}
-            >
-              Signin with Email
-            </Button>
+              )}
+            </View>
           )}
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </View>
+        />
+        <Button
+          variant='primary'
+          isLoading={sendSMS.isLoading}
+          onPress={handleSubmit(onSubmit)}
+        >
+          Send code
+        </Button>
+      </KeyboardAvoidingView>
+      <View className='mb-4'>
+        <Button
+          variant='secondary'
+          className='mt-4'
+          onPress={() => navigation.navigate('InitialUserDetails')}
+        >
+          Signup with Email
+        </Button>
+        <Button
+          variant='ghost'
+          className='mt-4'
+          onPress={() => {
+            navigation.navigate('EmailLoginScreen');
+          }}
+        >
+          Signin with Email
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 }

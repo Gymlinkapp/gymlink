@@ -69,6 +69,7 @@ const userDetailsSchema = z.object({
   bio: z.string().min(1).max(1000),
   email: z.string().email(),
   age: z.number().min(16).max(100),
+  password: z.string().min(8).max(100),
   // race: z.string().min(1).max(20),
   // gender: z.string().min(1).max(20),
 });
@@ -105,6 +106,7 @@ export default function InitialUserDetails({ route, navigation }) {
       bio: '',
       gender: '',
       race: '',
+      password: '',
       age: 18,
     },
   });
@@ -113,7 +115,10 @@ export default function InitialUserDetails({ route, navigation }) {
 
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
 
-  const saveUserDetails = useMutation(
+  console.log('phoneNumber', phoneNumber);
+
+  // if a user signs up with a phone number, we need to save their details with a phone number
+  const saveUserDetailsWithPhoneNumber = useMutation(
     async (data: z.infer<typeof userDetailsSchema>) => {
       try {
         return await api.post(
@@ -166,10 +171,68 @@ export default function InitialUserDetails({ route, navigation }) {
     }
   );
 
+  // if a user signs up with an email, we need to save their details with an email
+  const saveUserDetailsWithEmail = useMutation(
+    async (data: z.infer<typeof userDetailsSchema>) => {
+      try {
+        return await api.post(
+          '/auth/initialUserDetails',
+          {
+            password: data.password,
+            firstName: data.firstName,
+            bio: data.bio,
+            lastName: data.lastName,
+            age: data.age,
+            email: data.email,
+            gender: gender.toLowerCase(),
+            race,
+            longitude: longitude,
+            latitude: latitude,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      onSuccess: async (data) => {
+        console.log('data', data.data);
+        if (data.data.authStep === 3) {
+          try {
+            setItemAsync('token', data.data.token)
+              .then(() => {
+                setToken(data.data.token);
+                if (token) {
+                  queryClient.invalidateQueries('user');
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          } catch (error) {
+            console.log('here', error);
+          }
+        }
+      },
+      onError: (error) => {
+        console.log('uh', error);
+      },
+    }
+  );
+
   const onSubmit = async (data: z.infer<typeof userDetailsSchema>) => {
     try {
       Number(data.age);
-      return saveUserDetails.mutateAsync(data);
+      if (!phoneNumber) {
+        return saveUserDetailsWithEmail.mutateAsync(data);
+      } else {
+        return saveUserDetailsWithPhoneNumber.mutateAsync(data);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -383,12 +446,44 @@ export default function InitialUserDetails({ route, navigation }) {
                     )}
                   />
                 </View>
+                {!phoneNumber && (
+                  <Controller
+                    control={control}
+                    name='password'
+                    render={({
+                      field: { onChange, onBlur, value },
+                      fieldState: { isTouched, error },
+                    }) => (
+                      <View className='my-2 flex-1 mr-2'>
+                        <Text className='text-white py-2 text-l font-MontserratMedium'>
+                          Password
+                        </Text>
+                        <TextInput
+                          secureTextEntry
+                          passwordRules='minlength: 8; required: lower; required: upper; required: digit;'
+                          className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                            isTouched && 'border-2 border-tertiaryDark'
+                          }`}
+                          cursorColor={COLORS.mainWhite}
+                          value={value}
+                          onBlur={onBlur}
+                          onChangeText={(value) => onChange(value)}
+                        />
+                        {error && (
+                          <Text className='text-red-500 font-MontserratRegular'>
+                            {error.message}
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                  />
+                )}
               </>
             )}
           />
           <Button
             variant='primary'
-            isLoading={saveUserDetails.isLoading}
+            isLoading={saveUserDetailsWithPhoneNumber.isLoading}
             onPress={handleSubmit(onSubmit)}
           >
             Continue
@@ -596,11 +691,44 @@ export default function InitialUserDetails({ route, navigation }) {
                   )}
                 />
               </View>
+
+              {!phoneNumber && (
+                <Controller
+                  control={control}
+                  name='password'
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { isTouched, error },
+                  }) => (
+                    <View className='my-2 flex-1 mr-2'>
+                      <Text className='text-white py-2 text-l font-MontserratMedium'>
+                        Password
+                      </Text>
+                      <TextInput
+                        secureTextEntry
+                        passwordRules='minlength: 8; required: lower; required: upper; required: digit;'
+                        className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
+                          isTouched && 'border-2 border-tertiaryDark'
+                        }`}
+                        cursorColor={COLORS.mainWhite}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(value) => onChange(value)}
+                      />
+                      {error && (
+                        <Text className='text-red-500 font-MontserratRegular'>
+                          {error.message}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                />
+              )}
             </>
           </ScrollView>
           <Button
             variant='primary'
-            isLoading={saveUserDetails.isLoading}
+            isLoading={saveUserDetailsWithPhoneNumber.isLoading}
             onPress={handleSubmit(onSubmit)}
           >
             Continue

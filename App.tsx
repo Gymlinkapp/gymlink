@@ -63,6 +63,7 @@ export default function App() {
 
   useEffect(() => {
     if (!__DEV__ && process.env.NODE_ENV !== 'development') {
+      console.log('Scheduling push notifications (not in development mode)');
       schedulePushNotification();
     }
   }, []);
@@ -116,7 +117,7 @@ async function schedulePushNotification() {
   // const randomHour = currentDate.getHours();
   // const randomMinute = currentDate.getMinutes() + 1;
 
-  const randomHour = getRandomTime(17, 23); // 7pm - 8pm
+  const randomHour = getRandomTime(13, 20); // 7pm - 8pm
   const randomMinute = getRandomTime(0, 59);
 
   console.log('Random hour:', randomHour); // Add this line

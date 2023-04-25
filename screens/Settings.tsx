@@ -21,46 +21,39 @@ export default function SettingsScreen({ navigation }) {
 
   return (
     <SafeAreaView className='w-full h-full items-center flex-col-reverse'>
-      <Button
-        onPress={() => {
-          SecureStore.deleteItemAsync('token');
+      {__DEV__ && (
+        <>
+          <Button
+            onPress={() => {
+              SecureStore.deleteItemAsync('token');
 
-          api.delete(`/users/${token}`);
+              api.delete(`/users/${token}`);
 
-          navigation.popToTop();
-          setIsVerified(false);
-        }}
-        variant='danger'
-        icon={<User weight='fill' color='rgb(239, 68, 68)' />}
-      >
-        Delete
-      </Button>
-      <Button
-        onPress={() => {
-          SecureStore.deleteItemAsync('token');
+              navigation.popToTop();
+              setIsVerified(false);
+            }}
+            variant='danger'
+            icon={<User weight='fill' color='rgb(239, 68, 68)' />}
+          >
+            Delete
+          </Button>
 
-          signout.mutate();
-          navigation.popToTop();
-          setIsVerified(false);
-        }}
-        variant='menu'
-        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
-      >
-        Signout
-      </Button>
-      <Button
-        onPress={() => {
-          SecureStore.deleteItemAsync('token');
-          signout.mutate();
+          <Button
+            onPress={() => {
+              SecureStore.deleteItemAsync('token');
+              signout.mutate();
 
-          navigation.popToTop();
-          setIsVerified(false);
-        }}
-        variant='menu'
-        icon={<ClockClockwise weight='fill' color={COLORS.mainWhite} />}
-      >
-        Reset
-      </Button>
+              navigation.popToTop();
+              setIsVerified(false);
+            }}
+            variant='menu'
+            icon={<ClockClockwise weight='fill' color={COLORS.mainWhite} />}
+          >
+            Reset
+          </Button>
+        </>
+      )}
+
       <Button
         onPress={() => {
           navigation.navigate('EditAccount');
@@ -82,6 +75,19 @@ export default function SettingsScreen({ navigation }) {
         icon={<Eye weight='fill' color={COLORS.mainWhite} />}
       >
         Preview
+      </Button>
+      <Button
+        onPress={() => {
+          SecureStore.deleteItemAsync('token');
+
+          signout.mutate();
+          navigation.popToTop();
+          setIsVerified(false);
+        }}
+        variant='menu'
+        icon={<SignOut weight='fill' color={COLORS.mainWhite} />}
+      >
+        Signout
       </Button>
     </SafeAreaView>
   );

@@ -16,6 +16,7 @@ import { COLORS } from '../../utils/colors';
 import { useMutation, useQueryClient } from 'react-query';
 import { setItemAsync } from 'expo-secure-store';
 import { useAuth } from '../../utils/context';
+import AuthLayout from '../../layouts/AuthLayout';
 const userLoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(20),
@@ -65,15 +66,10 @@ export default function EmailLoginScreen({ navigation }) {
     }
   };
   return (
-    <SafeAreaView className='w-full h-full flex-1 relative '>
-      <View className='py-6'>
-        <Text className='text-2xl font-MontserratBold text-primaryWhite'>
-          Login with Email
-        </Text>
-        <Text className='text-base font-MontserratRegular text-secondaryWhite'>
-          Enter your email and password to login
-        </Text>
-      </View>
+    <AuthLayout
+      title='Login with Email'
+      description='Enter your email and password to login'
+    >
       <KeyboardAvoidingView
         behavior='position'
         keyboardVerticalOffset={keyboardVerticalOffset}
@@ -152,6 +148,7 @@ export default function EmailLoginScreen({ navigation }) {
           Login
         </Button>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AuthLayout>
+    // </SafeAreaView>
   );
 }

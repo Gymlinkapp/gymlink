@@ -1,4 +1,11 @@
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { ChatText, Eye, Heart, Plus } from 'phosphor-react-native';
 import { COLORS } from '../utils/colors';
@@ -11,6 +18,7 @@ import { Comment, Like, Post, View as TView } from '../utils/types/posts';
 import api from '../utils/axiosStore';
 import { useMutation, useQueryClient } from 'react-query';
 import * as Haptics from 'expo-haptics';
+import Button from './button';
 
 export const PostStat = ({
   icon,
@@ -33,11 +41,14 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
   const { token, user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [offset, setOffset] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [postContent, setPostContent] = useState('');
   const queryClient = useQueryClient();
 
   const { data, isLoading, isFetching } = usePosts(token, offset, LIMIT);
 
   useEffect(() => {
+    queryClient.invalidateQueries('posts');
     if (!isLoading && data && data.posts) {
       setPosts((prevFeed) => [...prevFeed, ...data.posts]);
     }
@@ -58,6 +69,22 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     }
   );
 
+  const createPost = useMutation(
+    async () => {
+      const { data } = await api.post(`/posts/create`, {
+        content: postContent,
+        userId: user.id,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        setModalVisible(false);
+        queryClient.invalidateQueries('posts');
+      },
+    }
+  );
+
   if (isLoading) {
     return <FeedLoading />;
   }
@@ -72,13 +99,69 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     <Text>No Posts</Text>;
   }
   return (
-    <View className='z-50 px-6 py-12 relative'>
-      <TouchableOpacity className='bg-accent w-16 h-16 rounded-full justify-center items-center absolute top-[65%] right-5 z-50'>
+    <View className='z-40 px-6 py-12 relative'>
+      <TouchableOpacity
+        onPress={() => {
+          setModalVisible(true);
+        }}
+        className='bg-accent w-16 h-16 rounded-full justify-center items-center absolute top-[75%] right-5 z-50'
+      >
         <Plus color='#fff' size={21} weight='fill' />
       </TouchableOpacity>
-      <Text className='text-white text-2xl font-ProstoOne mb-4'>Explore</Text>
+      <Text className='text-white text-2xl font-ProstoOne my-4'>Explore</Text>
+      <Modal animationType='slide' transparent={true} visible={modalVisible}>
+        <View className='flex-1 justify-end items-end w-full'>
+          <View className='bg-primaryDark  w-full h-3/4 p-12 rounded-3xl border-[0.5px] border-secondaryDark'>
+            <Text className='text-white text-2xl font-ProstoOne mb-4'>
+              Create Post
+            </Text>
+            <View className='mb-4'>
+              <TextInput
+                onChangeText={(text) => {
+                  setPostContent(text);
+                }}
+                value={postContent}
+                placeholder='What is on your mind?'
+                placeholderTextColor={COLORS.tertiaryDark}
+                multiline
+                numberOfLines={4}
+                textAlignVertical='top' // This will align the text to the top of the TextInput
+                style={{
+                  maxHeight: 120,
+                  color: COLORS.mainWhite,
+                  backgroundColor: COLORS.secondaryDark,
+                  borderRadius: 10,
+                  paddingHorizontal: 20,
+                  paddingVertical: 50,
+                  paddingTop: 15,
+                  fontFamily: 'MontserratRegular',
+                }}
+              />
+
+              <Button
+                isLoading={createPost.isLoading}
+                variant='primary'
+                className='my-4'
+                onPress={() => {
+                  createPost.mutate();
+                }}
+              >
+                Create
+              </Button>
+              <Button
+                variant='secondary'
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <FlatList
-        contentContainerStyle={{ paddingTop: 50, paddingBottom: 200 }}
+        contentContainerStyle={{ paddingBottom: 200 }}
         windowSize={5}
         maxToRenderPerBatch={5}
         removeClippedSubviews

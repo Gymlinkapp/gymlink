@@ -17,14 +17,8 @@ const fetchPosts = async (token: string, offset: number = 0, limit: number) => {
 };
 
 const usePosts = (token: string, offset: number = 0, limit: number) => {
-  return useQuery<Response, Error>(
-    ['posts', offset],
-    () => fetchPosts(token, offset, limit),
-    {
-      staleTime: 1000 * 60 * 5,
-      cacheTime: 1000 * 60 * 5,
-      keepPreviousData: true,
-    }
+  return useQuery<Response, Error>('posts', () =>
+    fetchPosts(token, offset, limit)
   );
 };
 

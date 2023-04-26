@@ -9,6 +9,7 @@ import { COLORS } from '../utils/colors';
 import HomeFeed from '../components/HomeFeed';
 import AnswerPrompt from '../components/AnswerPrompt';
 import PostsFeed from '../components/PostsFeed';
+import { BlurView } from 'expo-blur';
 
 export default function HomeScreen({ navigation, route }) {
   const { prompt, canAnswerPrompt } = useAuth();
@@ -32,58 +33,60 @@ export default function HomeScreen({ navigation, route }) {
         start={[0, 0]}
         end={[0, 1]}
       />
-      <View
-        style={{
-          overflow: 'hidden',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '50%',
-          alignSelf: 'center',
-          backgroundColor: COLORS.secondaryDark,
-          paddingVertical: 10,
-          borderRadius: 999,
-          zIndex: 50,
-        }}
-      >
-        <MotiView
-          animate={{
-            translateX: slidePosition === 0 ? -50 : 50, // Adjust the value '100' based on your desired sliding distance
-            backgroundColor: '#724CF9',
-          }}
+      <View className='absolute w-full flex-row justify-center top-0 z-50 py-2'>
+        <BlurView
+          intensity={5}
           style={{
-            position: 'absolute',
-            borderRadius: 50,
-            padding: 20,
-            width: '40%',
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => setScreen('home')}
-          style={{
-            paddingVertical: 8,
-            paddingHorizontal: 16,
-            borderRadius: 50,
-            marginRight: 4,
+            overflow: 'hidden',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '50%',
+            backgroundColor: COLORS.secondaryDark,
+            paddingVertical: 10,
+            borderRadius: 999,
+            zIndex: 50,
           }}
         >
-          <Text style={{ color: 'white', fontFamily: 'ProstoOne' }}>
-            For You
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setScreen('explore')}
-          style={{
-            paddingVertical: 8,
-            paddingHorizontal: 16,
-            borderRadius: 50,
-            marginLeft: 4,
-          }}
-        >
-          <Text style={{ color: 'white', fontFamily: 'ProstoOne' }}>
-            Explore
-          </Text>
-        </TouchableOpacity>
+          <MotiView
+            animate={{
+              translateX: slidePosition === 0 ? -50 : 50, // Adjust the value '100' based on your desired sliding distance
+              backgroundColor: '#724CF9',
+            }}
+            style={{
+              position: 'absolute',
+              borderRadius: 50,
+              padding: 20,
+              width: '40%',
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => setScreen('home')}
+            style={{
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              borderRadius: 50,
+              marginRight: 4,
+            }}
+          >
+            <Text style={{ color: 'white', fontFamily: 'ProstoOne' }}>
+              For You
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setScreen('explore')}
+            style={{
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              borderRadius: 50,
+              marginLeft: 4,
+            }}
+          >
+            <Text style={{ color: 'white', fontFamily: 'ProstoOne' }}>
+              Explore
+            </Text>
+          </TouchableOpacity>
+        </BlurView>
       </View>
 
       {/* <Filters /> */}

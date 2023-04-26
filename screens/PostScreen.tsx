@@ -22,7 +22,13 @@ import Loading from '../components/Loading';
 import * as Progress from 'react-native-progress';
 import * as Haptics from 'expo-haptics';
 
-export default function PostScreen({ route }: { route: any }) {
+export default function PostScreen({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) {
   const { postId }: { postId: string } = route.params;
   const { data, isLoading } = usePost(postId);
   const { user } = useAuth();
@@ -35,8 +41,24 @@ export default function PostScreen({ route }: { route: any }) {
       });
     }
 
+    queryClient.invalidateQueries('post');
     queryClient.invalidateQueries('posts');
   }, []);
+
+  const likePost = useMutation(
+    async (postId: string) => {
+      const { data } = await api.post(`/posts/likePost`, {
+        userId: user.id,
+        postId,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('posts');
+      },
+    }
+  );
 
   const [comment, setComment] = useState('');
 
@@ -71,7 +93,14 @@ export default function PostScreen({ route }: { route: any }) {
       style={{ flex: 1 }}
     >
       <SafeAreaView className='mx-8 flex-1'>
-        <View className='my-8'>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Profile', {
+              user: data.post.user,
+            });
+          }}
+          className='my-8'
+        >
           <View className='w-12 h-12 rounded-full overflow-hidden mr-2'>
             <Image
               source={{
@@ -83,17 +112,30 @@ export default function PostScreen({ route }: { route: any }) {
           <Text className='text-white font-ProstoOne text-xl'>
             {data.post.user.firstName} {data.post.user.lastName}
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <Text className='text-secondaryWhite font-MontserratRegular'>
           {data.post.content}
         </Text>
 
-        <View className='w-full flex-row justify-evenly mt-6'>
-          <TouchableOpacity>
+        <View className='w-full flex-row justify-evenly mt-6 border-b-2 border-secondaryDark pb-6'>
+          <TouchableOpacity
+            onPress={() => {
+              likePost.mutate(postId);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+          >
             <PostStat
               icon={
-                <Heart size={18} weight='fill' color={COLORS.tertiaryDark} />
+                <Heart
+                  size={18}
+                  weight='fill'
+                  color={
+                    data.post.likes?.find((like) => like.userId === user.id)
+                      ? COLORS.accent
+                      : COLORS.tertiaryDark
+                  }
+                />
               }
               stat={data.post.likes?.length}
             />
@@ -114,21 +156,31 @@ export default function PostScreen({ route }: { route: any }) {
           <ScrollView className='flex-1'>
             {data.post.comments?.map((comment) => (
               <View
-                className='flex-row w-full my-4 border-b-2 py-6 border-secondaryDark'
+                className='flex-row w-full my-4 border-b-2 py-6 border-secondaryDark items-center'
                 key={comment.id}
               >
-                <View className='w-6 h-6 rounded-full overflow-hidden mr-2'>
-                  <Image
-                    source={{
-                      uri: comment.user?.images[0],
-                    }}
-                    className='object-cover w-full h-full'
-                  />
-                </View>
-                <View className='flex-col'>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('Profile', {
+                      user: comment.user,
+                    });
+                  }}
+                  className='flex-row items-center'
+                >
+                  <View className='w-6 h-6 rounded-full overflow-hidden mr-2'>
+                    <Image
+                      source={{
+                        uri: comment.user?.images[0],
+                      }}
+                      className='object-cover w-full h-full'
+                    />
+                  </View>
+
                   <Text className='text-white font-ProstoOne text-sm'>
                     {comment.user?.firstName} {comment.user?.lastName}
                   </Text>
+                </TouchableOpacity>
+                <View className='flex-col'>
                   <Text className='text-secondaryWhite font-MontserratRegular'>
                     {comment.content}
                   </Text>

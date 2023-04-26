@@ -90,9 +90,9 @@ export default function App() {
         >
           <Routes socket={socket} />
           <NotificationHandler />
-          {__DEV__ && (
+          {/* {__DEV__ && (
             <Button onPress={logStoredTime} title='Check Stored Time' />
-          )}
+          )} */}
         </NavigationContainer>
       </AuthProvider>
     </QueryClientProvider>

@@ -26,12 +26,12 @@ export const useAuthState = () => {
 
       setUser(user);
       setIsLoadingAuth(false);
-    } else if (!isLoading && !user && token) {
-      // Token exists, but user doesn't
+    } else if (!isLoading && !user) {
       setIsLoadingAuth(false);
-      setIsVerified(false);
-    } else if (!isLoading && !user && !token) {
-      setIsLoadingAuth(false);
+    }
+
+    if (isLoading || isError) {
+      setIsLoadingAuth(true);
     }
 
     if (socket) setSocket(socket);

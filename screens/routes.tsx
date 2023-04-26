@@ -26,13 +26,12 @@ const Stack = createNativeStackNavigator();
 export default function Routes({ socket }: { socket: any }) {
   const { isVerified, setIsVerified, isLoadingAuth, token, isTokenChecked } =
     useAuthState();
+
   const { setSocket, user, setCanAnswerPrompt, setPrompt } = useAuth();
 
-  // saving socket to context inititally
   useEffect(() => {
     setSocket(socket);
 
-    // i want to check if the most recent userPrompts was answered yet
     if (user && isVerified) {
       const lastPrompt = getMostRecentPrompt(user);
       console.log('lastPrompt', lastPrompt);
@@ -56,7 +55,6 @@ export default function Routes({ socket }: { socket: any }) {
     }
   }, [user, socket, setCanAnswerPrompt, setPrompt, setSocket, token]);
 
-  // deleteItemAsync('token');
   if (isLoadingAuth || (token && !isTokenChecked)) {
     return <Loading />;
   }

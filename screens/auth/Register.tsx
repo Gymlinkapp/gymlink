@@ -30,10 +30,8 @@ export default function RegisterScreen({ navigation }) {
     },
   });
   const sendSMS = useMutation(
-    async () => {
+    async (phoneNumber: string) => {
       setPhoneNumber(phoneNumber);
-
-      console.log(phoneNumber);
       try {
         return await api.post(
           '/auth/sendsms',
@@ -63,7 +61,7 @@ export default function RegisterScreen({ navigation }) {
   );
 
   const onSubmit = async (data: z.infer<typeof phoneNumberSchema>) => {
-    return await sendSMS.mutateAsync();
+    return await sendSMS.mutateAsync(data.callingCode + data.phoneNumber);
     // mutation.mutate({
     //   phoneNumber: data.callingCode + data.phoneNumber,
     // });

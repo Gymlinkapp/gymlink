@@ -69,7 +69,7 @@ const userDetailsSchema = z.object({
   bio: z.string().min(1).max(1000),
   email: z.string().email(),
   age: z.number().min(16).max(100),
-  password: z.string().min(8).max(100),
+  password: z.string(),
   // race: z.string().min(1).max(20),
   // gender: z.string().min(1).max(20),
 });

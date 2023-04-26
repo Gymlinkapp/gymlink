@@ -26,6 +26,7 @@ import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 import { MapPin, NavigationArrow } from 'phosphor-react-native';
 import { transformTag } from '../utils/transformTags';
 import { DisplayGymName } from '../utils/displayGymName';
+import PromptCountdown from '../components/PromptCountdown';
 
 export default function HomeScreen({ navigation, route }) {
   const LIMIT = 9;
@@ -99,30 +100,35 @@ export default function HomeScreen({ navigation, route }) {
 
       {/* <Filters /> */}
       {prompt && canAnswerPrompt && (
-        <View className=' z-50 border-[1px] border-dashed border-tertiaryDark rounded-3xl'>
-          <View className='px-6 pt-4'>
-            <Text className='font-ProstoOne text-tertiaryDark'>
-              Let people know your Vibe
-            </Text>
-            <Text className='font-ProstoOne text-white'>{prompt.prompt}</Text>
-
-            <TextInput
-              className='w-full p-4 bg-secondaryDark rounded-md mt-4 font-MontserratMedium text-white'
-              onChangeText={(text) => setUserPromptAnswer(text)}
-            />
+        <View className='z-50 bg-transparent'>
+          <View className='w-full flex-row justify-end mb-2'>
+            <PromptCountdown />
           </View>
+          <View className='border-[1px] border-dashed border-tertiaryDark rounded-3xl'>
+            <View className='px-6 pt-4'>
+              <Text className='font-ProstoOne text-tertiaryDark'>
+                Let people know your Vibe
+              </Text>
+              <Text className='font-ProstoOne text-white'>{prompt.prompt}</Text>
 
-          <TouchableOpacity
-            className='w-full border-t-[1px] border-secondaryDark items-center mt-4 py-4'
-            onPress={() => {
-              answerPromptMutation.mutate(userPromptAnswer);
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-            }}
-          >
-            <Text className='font-ProstoOne text-white'>Share</Text>
-          </TouchableOpacity>
+              <TextInput
+                className='w-full p-4 bg-secondaryDark rounded-md mt-4 font-MontserratMedium text-white'
+                onChangeText={(text) => setUserPromptAnswer(text)}
+              />
+            </View>
+
+            <TouchableOpacity
+              className='w-full border-t-[1px] border-secondaryDark items-center mt-4 py-4'
+              onPress={() => {
+                answerPromptMutation.mutate(userPromptAnswer);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success
+                );
+              }}
+            >
+              <Text className='font-ProstoOne text-white'>Share</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
       <FlatList

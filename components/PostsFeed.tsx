@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { ChatText, Eye, Heart, Plus } from 'phosphor-react-native';
 import { COLORS } from '../utils/colors';
@@ -7,9 +7,10 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../utils/context';
 import FeedLoading from './FeedLoading';
 import Loading from './Loading';
-import { Post } from '../utils/types/posts';
+import { Comment, Like, Post, View as TView } from '../utils/types/posts';
+import { Gym } from '../utils/types/gym';
 
-const PostStat = ({
+export const PostStat = ({
   icon,
   stat,
 }: {
@@ -48,6 +49,10 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     if (data.posts.length < LIMIT) return;
     setOffset((prevOffset) => prevOffset + LIMIT);
   };
+
+  if (!posts.length) {
+    <Text>No Posts</Text>;
+  }
   return (
     <View className='z-50 px-6 py-12 relative'>
       <TouchableOpacity className='bg-accent w-16 h-16 rounded-full justify-center items-center absolute top-[65%] right-5 z-50'>
@@ -67,64 +72,74 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
         }
         onEndReachedThreshold={0.1}
         data={posts}
-        renderItem={({ item: post }: { item: Post }) => (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Post', { id: post.id });
-            }}
-            className='bg-secondaryDark rounded-3xl p-4 mb-4'
-            activeOpacity={1}
-          >
-            <View className='flex-row  items-center mb-2'>
-              <View className='flex-row items-center'>
-                <View className='w-6 h-6 bg-tertiaryDark rounded-full mr-2' />
-                <Text className='text-white text-md font-ProstoOne'>Name</Text>
+        renderItem={({ item: post }: { item: Post }) => {
+          return (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Post', { postId: post.id });
+              }}
+              className='bg-secondaryDark rounded-3xl p-4 mb-4'
+              activeOpacity={1}
+            >
+              <View className='flex-row  items-center mb-2'>
+                <View className='flex-row items-center'>
+                  <View className='w-8 h-8 rounded-full overflow-hidden mr-2'>
+                    <Image
+                      source={{
+                        uri: post.user.images[0],
+                      }}
+                      className='object-cover w-full h-full'
+                    />
+                  </View>
+                  <Text className='text-white text-base font-ProstoOne'>
+                    {post.user.firstName}
+                  </Text>
+                </View>
+                <Text className='text-tertiaryDark text-xs font-MontserratRegular ml-auto'>
+                  {new Date(post.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </Text>
               </View>
-              <Text className='text-tertiaryDark text-xs font-MontserratRegular ml-auto'>
-                {new Date(post.createdAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </Text>
-            </View>
-            <View>
-              <Text className='text-white font-MontserratRegular'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              </Text>
-            </View>
-            <View className='w-full flex-row justify-evenly mt-6'>
-              <TouchableOpacity>
+              <View>
+                <Text className='text-secondaryWhite font-MontserratRegular leading-5'>
+                  {post.content}
+                </Text>
+              </View>
+              <View className='w-full flex-row justify-evenly mt-6'>
+                <TouchableOpacity>
+                  <PostStat
+                    icon={
+                      <Heart
+                        size={18}
+                        weight='fill'
+                        color={COLORS.tertiaryDark}
+                      />
+                    }
+                    stat={post.likes?.length}
+                  />
+                </TouchableOpacity>
                 <PostStat
                   icon={
-                    <Heart
+                    <Eye size={18} weight='fill' color={COLORS.tertiaryDark} />
+                  }
+                  stat={post.views?.length}
+                />
+                <PostStat
+                  icon={
+                    <ChatText
                       size={18}
                       weight='fill'
                       color={COLORS.tertiaryDark}
                     />
                   }
-                  stat={21}
+                  stat={post.comments?.length}
                 />
-              </TouchableOpacity>
-              <PostStat
-                icon={
-                  <Eye size={18} weight='fill' color={COLORS.tertiaryDark} />
-                }
-                stat={21}
-              />
-              <PostStat
-                icon={
-                  <ChatText
-                    size={18}
-                    weight='fill'
-                    color={COLORS.tertiaryDark}
-                  />
-                }
-                stat={21}
-              />
-            </View>
-          </TouchableOpacity>
-        )}
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );

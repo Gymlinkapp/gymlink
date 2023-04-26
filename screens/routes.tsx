@@ -20,6 +20,7 @@ import EditAccount from './EditAccount';
 import ProfileInfo from './ProfileInfo';
 import { useAuthState } from '../hooks/useAuthState';
 import getMostRecentPrompt from '../utils/getMostRecentPrompt';
+import PostScreen from './PostScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -100,6 +101,14 @@ export default function Routes({ socket }: { socket: any }) {
         name='Notifications'
         component={NotificationScreen}
         initialParams={{ token }}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name='Post'
+        component={PostScreen}
         options={{
           headerShown: false,
         }}

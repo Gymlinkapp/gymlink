@@ -8,7 +8,9 @@ import { useAuth } from '../utils/context';
 import FeedLoading from './FeedLoading';
 import Loading from './Loading';
 import { Comment, Like, Post, View as TView } from '../utils/types/posts';
-import { Gym } from '../utils/types/gym';
+import api from '../utils/axiosStore';
+import { useMutation, useQueryClient } from 'react-query';
+import * as Haptics from 'expo-haptics';
 
 export const PostStat = ({
   icon,
@@ -31,6 +33,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
   const { token, user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [offset, setOffset] = useState(0);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isFetching } = usePosts(token, offset, LIMIT);
 
@@ -39,6 +42,21 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
       setPosts((prevFeed) => [...prevFeed, ...data.posts]);
     }
   }, [isLoading, data, user]);
+
+  const likePost = useMutation(
+    async (postId: string) => {
+      const { data } = await api.post(`/posts/likePost`, {
+        userId: user.id,
+        postId,
+      });
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('posts');
+      },
+    }
+  );
 
   if (isLoading) {
     return <FeedLoading />;
@@ -108,13 +126,24 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                 </Text>
               </View>
               <View className='w-full flex-row justify-evenly mt-6'>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    likePost.mutate(post.id);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                >
                   <PostStat
                     icon={
                       <Heart
                         size={18}
                         weight='fill'
-                        color={COLORS.tertiaryDark}
+                        color={
+                          post.likes?.find(
+                            (like: Like) => like.userId === user.id
+                          )
+                            ? COLORS.accent
+                            : COLORS.tertiaryDark
+                        }
                       />
                     }
                     stat={post.likes?.length}

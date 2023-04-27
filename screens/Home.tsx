@@ -34,15 +34,14 @@ export default function HomeScreen({ navigation, route }) {
         end={[0, 1]}
       />
       <View className='absolute w-full flex-row justify-center top-0 z-50 py-2'>
-        <BlurView
-          intensity={5}
+        <View
           style={{
             overflow: 'hidden',
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
             width: '50%',
-            backgroundColor: COLORS.secondaryDark,
+            backgroundColor: COLORS.primaryDark,
             paddingVertical: 10,
             borderRadius: 999,
             zIndex: 50,
@@ -86,7 +85,7 @@ export default function HomeScreen({ navigation, route }) {
               Explore
             </Text>
           </TouchableOpacity>
-        </BlurView>
+        </View>
       </View>
 
       {/* <Filters /> */}

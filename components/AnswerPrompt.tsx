@@ -27,7 +27,7 @@ export default function AnswerPrompt() {
     }
   );
   return (
-    <View className='z-50 bg-transparent'>
+    <View className='z-50 mt-20 bg-transparent'>
       <View className='w-full flex-row justify-end mb-2'>
         <PromptCountdown />
       </View>

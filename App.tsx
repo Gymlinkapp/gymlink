@@ -33,9 +33,7 @@ console.log(URL);
 export default function App() {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState<any>(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const notificationListener = useRef<any>();
-  const responseListener = useRef<any>();
   const [fontsLoaded] = useFonts({
     MontserratRegular: require('./assets/fonts/Montserrat-Regular.ttf'),
     MontserratMedium: require('./assets/fonts/Montserrat-Medium.ttf'),
@@ -59,13 +57,6 @@ export default function App() {
         notificationListener.current
       );
     };
-  }, []);
-
-  useEffect(() => {
-    if (!__DEV__ && process.env.NODE_ENV !== 'development') {
-      console.log('Scheduling push notifications (not in development mode)');
-      schedulePushNotification();
-    }
   }, []);
 
   if (!fontsLoaded) {
@@ -97,63 +88,6 @@ export default function App() {
       </AuthProvider>
     </QueryClientProvider>
   );
-}
-
-function getRandomTime(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-async function scheduleNotification(notification) {
-  await Notifications.scheduleNotificationAsync(notification);
-}
-
-async function schedulePushNotification() {
-  console.log('Scheduling push notification...'); // Add this line
-
-  const currentDate = new Date();
-  const targetDate = new Date();
-
-  // in a minute
-  // const randomHour = currentDate.getHours();
-  // const randomMinute = currentDate.getMinutes() + 1;
-
-  const randomHour = getRandomTime(13, 20); // 7pm - 8pm
-  const randomMinute = getRandomTime(0, 59);
-
-  console.log('Random hour:', randomHour); // Add this line
-  console.log('Random minute:', randomMinute); // Add this line
-
-  targetDate.setHours(randomHour);
-  targetDate.setMinutes(randomMinute);
-  targetDate.setSeconds(0);
-
-  // If the current time is past the random time, schedule for the next day
-  if (currentDate > targetDate) {
-    targetDate.setDate(targetDate.getDate() + 1);
-  }
-
-  const secondsUntilTarget = Math.floor(
-    (targetDate.getTime() - currentDate.getTime()) / 1000
-  );
-
-  if (!__DEV__ && process.env.NODE_ENV !== 'development') {
-    const { data } = await api.get('/social/generatePrompt');
-
-    const prompt = data.prompt;
-    const notification = {
-      content: {
-        title: '?',
-        body: prompt,
-        data: { actionId: 'open_home' },
-      },
-      trigger: { seconds: secondsUntilTarget, repeats: true },
-    };
-    await Notifications.scheduleNotificationAsync(notification);
-  }
-
-  // Store the randomHour and randomMinute values
-  await setItemAsync('randomHour', randomHour.toString());
-  await setItemAsync('randomMinute', randomMinute.toString());
 }
 
 async function registerForPushNotificationsAsync() {

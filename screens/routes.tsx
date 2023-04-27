@@ -25,8 +25,14 @@ import PostScreen from './PostScreen';
 const Stack = createNativeStackNavigator();
 
 export default function Routes({ socket }: { socket: any }) {
-  const { isVerified, setIsVerified, isLoadingAuth, token, isTokenChecked } =
-    useAuthState();
+  const {
+    isVerified,
+    setIsVerified,
+    isLoadingAuth,
+    token,
+    isTokenChecked,
+    showLoading,
+  } = useAuthState();
 
   const { setSocket, user, setCanAnswerPrompt, setPrompt } = useAuth();
 
@@ -56,7 +62,7 @@ export default function Routes({ socket }: { socket: any }) {
     }
   }, [user, socket, setCanAnswerPrompt, setPrompt, setSocket, token]);
 
-  if (isLoadingAuth || (token && !isTokenChecked)) {
+  if (showLoading) {
     return <Loading />;
   }
 
@@ -73,7 +79,7 @@ export default function Routes({ socket }: { socket: any }) {
     );
   }
 
-  if (!token || !isTokenChecked) {
+  if (!token) {
     return (
       <Stack.Navigator>
         <Stack.Screen

@@ -10,6 +10,8 @@ export const useAuthState = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isTokenChecked, setIsTokenChecked] = useState(false);
+  const [showLoading, setShowLoading] = useState(true);
+
   const { data: user, isLoading, isError } = useUser(token);
 
   useEffect(() => {
@@ -18,6 +20,7 @@ export const useAuthState = () => {
         setToken(token);
       }
       setIsTokenChecked(true);
+      setShowLoading(false);
     });
 
     if (!isLoading && user) {
@@ -26,7 +29,7 @@ export const useAuthState = () => {
 
       setUser(user);
       setIsLoadingAuth(false);
-    } else if (!isLoading && !user) {
+    } else if (!isLoading && !user && isTokenChecked) {
       setIsLoadingAuth(false);
     }
 
@@ -35,7 +38,7 @@ export const useAuthState = () => {
     }
 
     if (socket) setSocket(socket);
-  }, [token, user, isLoading, socket]);
+  }, [token, user, isLoading, isTokenChecked, socket]);
 
   return {
     isVerified,
@@ -44,5 +47,6 @@ export const useAuthState = () => {
     isLoadingAuth,
     token,
     isTokenChecked,
+    showLoading,
   };
 };

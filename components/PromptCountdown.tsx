@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
-import { getItemAsync } from 'expo-secure-store';
 
 const PromptCountdown = () => {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
   useEffect(() => {
-    const calculateTimeRemaining = async () => {
-      const randomHour = await getItemAsync('randomHour');
-      const randomMinute = await getItemAsync('randomMinute');
-
+    const calculateTimeRemaining = () => {
       const currentDate = new Date();
-      const targetDate = new Date();
-
-      targetDate.setHours(Number(randomHour));
-      targetDate.setMinutes(Number(randomMinute));
-      targetDate.setSeconds(0);
+      const targetDate = new Date(
+        currentDate.toISOString().split('T')[0] + 'T17:00:00.000Z'
+      );
 
       if (currentDate > targetDate) {
         targetDate.setDate(targetDate.getDate() + 1);

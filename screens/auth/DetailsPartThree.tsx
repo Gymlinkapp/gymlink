@@ -66,6 +66,7 @@ export default function InitialUserDetailsPartThree({ route, navigation }) {
             age: age,
             email: data.email,
             gender: gender.toLowerCase(),
+            phoneNumber: phoneNumber || null,
           },
           {
             headers: {

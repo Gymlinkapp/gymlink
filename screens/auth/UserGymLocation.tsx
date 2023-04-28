@@ -14,14 +14,11 @@ import { z } from 'zod';
 import Button from '../../components/button';
 import { COLORS } from '../../utils/colors';
 import api from '../../utils/axiosStore';
-import { useEffect, useState } from 'react';
-import { getItemAsync } from 'expo-secure-store';
+import { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../utils/context';
 import { useMutation, useQueryClient } from 'react-query';
 import AuthLayout from '../../layouts/AuthLayout';
-import useLocation from '../../hooks/useLocation';
-import * as Location from 'expo-location';
 
 const userGymLocationSchema = z.object({
   // experience: z.string().min(1).max(20),
@@ -34,26 +31,9 @@ const userGymLocationSchema = z.object({
 });
 
 export default function UserGymLocation({ navigation }) {
-  const { promptForPermission, permissionStatus } = useLocation();
   const [nearGyms, setNearGyms] = useState([]);
-  const { token, setLat, setLong, long, lat } = useAuth();
+  const { token, long, lat } = useAuth();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (permissionStatus === 'denied' || permissionStatus === 'undetermined') {
-      promptForPermission();
-    }
-
-    if (permissionStatus === 'granted') {
-      (async () => {
-        const { coords } = await Location.getCurrentPositionAsync();
-
-        const { latitude, longitude } = coords;
-        setLat(latitude);
-        setLong(longitude);
-      })();
-    }
-  }, [permissionStatus]);
 
   const {
     handleSubmit,
@@ -291,19 +271,13 @@ export default function UserGymLocation({ navigation }) {
               )}
             />
           </ScrollView>
-          {!long || !lat ? (
-            <Button
-              variant='primary'
-              isLoading={saveUserGymLocation.isLoading || !location}
-              onPress={handleSubmit(onSubmit)}
-            >
-              Continue
-            </Button>
-          ) : (
-            <Button variant='primary' onPress={() => promptForPermission()}>
-              Retry
-            </Button>
-          )}
+          <Button
+            variant='primary'
+            isLoading={saveUserGymLocation.isLoading || !location}
+            onPress={handleSubmit(onSubmit)}
+          >
+            Continue
+          </Button>
         </KeyboardAvoidingView>
       )}
     </AuthLayout>

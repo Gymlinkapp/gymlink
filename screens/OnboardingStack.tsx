@@ -12,6 +12,9 @@ import { useAuth } from '../utils/context';
 import CreateSplit from './auth/CreateGymSplit';
 import AssignExcercise from './auth/AssignExcercise';
 import { AUTH_STEPS } from '../utils/users';
+import InitialUserDetailsPartTwo from './auth/DetailsPartTwo';
+import InitialUserDetailsPartThree from './auth/DetailsPartThree';
+import DiscloseLocationScreen from './auth/DiscloseLocationScreen';
 
 // create a proper type for above object so I can access it by `stepToScreen.Register` instead of `stepToScreen[0]`
 type StepToScreen = {
@@ -23,7 +26,7 @@ export const stepToScreen: StepToScreen = {
   1: 'OTPScreen',
   2: 'InitialUserDetails',
   3: 'UserImageUpload',
-  4: 'UserGymLocation',
+  4: 'UserDiscloseLocation',
   5: 'UserGymSplit',
   6: 'UserFavoriteMovements',
   7: 'EmailLoginScreen',
@@ -69,6 +72,20 @@ export default function OnboardingStack({ navigation, route }) {
         }}
       />
       <AuthStack.Screen
+        name={'InitialUserDetailsPartTwo'}
+        component={InitialUserDetailsPartTwo}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <AuthStack.Screen
+        name={'InitialUserDetailsPartThree'}
+        component={InitialUserDetailsPartThree}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <AuthStack.Screen
         name={stepToScreen[3]}
         component={UserImageUpload}
         options={{
@@ -77,6 +94,13 @@ export default function OnboardingStack({ navigation, route }) {
       />
       <AuthStack.Screen
         name={stepToScreen[4]}
+        component={DiscloseLocationScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <AuthStack.Screen
+        name={'UserGymLocation'}
         component={UserGymLocation}
         options={{
           headerShown: false,

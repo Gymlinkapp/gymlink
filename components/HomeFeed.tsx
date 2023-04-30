@@ -28,11 +28,13 @@ export default function HomeFeed({ navigation }: { navigation: any }) {
   const { data, isLoading, isFetching } = useUsers(token, offset, LIMIT);
 
   useEffect(() => {
-    // if (user) {
-    //   setFilters(defaultFilters);
-    // }
     if (!isLoading && data && data.users) {
-      setFeed((prevFeed) => [...prevFeed, ...data.users]);
+      setFeed((prevFeed) => {
+        const newUsers = data.users.filter(
+          (newUser) => !prevFeed.some((prevUser) => prevUser.id === newUser.id)
+        );
+        return [...prevFeed, ...newUsers];
+      });
     }
   }, [isLoading, data, user]);
 

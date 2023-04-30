@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { setItemAsync } from 'expo-secure-store';
 import { useAuth } from '../../utils/context';
 import AuthLayout from '../../layouts/AuthLayout';
+import OnboardingInput from '../../components/OnboardingInput';
 const userLoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(20),
@@ -86,25 +87,14 @@ export default function EmailLoginScreen({ navigation }) {
                   field: { onChange, onBlur, value },
                   fieldState: { error, isTouched },
                 }) => (
-                  <View className='my-2'>
-                    <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      Email
-                    </Text>
-                    <TextInput
-                      className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                        isTouched && 'border-2 border-tertiaryDark'
-                      }`}
-                      cursorColor={COLORS.mainWhite}
-                      value={value}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                    />
-                    {error && (
-                      <Text className='text-red-500 font-MontserratRegular'>
-                        {error.message}
-                      </Text>
-                    )}
-                  </View>
+                  <OnboardingInput
+                    label='Email'
+                    value={value}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error}
+                    isTouched={isTouched}
+                  />
                 )}
               />
               <Controller
@@ -114,26 +104,16 @@ export default function EmailLoginScreen({ navigation }) {
                   field: { onChange, onBlur, value },
                   fieldState: { error, isTouched },
                 }) => (
-                  <View className='my-2'>
-                    <Text className='text-white py-2 text-l font-MontserratMedium'>
-                      Password
-                    </Text>
-                    <TextInput
-                      secureTextEntry
-                      className={`bg-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium] ${
-                        isTouched && 'border-2 border-tertiaryDark'
-                      }`}
-                      cursorColor={COLORS.mainWhite}
-                      value={value}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                    />
-                    {error && (
-                      <Text className='text-red-500 font-MontserratRegular'>
-                        {error.message}
-                      </Text>
-                    )}
-                  </View>
+                  <OnboardingInput
+                    label='Password'
+                    value={value}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error}
+                    isTouched={isTouched}
+                    // @ts-expect-error -- TSCONVERSION
+                    secureTextEntry
+                  />
                 )}
               />
             </>

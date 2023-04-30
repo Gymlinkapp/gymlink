@@ -69,16 +69,22 @@ export default function RegisterScreen({ navigation }) {
 
   return (
     <SafeAreaView className='justify-between h-full'>
-      <KeyboardAvoidingView className='justify-center mt-20 p-4'>
+      <KeyboardAvoidingView className='justify-center mt-12 p-4'>
         <Controller
           control={control}
           name='phoneNumber'
           rules={{ maxLength: 10 }}
           render={({ field: { onChange, onBlur, value, name } }) => (
             <View>
-              <Text className='text-white font-[MontserratBold] text-l pb-4'>
-                Sign up with your phone number
-              </Text>
+              <View className='pb-12 px-6'>
+                <Text className='text-2xl font-MontserratBold text-primaryWhite'>
+                  Enter your phone number to get started.
+                </Text>
+                <Text className='text-base font-MontserratRegular text-secondaryWhite'>
+                  We will send you a code to verify your phone number and get
+                  started on your account.
+                </Text>
+              </View>
               <PhoneInput
                 onChangeCountry={(country) => {
                   setValue('callingCode', country.callingCode[0]);
@@ -118,6 +124,7 @@ export default function RegisterScreen({ navigation }) {
           variant='primary'
           isLoading={sendSMS.isLoading}
           onPress={handleSubmit(onSubmit)}
+          className='mt-4'
         >
           Send code
         </Button>

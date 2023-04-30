@@ -8,6 +8,7 @@ export default function OnboardingInput({
   error,
   isTouched,
   label,
+  ...props
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -22,6 +23,7 @@ export default function OnboardingInput({
         {label}
       </Text>
       <TextInput
+        {...props}
         className={`border-[1px] border-secondaryDark rounded-md p-4 w-full border-none text-white font-[MontserratMedium]`}
         cursorColor={COLORS.mainWhite}
         value={value}

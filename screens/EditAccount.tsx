@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../utils/context';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import api from '../utils/axiosStore';
 import { SafeAreaView, TextInput, View } from 'react-native';
 import { TouchableOpacity } from 'react-native';
@@ -10,6 +10,7 @@ import Button from '../components/button';
 
 export default function EditAccount({ navigation }: any) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [bio, setBio] = useState(user.bio);
@@ -17,7 +18,8 @@ export default function EditAccount({ navigation }: any) {
   const editAccount = useMutation(
     async () => {
       try {
-        return await api.put(`/dashboardEditUser/${user.id}`, {
+        return await api.post(`/users/update`, {
+          token: user.tempJWT,
           firstName,
           lastName,
           bio,
@@ -28,8 +30,8 @@ export default function EditAccount({ navigation }: any) {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
-        navigation.navigate('Account');
+        queryClient.invalidateQueries('user');
+        navigation.goBack();
       },
     }
   );
@@ -78,6 +80,7 @@ export default function EditAccount({ navigation }: any) {
           />
         </View>
         <Button
+          isLoading={editAccount.isLoading}
           variant='primary'
           className='mt-4'
           onPress={() => {

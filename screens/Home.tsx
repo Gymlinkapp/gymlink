@@ -9,7 +9,7 @@ import { COLORS } from '../utils/colors';
 import HomeFeed from '../components/HomeFeed';
 import AnswerPrompt from '../components/AnswerPrompt';
 import PostsFeed from '../components/PostsFeed';
-import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 
 export default function HomeScreen({ navigation, route }) {
   const { prompt, canAnswerPrompt } = useAuth();
@@ -60,7 +60,10 @@ export default function HomeScreen({ navigation, route }) {
             }}
           />
           <TouchableOpacity
-            onPress={() => setScreen('home')}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setScreen('home');
+            }}
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,
@@ -73,7 +76,10 @@ export default function HomeScreen({ navigation, route }) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setScreen('explore')}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setScreen('explore');
+            }}
             style={{
               paddingVertical: 8,
               paddingHorizontal: 16,

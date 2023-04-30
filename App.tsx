@@ -43,6 +43,9 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
+      // Cancel all scheduled notifications
+      await Notifications.cancelAllScheduledNotificationsAsync();
+
       const token = await registerForPushNotificationsAsync();
       setExpoPushToken(token);
     })();

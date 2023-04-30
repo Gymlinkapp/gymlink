@@ -1,6 +1,12 @@
 import { User } from '../users';
 import { Gym } from './gym';
 
+export let PostTag: {
+  ADVICE: 'ADVICE';
+  QUESTION: 'QUESTION';
+  GENERAL: 'GENERAL';
+};
+
 export type Post = {
   id: string;
   createdAt: Date;
@@ -8,6 +14,7 @@ export type Post = {
   content: string;
   userId: string;
   user: User;
+  tags: typeof PostTag;
 } & {
   user: {
     gym: Gym | null;

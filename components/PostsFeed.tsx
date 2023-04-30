@@ -20,6 +20,11 @@ import { useMutation, useQueryClient } from 'react-query';
 import * as Haptics from 'expo-haptics';
 import Button from './button';
 
+const hexToRGBA = (hex: string, alpha: number) => {
+  const [r, g, b] = hex.match(/\w\w/g).map((x) => parseInt(x, 16));
+  return `rgba(${r},${g},${b},${alpha})`;
+};
+
 export const PostStat = ({
   icon,
   stat,
@@ -50,7 +55,12 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
   useEffect(() => {
     queryClient.invalidateQueries('posts');
     if (!isLoading && data && data.posts) {
-      setPosts((prevFeed) => [...prevFeed, ...data.posts]);
+      setPosts((prevFeed) => {
+        const newUsers = data.posts.filter(
+          (newPost) => !prevFeed.some((prevPost) => prevPost.id === newPost.id)
+        );
+        return [...prevFeed, ...newUsers];
+      });
     }
   }, [isLoading, data, user]);
 
@@ -174,6 +184,23 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
         onEndReachedThreshold={0.1}
         data={posts}
         renderItem={({ item: post }: { item: Post }) => {
+          const transformPostTag = (post: Post) => {
+            const tag = post.tags as unknown as keyof typeof post.tags;
+            return tag.charAt(0) + tag.slice(1).toLowerCase();
+          };
+          const tagColor = (post: Post) => {
+            const tag = post.tags as unknown as keyof typeof post.tags;
+            switch (tag) {
+              case 'ADVICE':
+                return '#724CF9';
+              case 'QUESTION':
+                return '#F9D34C';
+              case 'GENERAL':
+                return '#4CF9CF';
+              default:
+                return '#724CF9';
+            }
+          };
           return (
             <TouchableOpacity
               onPress={() => {
@@ -183,18 +210,35 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
               activeOpacity={1}
             >
               <View className='flex-row  items-center mb-2'>
-                <View className='flex-row items-center'>
-                  <View className='w-8 h-8 rounded-full overflow-hidden mr-2'>
-                    <Image
-                      source={{
-                        uri: post.user.images[0],
-                      }}
-                      className='object-cover w-full h-full'
-                    />
+                <View>
+                  <View className='flex-row items-center'>
+                    <View className='w-8 h-8 rounded-full overflow-hidden mr-2'>
+                      <Image
+                        source={{
+                          uri: post.user.images[0],
+                        }}
+                        className='object-cover w-full h-full'
+                      />
+                    </View>
+                    <Text className='text-white text-base font-ProstoOne'>
+                      {post.user.firstName}
+                    </Text>
                   </View>
-                  <Text className='text-white text-base font-ProstoOne'>
-                    {post.user.firstName}
-                  </Text>
+                  <View
+                    style={{
+                      backgroundColor: hexToRGBA(tagColor(post), 0.25),
+                    }}
+                    className='rounded-full px-2 w-fit py-1 my-2 items-center justify-center'
+                  >
+                    <Text
+                      style={{
+                        color: tagColor(post),
+                      }}
+                      className='font-MontserratRegular text-xs'
+                    >
+                      {transformPostTag(post)}
+                    </Text>
+                  </View>
                 </View>
                 <Text className='text-tertiaryDark text-xs font-MontserratRegular ml-auto'>
                   {new Date(post.createdAt).toLocaleDateString('en-US', {

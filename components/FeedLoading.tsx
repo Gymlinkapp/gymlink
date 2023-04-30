@@ -31,7 +31,7 @@ const card = StyleSheet.create({
   roundedLarge: {
     height: '75%',
     borderRadius: 75,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.35)',
   },
 
   row: {
@@ -43,13 +43,13 @@ const card = StyleSheet.create({
     width: 50,
     marginRight: 10,
     borderRadius: 9999,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.35)',
   },
   pill: {
     height: 50,
     width: 200,
     borderRadius: 9999,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.35)',
   },
   marginRight: {
     marginRight: 2,

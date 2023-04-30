@@ -20,7 +20,25 @@ import { useMutation, useQueryClient } from 'react-query';
 import * as Haptics from 'expo-haptics';
 import Button from './button';
 
-const hexToRGBA = (hex: string, alpha: number) => {
+export const transformPostTag = (post: Post) => {
+  const tag = post.tags as unknown as keyof typeof post.tags;
+  return tag.charAt(0) + tag.slice(1).toLowerCase();
+};
+export const tagColor = (post: Post) => {
+  const tag = post.tags as unknown as keyof typeof post.tags;
+  switch (tag) {
+    case 'ADVICE':
+      return '#724CF9';
+    case 'QUESTION':
+      return '#F9D34C';
+    case 'GENERAL':
+      return '#4CF9CF';
+    default:
+      return '#724CF9';
+  }
+};
+
+export const hexToRGBA = (hex: string, alpha: number) => {
   const [r, g, b] = hex.match(/\w\w/g).map((x) => parseInt(x, 16));
   return `rgba(${r},${g},${b},${alpha})`;
 };
@@ -184,23 +202,6 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
         onEndReachedThreshold={0.1}
         data={posts}
         renderItem={({ item: post }: { item: Post }) => {
-          const transformPostTag = (post: Post) => {
-            const tag = post.tags as unknown as keyof typeof post.tags;
-            return tag.charAt(0) + tag.slice(1).toLowerCase();
-          };
-          const tagColor = (post: Post) => {
-            const tag = post.tags as unknown as keyof typeof post.tags;
-            switch (tag) {
-              case 'ADVICE':
-                return '#724CF9';
-              case 'QUESTION':
-                return '#F9D34C';
-              case 'GENERAL':
-                return '#4CF9CF';
-              default:
-                return '#724CF9';
-            }
-          };
           return (
             <TouchableOpacity
               onPress={() => {
@@ -228,7 +229,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                     style={{
                       backgroundColor: hexToRGBA(tagColor(post), 0.25),
                     }}
-                    className='rounded-full px-2 w-fit py-1 my-2 items-center justify-center'
+                    className='rounded-full px-2 py-1 my-2 items-center justify-center'
                   >
                     <Text
                       style={{

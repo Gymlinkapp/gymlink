@@ -16,7 +16,12 @@ import { useAuth } from '../utils/context';
 import { useMutation, useQueryClient } from 'react-query';
 import { ChatText, Eye, Heart, PaperPlaneRight } from 'phosphor-react-native';
 import { COLORS } from '../utils/colors';
-import { PostStat } from '../components/PostsFeed';
+import {
+  PostStat,
+  hexToRGBA,
+  tagColor,
+  transformPostTag,
+} from '../components/PostsFeed';
 import { usePost } from '../hooks/usePost';
 import Loading from '../components/Loading';
 import * as Progress from 'react-native-progress';
@@ -93,26 +98,43 @@ export default function PostScreen({
       style={{ flex: 1 }}
     >
       <SafeAreaView className='mx-8 flex-1'>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Profile', {
-              user: data.post.user,
-            });
-          }}
-          className='my-8'
-        >
-          <View className='w-12 h-12 rounded-full overflow-hidden mr-2'>
-            <Image
-              source={{
-                uri: data.post.user.images[0],
+        <View className='flex-col'>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Profile', {
+                user: data.post.user,
+              });
+            }}
+            className='my-8'
+          >
+            <View className='w-12 h-12 rounded-full overflow-hidden mr-2'>
+              <Image
+                source={{
+                  uri: data.post.user.images[0],
+                }}
+                className='object-cover w-full h-full'
+              />
+            </View>
+            <Text className='text-white font-ProstoOne text-xl'>
+              {data.post.user.firstName} {data.post.user.lastName}
+            </Text>
+          </TouchableOpacity>
+          <View
+            style={{
+              backgroundColor: hexToRGBA(tagColor(data.post), 0.25),
+            }}
+            className='rounded-full px-2 py-1 mb-2 items-center justify-center w-1/4'
+          >
+            <Text
+              style={{
+                color: tagColor(data.post),
               }}
-              className='object-cover w-full h-full'
-            />
+              className='font-MontserratRegular text-xs'
+            >
+              {transformPostTag(data.post)}
+            </Text>
           </View>
-          <Text className='text-white font-ProstoOne text-xl'>
-            {data.post.user.firstName} {data.post.user.lastName}
-          </Text>
-        </TouchableOpacity>
+        </View>
 
         <Text className='text-secondaryWhite font-MontserratRegular'>
           {data.post.content}

@@ -19,13 +19,15 @@
     "ios": {
       "supportsTablet": true,
       "buildNumber": "42",
-      "bundleIdentifier": "com.devdylan.gymlink-app"
+      "bundleIdentifier": "com.devdylan.gymlink-app",
+      "infoPlist": ""
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.devdylan.gymlink"
     },
     "extra": {
       "eas": {
@@ -39,7 +41,13 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location. This will give you a tailored experience and allow $(PRODUCT_NAME) to display nearby gyms and potential like-minded gym goers on your feed."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "$(PRODUCT_NAME) will display your selected photos to other users on their feed. This will give you a tailored experience and allow $(PRODUCT_NAME) to display nearby gyms and potential like-minded gym goers on your feed."
         }
       ]
     ]

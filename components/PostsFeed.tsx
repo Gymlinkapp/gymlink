@@ -10,7 +10,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { ChatText, Eye, Flag, Heart, Plus } from "phosphor-react-native";
 import { COLORS } from "../utils/colors";
 import { usePosts } from "../hooks/usePosts";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../utils/context";
 import FeedLoading from "./FeedLoading";
 import Loading from "./Loading";
@@ -19,6 +19,7 @@ import api from "../utils/axiosStore";
 import { useMutation, useQueryClient } from "react-query";
 import * as Haptics from "expo-haptics";
 import Button from "./button";
+import Spinner from "./Spinner";
 
 export const transformPostTag = (post: Post) => {
   const tag = post.tags as unknown as keyof typeof post.tags;
@@ -60,27 +61,42 @@ export const PostStat = ({
   );
 };
 export default function PostsFeed({ navigation }: { navigation: any }) {
-  const LIMIT = 10;
-  const { token, user } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [offset, setOffset] = useState(0);
+  const { user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [postContent, setPostContent] = useState("");
+  const [flaggedPostId, setFlaggedPostId] = useState("");
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isFetching } = usePosts(token, offset, LIMIT);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = usePosts(user.id);
 
-  useEffect(() => {
-    queryClient.invalidateQueries("posts");
-    if (!isLoading && data && data.posts) {
-      setPosts((prevFeed) => {
-        const newUsers = data.posts.filter(
-          (newPost) => !prevFeed.some((prevPost) => prevPost.id === newPost.id)
-        );
-        return [...prevFeed, ...newUsers];
+  const allPosts = React.useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.posts);
+  }, [data]);
+  const flagPost = useMutation(
+    async (postId: string) => {
+      const { data } = await api.post(`/posts/flagPost`, {
+        userId: user.id,
+        postId,
       });
+      return data;
+    },
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries("posts");
+      },
     }
-  }, [isLoading, data, user]);
+  );
+
+  console.log("allPosts", allPosts);
 
   const likePost = useMutation(
     async (postId: string) => {
@@ -91,7 +107,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
       return data;
     },
     {
-      onSuccess: (data) => {
+      onSettled: (data) => {
         queryClient.invalidateQueries("posts");
       },
     }
@@ -106,7 +122,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
       return data;
     },
     {
-      onSuccess: (data) => {
+      onSettled: (data) => {
         setModalVisible(false);
         queryClient.invalidateQueries("posts");
       },
@@ -117,13 +133,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     return <FeedLoading />;
   }
 
-  const fetchMore = () => {
-    if (isLoading || isFetching) return;
-    if (data.posts.length < LIMIT) return;
-    setOffset((prevOffset) => prevOffset + LIMIT);
-  };
-
-  if (!posts.length) {
+  if (!allPosts.length) {
     <Text>No Posts</Text>;
   }
   return (
@@ -195,12 +205,20 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
         removeClippedSubviews
         keyExtractor={(item, idx) => `${item.id}_${idx}`}
         showsVerticalScrollIndicator={false}
-        onEndReached={fetchMore}
-        ListFooterComponent={() =>
-          isLoading || isFetching ? <Loading /> : <Text>No more Users</Text>
-        }
-        onEndReachedThreshold={0.1}
-        data={posts}
+        onEndReached={() => {
+          console.log("hasNextPage:", hasNextPage);
+          console.log("isFetchingNextPage:", isFetchingNextPage);
+
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+          console.log("reached end");
+        }}
+        ListFooterComponent={() => {
+          return isFetchingNextPage ? <Loading /> : null;
+        }}
+        onEndReachedThreshold={0.5}
+        data={allPosts}
         renderItem={({ item: post }: { item: Post }) => {
           return (
             <TouchableOpacity
@@ -212,33 +230,46 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
             >
               <View className="flex-row justify-between items-center mb-2">
                 <View className="flex-col w-full justify-between">
-                  <View className="w-8 h-8 rounded-full overflow-hidden mr-2">
-                    <Image
-                      source={{
-                        uri: post.user.images[0],
-                      }}
-                      className="object-cover w-full h-full"
-                    />
-                  </View>
-                <View className="flex-row w-full justify-between">
-                  <Text className="text-white text-base font-ProstoOne">
-                    {post.user.firstName}
-                  </Text>
+                  <View className="flex-row w-full justify-between items-center">
+                    <View className="flex-row items-center">
+                      <View className="w-8 h-8 rounded-full overflow-hidden mr-2">
+                        <Image
+                          source={{
+                            uri: post.user?.images[0],
+                          }}
+                          className="object-cover w-full h-full"
+                        />
+                      </View>
+                      <Text className="text-white text-base font-ProstoOne">
+                        {post.user?.firstName}
+                      </Text>
+                    </View>
 
-                  <View className="flex-row items-center">
-                  <Text className="text-tertiaryDark text-xs font-MontserratRegular pr-4">
-                    {new Date(post.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </Text>
-                    <Flag
-                      size={20}
-                      color={COLORS.secondaryWhite}
-                      weight="bold"
-                    />
+                    <View className="flex-row items-center">
+                      <Text className="text-tertiaryDark text-xs font-MontserratRegular pr-4">
+                        {new Date(post.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          flagPost.mutate(post.id);
+                          setFlaggedPostId(post.id);
+                        }}
+                      >
+                        {flagPost.isLoading && flaggedPostId === post.id ? (
+                          <Spinner />
+                        ) : (
+                          <Flag
+                            size={20}
+                            color={COLORS.secondaryWhite}
+                            weight="fill"
+                          />
+                        )}
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
                   <View
                     style={{
                       backgroundColor: hexToRGBA(tagColor(post), 0.25),
@@ -251,7 +282,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                       }}
                       className="font-MontserratRegular text-xs"
                     >
-                      {transformPostTag(post)}
+                      {post.tags && transformPostTag(post)}
                     </Text>
                   </View>
                 </View>

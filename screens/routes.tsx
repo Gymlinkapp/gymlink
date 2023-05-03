@@ -12,7 +12,6 @@ import { useUser } from '../hooks/useUser';
 import { useAuth } from '../utils/context';
 import Loading from '../components/Loading';
 import ProfileScreen from './Profile';
-import { AUTH_STEPS } from '../utils/users';
 import EditSplit from './EditSplit';
 import AssignExcercise from './auth/AssignExcercise';
 import CreateSplit from './auth/CreateGymSplit';
@@ -38,8 +37,8 @@ export default function Routes({ socket }: { socket: any }) {
 
   useEffect(() => {
     setSocket(socket);
-
-    if (user && isVerified) {
+      const isTestUser = user?.email === 'barbrajanson@gmail.com'
+    if (user && isVerified && !isTestUser) {
       const lastPrompt = getMostRecentPrompt(user);
       console.log('lastPrompt', lastPrompt);
       if (lastPrompt && lastPrompt.hasAnswered === false) {

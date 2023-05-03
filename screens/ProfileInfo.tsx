@@ -55,7 +55,10 @@ export default function ProfileInfo({
     queryClient.invalidateQueries('user');
   }, []);
 
+  const isTestUser = user.email === 'barbrajanson@gmail.com' || user.email === 'dominicwalsh@gmail.com';
+
   useEffect(() => {
+    if (isTestUser) return;
     if (user.userPrompts.length < 1) return;
     if (user.id !== currUser?.id) {
       const lastPrompt = getMostRecentPrompt(user);
@@ -120,7 +123,9 @@ export default function ProfileInfo({
       </View>
       <ScrollView className='mt-2 mb-52'>
         <View className='my-4'>
-          <UserPrompt answer={recentPrompt} prompt={prompt.prompt} />
+          {!isTestUser && (
+            <UserPrompt answer={recentPrompt} prompt={prompt.prompt} />
+          )}
         </View>
         <ProfileInfoSection title='About'>
           <Text className='text-md text-secondaryWhite font-MontserratRegular'>

@@ -31,6 +31,7 @@ import { User } from '../utils/users';
 import * as Progress from 'react-native-progress';
 import { COLORS } from '../utils/colors';
 import { DisplayGymName } from '../utils/displayGymName';
+import Spinner from '../components/Spinner';
 
 export function ProfileHeader({
   user,
@@ -260,12 +261,7 @@ export default function ProfileScreen({
                       </Text>
                     </View>
                     {gymLoading ? (
-                      <Progress.Circle
-                        size={18}
-                        indeterminate={true}
-                        color={COLORS.mainWhite}
-                        shouldRasterizeIOS
-                      />
+                      <Spinner />
                     ) : (
                       <View className='flex-row items-center mb-6'>
                         <MapPin color='#CCC9C9' weight='regular' size={16} />
@@ -315,12 +311,7 @@ export default function ProfileScreen({
                   >
                     <>
                       {createLink.isLoading ? (
-                        <Progress.Circle
-                          size={18}
-                          indeterminate={true}
-                          color={COLORS.mainWhite}
-                          shouldRasterizeIOS
-                        />
+                        <Spinner />
                       ) : (
                         <PaperPlaneRight
                           color='#CCC9C9'

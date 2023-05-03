@@ -15,6 +15,7 @@ export type Post = {
   userId: string;
   user: User;
   tags: typeof PostTag;
+  isFlagged: boolean;
 } & {
   user: {
     gym: Gym | null;

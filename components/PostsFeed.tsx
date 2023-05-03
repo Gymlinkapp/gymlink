@@ -5,20 +5,21 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-import { ChatText, Eye, Heart, Plus } from 'phosphor-react-native';
-import { COLORS } from '../utils/colors';
-import { usePosts } from '../hooks/usePosts';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../utils/context';
-import FeedLoading from './FeedLoading';
-import Loading from './Loading';
-import { Comment, Like, Post, View as TView } from '../utils/types/posts';
-import api from '../utils/axiosStore';
-import { useMutation, useQueryClient } from 'react-query';
-import * as Haptics from 'expo-haptics';
-import Button from './button';
+} from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { ChatText, Eye, Flag, Heart, Plus } from "phosphor-react-native";
+import { COLORS } from "../utils/colors";
+import { usePosts } from "../hooks/usePosts";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../utils/context";
+import FeedLoading from "./FeedLoading";
+import Loading from "./Loading";
+import { Comment, Like, Post, View as TView } from "../utils/types/posts";
+import api from "../utils/axiosStore";
+import { useMutation, useQueryClient } from "react-query";
+import * as Haptics from "expo-haptics";
+import Button from "./button";
+import Spinner from "./Spinner";
 
 export const transformPostTag = (post: Post) => {
   const tag = post.tags as unknown as keyof typeof post.tags;
@@ -27,14 +28,14 @@ export const transformPostTag = (post: Post) => {
 export const tagColor = (post: Post) => {
   const tag = post.tags as unknown as keyof typeof post.tags;
   switch (tag) {
-    case 'ADVICE':
-      return '#724CF9';
-    case 'QUESTION':
-      return '#F9D34C';
-    case 'GENERAL':
-      return '#4CF9CF';
+    case "ADVICE":
+      return "#724CF9";
+    case "QUESTION":
+      return "#F9D34C";
+    case "GENERAL":
+      return "#4CF9CF";
     default:
-      return '#724CF9';
+      return "#724CF9";
   }
 };
 
@@ -51,36 +52,51 @@ export const PostStat = ({
   stat: string | number;
 }) => {
   return (
-    <View className='flex-row items-center'>
+    <View className="flex-row items-center">
       {icon}
-      <Text className='text-secondaryWhite text-xs ml-2 font-ProstoOne'>
+      <Text className="text-secondaryWhite text-xs ml-2 font-ProstoOne">
         {stat}
       </Text>
     </View>
   );
 };
 export default function PostsFeed({ navigation }: { navigation: any }) {
-  const LIMIT = 10;
-  const { token, user } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [offset, setOffset] = useState(0);
+  const { user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
-  const [postContent, setPostContent] = useState('');
+  const [postContent, setPostContent] = useState("");
+  const [flaggedPostId, setFlaggedPostId] = useState("");
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isFetching } = usePosts(token, offset, LIMIT);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = usePosts(user.id);
 
-  useEffect(() => {
-    queryClient.invalidateQueries('posts');
-    if (!isLoading && data && data.posts) {
-      setPosts((prevFeed) => {
-        const newUsers = data.posts.filter(
-          (newPost) => !prevFeed.some((prevPost) => prevPost.id === newPost.id)
-        );
-        return [...prevFeed, ...newUsers];
+  const allPosts = React.useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.posts);
+  }, [data]);
+  const flagPost = useMutation(
+    async (postId: string) => {
+      const { data } = await api.post(`/posts/flagPost`, {
+        userId: user.id,
+        postId,
       });
+      return data;
+    },
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries("posts");
+      },
     }
-  }, [isLoading, data, user]);
+  );
+
+  console.log("allPosts", allPosts);
 
   const likePost = useMutation(
     async (postId: string) => {
@@ -91,8 +107,8 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
       return data;
     },
     {
-      onSuccess: (data) => {
-        queryClient.invalidateQueries('posts');
+      onSettled: (data) => {
+        queryClient.invalidateQueries("posts");
       },
     }
   );
@@ -106,9 +122,9 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
       return data;
     },
     {
-      onSuccess: (data) => {
+      onSettled: (data) => {
         setModalVisible(false);
-        queryClient.invalidateQueries('posts');
+        queryClient.invalidateQueries("posts");
       },
     }
   );
@@ -117,43 +133,37 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     return <FeedLoading />;
   }
 
-  const fetchMore = () => {
-    if (isLoading || isFetching) return;
-    if (data.posts.length < LIMIT) return;
-    setOffset((prevOffset) => prevOffset + LIMIT);
-  };
-
-  if (!posts.length) {
+  if (!allPosts.length) {
     <Text>No Posts</Text>;
   }
   return (
-    <View className='z-40 px-6 py-12 relative'>
+    <View className="z-40 px-6 py-12 relative">
       <TouchableOpacity
         onPress={() => {
           setModalVisible(true);
         }}
-        className='bg-accent w-16 h-16 rounded-full justify-center items-center absolute top-[75%] right-5 z-50'
+        className="bg-accent w-16 h-16 rounded-full justify-center items-center absolute top-[75%] right-5 z-50"
       >
-        <Plus color='#fff' size={21} weight='fill' />
+        <Plus color="#fff" size={21} weight="fill" />
       </TouchableOpacity>
-      <Text className='text-white text-2xl font-ProstoOne my-4'>Explore</Text>
-      <Modal animationType='slide' transparent={true} visible={modalVisible}>
-        <View className='flex-1 justify-end items-end w-full'>
-          <View className='bg-primaryDark  w-full h-3/4 p-12 rounded-3xl border-[0.5px] border-secondaryDark'>
-            <Text className='text-white text-2xl font-ProstoOne mb-4'>
+      <Text className="text-white text-2xl font-ProstoOne my-4">Explore</Text>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View className="flex-1 justify-end items-end w-full">
+          <View className="bg-primaryDark  w-full h-3/4 p-12 rounded-3xl border-[0.5px] border-secondaryDark">
+            <Text className="text-white text-2xl font-ProstoOne mb-4">
               Create Post
             </Text>
-            <View className='mb-4'>
+            <View className="mb-4">
               <TextInput
                 onChangeText={(text) => {
                   setPostContent(text);
                 }}
                 value={postContent}
-                placeholder='What is on your mind?'
+                placeholder="What is on your mind?"
                 placeholderTextColor={COLORS.tertiaryDark}
                 multiline
                 numberOfLines={4}
-                textAlignVertical='top' // This will align the text to the top of the TextInput
+                textAlignVertical="top" // This will align the text to the top of the TextInput
                 style={{
                   maxHeight: 120,
                   color: COLORS.mainWhite,
@@ -162,14 +172,14 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                   paddingHorizontal: 20,
                   paddingVertical: 50,
                   paddingTop: 15,
-                  fontFamily: 'MontserratRegular',
+                  fontFamily: "MontserratRegular",
                 }}
               />
 
               <Button
                 isLoading={createPost.isLoading}
-                variant='primary'
-                className='my-4'
+                variant="primary"
+                className="my-4"
                 onPress={() => {
                   createPost.mutate();
                 }}
@@ -177,7 +187,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                 Create
               </Button>
               <Button
-                variant='secondary'
+                variant="secondary"
                 onPress={() => {
                   setModalVisible(false);
                 }}
@@ -195,65 +205,94 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
         removeClippedSubviews
         keyExtractor={(item, idx) => `${item.id}_${idx}`}
         showsVerticalScrollIndicator={false}
-        onEndReached={fetchMore}
-        ListFooterComponent={() =>
-          isLoading || isFetching ? <Loading /> : <Text>No more Users</Text>
-        }
-        onEndReachedThreshold={0.1}
-        data={posts}
+        onEndReached={() => {
+          console.log("hasNextPage:", hasNextPage);
+          console.log("isFetchingNextPage:", isFetchingNextPage);
+
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+          console.log("reached end");
+        }}
+        ListFooterComponent={() => {
+          return isFetchingNextPage ? <Loading /> : null;
+        }}
+        onEndReachedThreshold={0.5}
+        data={allPosts}
         renderItem={({ item: post }: { item: Post }) => {
           return (
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Post', { postId: post.id });
+                navigation.navigate("Post", { postId: post.id });
               }}
-              className='bg-secondaryDark rounded-3xl p-4 mb-4'
+              className="bg-secondaryDark rounded-3xl p-4 mb-4"
               activeOpacity={1}
             >
-              <View className='flex-row  items-center mb-2'>
-                <View>
-                  <View className='flex-row items-center'>
-                    <View className='w-8 h-8 rounded-full overflow-hidden mr-2'>
-                      <Image
-                        source={{
-                          uri: post.user.images[0],
-                        }}
-                        className='object-cover w-full h-full'
-                      />
+              <View className="flex-row justify-between items-center mb-2">
+                <View className="flex-col w-full justify-between">
+                  <View className="flex-row w-full justify-between items-center">
+                    <View className="flex-row items-center">
+                      <View className="w-8 h-8 rounded-full overflow-hidden mr-2">
+                        <Image
+                          source={{
+                            uri: post.user?.images[0],
+                          }}
+                          className="object-cover w-full h-full"
+                        />
+                      </View>
+                      <Text className="text-white text-base font-ProstoOne">
+                        {post.user?.firstName}
+                      </Text>
                     </View>
-                    <Text className='text-white text-base font-ProstoOne'>
-                      {post.user.firstName}
-                    </Text>
+
+                    <View className="flex-row items-center">
+                      <Text className="text-tertiaryDark text-xs font-MontserratRegular pr-4">
+                        {new Date(post.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          flagPost.mutate(post.id);
+                          setFlaggedPostId(post.id);
+                        }}
+                      >
+                        {flagPost.isLoading && flaggedPostId === post.id ? (
+                          <Spinner />
+                        ) : (
+                          <Flag
+                            size={20}
+                            color={COLORS.secondaryWhite}
+                            weight="fill"
+                          />
+                        )}
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <View
                     style={{
                       backgroundColor: hexToRGBA(tagColor(post), 0.25),
                     }}
-                    className='rounded-full px-2 py-1 my-2 items-center justify-center'
+                    className="rounded-full px-2 py-1 my-2 w-1/4 items-center justify-center"
                   >
                     <Text
                       style={{
                         color: tagColor(post),
                       }}
-                      className='font-MontserratRegular text-xs'
+                      className="font-MontserratRegular text-xs"
                     >
-                      {transformPostTag(post)}
+                      {post.tags && transformPostTag(post)}
                     </Text>
                   </View>
                 </View>
-                <Text className='text-tertiaryDark text-xs font-MontserratRegular ml-auto'>
-                  {new Date(post.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </Text>
               </View>
               <View>
-                <Text className='text-secondaryWhite font-MontserratRegular leading-5'>
+                <Text className="text-secondaryWhite font-MontserratRegular leading-5">
                   {post.content}
                 </Text>
               </View>
-              <View className='w-full flex-row justify-evenly mt-6'>
+              <View className="w-full flex-row justify-evenly mt-6">
                 <TouchableOpacity
                   onPress={() => {
                     likePost.mutate(post.id);
@@ -264,7 +303,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                     icon={
                       <Heart
                         size={18}
-                        weight='fill'
+                        weight="fill"
                         color={
                           post.likes?.find(
                             (like: Like) => like.userId === user.id
@@ -279,7 +318,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                 </TouchableOpacity>
                 <PostStat
                   icon={
-                    <Eye size={18} weight='fill' color={COLORS.tertiaryDark} />
+                    <Eye size={18} weight="fill" color={COLORS.tertiaryDark} />
                   }
                   stat={post.views?.length}
                 />
@@ -287,7 +326,7 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                   icon={
                     <ChatText
                       size={18}
-                      weight='fill'
+                      weight="fill"
                       color={COLORS.tertiaryDark}
                     />
                   }

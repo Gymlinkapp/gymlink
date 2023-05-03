@@ -24,14 +24,11 @@ const usePosts = (userId: string, limit: number = 9) => {
     ({ pageParam }) => fetchPosts(userId, pageParam, limit),
     {
       getNextPageParam: (lastPage, allPages) => {
-        console.log('Last page:', lastPage.length);
-        console.log('All pages:', allPages.length);
-        
         if (lastPage.length === 0) {
           return undefined;
         }
-        const lastPost = lastPage[lastPage.length - 1];
-        return lastPost ? lastPost.id : undefined;
+        const lastPostIndex = allPages.flatMap(page => page).length - 1;
+        return lastPostIndex;
       },
     }
   );

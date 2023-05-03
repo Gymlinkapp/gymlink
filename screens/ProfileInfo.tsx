@@ -1,6 +1,6 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CaretLeft, MapPin } from 'phosphor-react-native';
+import { CaretLeft, Flag, MapPin } from 'phosphor-react-native';
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native';
 import { Text } from 'react-native';
@@ -16,7 +16,10 @@ import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 import { useUser } from '../hooks/useUser';
 import Loading from '../components/Loading';
 import { transformTag } from '../utils/transformTags';
-import { useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
+import { COLORS } from '../utils/colors';
+import api from '../utils/axiosStore'
+import Spinner from '../components/Spinner';
 
 const ProfileInfoSection = ({
   title,
@@ -54,6 +57,22 @@ export default function ProfileInfo({
   useEffect(() => {
     queryClient.invalidateQueries('user');
   }, []);
+
+  const blockUser = useMutation(
+  async (blockedUserId: string) => {
+      const {data} = await api.post('/users/blockUser', {
+        blockingUserId: currUser.id,
+        blockedUserId,
+      });
+      return data;
+    }, {
+      onSettled: () => {
+        queryClient.invalidateQueries('user');
+        queryClient.invalidateQueries('users');
+
+        navigation.navigate('Home');
+      }
+    })
 
   const isTestUser = user.email === 'barbrajanson@gmail.com' || user.email === 'dominicwalsh@gmail.com';
 
@@ -107,6 +126,17 @@ export default function ProfileInfo({
               {gym?.name}
             </Text>
           </View>
+          {blockUser.isLoading ? (
+          <Spinner/>
+          ) : (
+          <TouchableOpacity onPress={() => blockUser.mutate(user.id)}>
+          <Flag 
+            color={COLORS.secondaryWhite} 
+            weight='regular'
+            size={20}
+          />
+              </TouchableOpacity>
+          )}
         </View>
         <LinearGradient
           pointerEvents='none'
@@ -123,7 +153,7 @@ export default function ProfileInfo({
       </View>
       <ScrollView className='mt-2 mb-52'>
         <View className='my-4'>
-          {!isTestUser && (
+          {!isTestUser || !user.isBot && (
             <UserPrompt answer={recentPrompt} prompt={prompt.prompt} />
           )}
         </View>

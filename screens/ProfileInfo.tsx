@@ -153,7 +153,7 @@ export default function ProfileInfo({
       </View>
       <ScrollView className='mt-2 mb-52'>
         <View className='my-4'>
-          {!isTestUser || !user.isBot && (
+          {!user.isBot && (
             <UserPrompt answer={recentPrompt} prompt={prompt.prompt} />
           )}
         </View>

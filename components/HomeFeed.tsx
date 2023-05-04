@@ -18,14 +18,19 @@ import Loading from './Loading';
 import getMostRecentPrompt from '../utils/getMostRecentPrompt';
 import FeedLoading from './FeedLoading';
 import UserPrompt from './UserPrompt';
+import { useQueryClient } from 'react-query';
 
 export default function HomeFeed({ navigation }: { navigation: any }) {
   const LIMIT = 9;
   const { token, user, feed, setFeed } = useAuth();
-
+  const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
 
   const { data, isLoading, isFetching } = useUsers(token, offset, LIMIT);
+
+  useEffect(() => {
+    queryClient.invalidateQueries('users');
+  }, [])
 
   useEffect(() => {
     if (!isLoading && data && data.users) {

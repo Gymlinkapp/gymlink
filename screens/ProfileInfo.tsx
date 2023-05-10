@@ -1,6 +1,6 @@
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { CaretLeft, Flag, MapPin } from "phosphor-react-native";
+import { CaretLeft, DotsThree, Flag, MapPin } from "phosphor-react-native";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { Image } from "react-native";
 import { Text } from "react-native";
@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { COLORS } from "../utils/colors";
 import api from "../utils/axiosStore";
 import Spinner from "../components/Spinner";
+import UserProfileOptionsModal from "../components/UserProfileOptionsModal";
 
 const ProfileInfoSection = ({
   title,
@@ -47,7 +48,8 @@ export default function ProfileInfo({
   const { user, gymId } = route.params;
   const { prompt, token } = useAuth();
   const [userSplit, setUserSplit] = useState<WeekSplit[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  /* const [currentImageIndex, setCurrentImageIndex] = useState(0); */
+  const [modalVisable, setModalVisable] = useState(false);
 
   const [recentPrompt, setRecentPrompt] = useState("");
 
@@ -109,10 +111,29 @@ export default function ProfileInfo({
   return (
     <View className="relative">
       {currUser?.id !== user.id && (
-        <View className="px-6 absolute z-50 w-52 h-52 justify-between">
+        <View className="px-6 py-10 absolute z-50 w-full top-4 flex-row items-center justify-between">
           <BackButton navigation={navigation} />
+
+          {blockUser.isLoading && <Spinner />}
+          {!blockUser.isLoading && (
+            <BlurView intensity={20} className="rounded-full overflow-hidden w-12 h-12 justify-center items-center">
+              <TouchableOpacity onPress={() => setModalVisable(!modalVisable)}>
+                <DotsThree
+                  color={COLORS.secondaryWhite}
+                  weight="regular"
+                  size={32}
+                />
+              </TouchableOpacity>
+            </BlurView>
+          )}
         </View>
       )}
+      <UserProfileOptionsModal
+        modalVisible={modalVisable}
+        setModalVisible={setModalVisable}
+        blockUser={blockUser}
+        userId={user.id}
+      />
       <View className="w-full h-72 rounded-[50px] overflow-hidden justify-end">
         <View className="z-50 p-4">
           <Text className="text-white font-MontserratRegular text-lg mb-2">
@@ -130,14 +151,6 @@ export default function ProfileInfo({
               {gym?.name}
             </Text>
           </View>
-          {blockUser.isLoading && (
-            <Spinner />
-          )} 
-          {currUser?.id !== user.id && !blockUser.isLoading && (
-            <TouchableOpacity onPress={() => blockUser.mutate(user.id)}>
-              <Flag color={COLORS.secondaryWhite} weight="regular" size={20} />
-            </TouchableOpacity>
-          )}
         </View>
         <LinearGradient
           pointerEvents="none"

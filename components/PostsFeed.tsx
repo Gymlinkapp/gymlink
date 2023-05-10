@@ -10,16 +10,17 @@ import { FlatList } from "react-native-gesture-handler";
 import { ChatText, Eye, Flag, Heart, Plus } from "phosphor-react-native";
 import { COLORS } from "../utils/colors";
 import { usePosts } from "../hooks/usePosts";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../utils/context";
 import FeedLoading from "./FeedLoading";
 import Loading from "./Loading";
-import { Comment, Like, Post, View as TView } from "../utils/types/posts";
+import { Like, Post } from "../utils/types/posts";
 import api from "../utils/axiosStore";
 import { useMutation, useQueryClient } from "react-query";
 import * as Haptics from "expo-haptics";
 import Button from "./button";
 import Spinner from "./Spinner";
+import PostOptionsModal from "./PostOptionsModal";
 
 export const transformPostTag = (post: Post) => {
   const tag = post.tags as unknown as keyof typeof post.tags;
@@ -81,20 +82,6 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     if (!data) return [];
     return data.pages.flatMap((page) => page.posts);
   }, [data]);
-  const flagPost = useMutation(
-    async (postId: string) => {
-      const { data } = await api.post(`/posts/flagPost`, {
-        userId: user.id,
-        postId,
-      });
-      return data;
-    },
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries("posts");
-      },
-    }
-  );
 
   console.log("allPosts", allPosts);
 
@@ -252,22 +239,6 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                           day: "numeric",
                         })}
                       </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          flagPost.mutate(post.id);
-                          setFlaggedPostId(post.id);
-                        }}
-                      >
-                        {flagPost.isLoading && flaggedPostId === post.id ? (
-                          <Spinner />
-                        ) : (
-                          <Flag
-                            size={20}
-                            color={COLORS.secondaryWhite}
-                            weight="fill"
-                          />
-                        )}
-                      </TouchableOpacity>
                     </View>
                   </View>
                   <View

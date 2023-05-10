@@ -6,7 +6,7 @@ import * as Haptics from 'expo-haptics';
 export default function BackButton({ navigation }: any) {
   return (
     <BlurView
-      className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 mt-10 overflow-hidden'
+      className='flex-row items-center justify-center rounded-full py-2 w-12 h-12 overflow-hidden'
       intensity={20}
     >
       <TouchableOpacity

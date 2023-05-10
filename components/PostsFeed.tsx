@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from "react-query";
 import * as Haptics from "expo-haptics";
 import Button from "./button";
 import Spinner from "./Spinner";
+import PostOptionsModal from "./PostOptionsModal";
 
 export const transformPostTag = (post: Post) => {
   const tag = post.tags as unknown as keyof typeof post.tags;
@@ -81,20 +82,6 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
     if (!data) return [];
     return data.pages.flatMap((page) => page.posts);
   }, [data]);
-  const flagPost = useMutation(
-    async (postId: string) => {
-      const { data } = await api.post(`/posts/flagPost`, {
-        userId: user.id,
-        postId,
-      });
-      return data;
-    },
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries("posts");
-      },
-    }
-  );
 
   console.log("allPosts", allPosts);
 
@@ -252,22 +239,6 @@ export default function PostsFeed({ navigation }: { navigation: any }) {
                           day: "numeric",
                         })}
                       </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          flagPost.mutate(post.id);
-                          setFlaggedPostId(post.id);
-                        }}
-                      >
-                        {flagPost.isLoading && flaggedPostId === post.id ? (
-                          <Spinner />
-                        ) : (
-                          <Flag
-                            size={20}
-                            color={COLORS.secondaryWhite}
-                            weight="fill"
-                          />
-                        )}
-                      </TouchableOpacity>
                     </View>
                   </View>
                   <View

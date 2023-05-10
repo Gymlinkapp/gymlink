@@ -34,6 +34,7 @@ import * as Progress from "react-native-progress";
 import * as Haptics from "expo-haptics";
 import PostOptionsModal from "../components/PostOptionsModal";
 import Spinner from "../components/Spinner";
+import CommentOptionsModal from "../components/CommentOptionsModal";
 
 export default function PostScreen({
   route,
@@ -45,8 +46,11 @@ export default function PostScreen({
   const { postId }: { postId: string } = route.params;
   const { data, isLoading } = usePost(postId);
   const [postOptionsModalVisable, setPostOptionsModalVisable] = useState(false);
+  const [commentOptions, setCommentOptions] = useState(false);
+  const [commentId, setCommentId] = useState("");
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
   useEffect(() => {
     if (data && !isLoading) {
       api.post("/posts/viewPost", {
@@ -71,6 +75,20 @@ export default function PostScreen({
       onSettled: () => {
         queryClient.invalidateQueries("posts");
         navigation.goBack();
+      },
+    }
+  );
+
+  const flagComment = useMutation(
+    async (commentId: string) => {
+      const { data } = await api.post(`/posts/flagPostComment`, {
+        commentId: commentId
+      });
+      return data;
+    },
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries("post");
       },
     }
   );
@@ -124,6 +142,12 @@ export default function PostScreen({
         modalVisible={postOptionsModalVisable}
         flagPost={flagPost}
         postId={postId}
+      />
+      <CommentOptionsModal
+        setModalVisible={setCommentOptions}
+        modalVisible={commentOptions}
+        flagComment={flagComment}
+        commentId={commentId}
       />
       <SafeAreaView className="mx-8 flex-1">
         <View className="flex-row items-center w-full justify-between">
@@ -219,12 +243,15 @@ export default function PostScreen({
         </View>
 
         <View className="flex-1">
-          <ScrollView className="flex-1">
+          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
             {data.post.comments?.map((comment) => (
+
               <View
-                className="flex-row w-full my-4 border-b-2 py-6 border-secondaryDark items-center"
+                className="w-full my-4 border-b-2 py-6 border-secondaryDark"
                 key={comment.id}
               >
+                <View className="flex-row items-center justify-between">
+
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate("Profile", {
@@ -246,6 +273,24 @@ export default function PostScreen({
                     {comment.user?.firstName} {comment.user?.lastName}
                   </Text>
                 </TouchableOpacity>
+
+          {flagComment.isLoading && <Spinner />}
+          {!flagComment.isLoading && (
+            <TouchableOpacity
+              onPress={() => {
+                        setCommentId(comment.id)
+                setCommentOptions(!commentOptions)
+                      }
+              }
+            >
+              <DotsThree
+                color={COLORS.secondaryWhite}
+                weight="regular"
+                size={24}
+              />
+            </TouchableOpacity>
+          )}
+                </View>
                 <View className="flex-col">
                   <Text className="text-secondaryWhite font-MontserratRegular">
                     {comment.content}

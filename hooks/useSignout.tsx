@@ -3,7 +3,7 @@ import api from '../utils/axiosStore';
 import { useAuth } from '../utils/context';
 
 export default function useSignout(token: string) {
-  const { setToken, setIsVerified } = useAuth();
+  const { setToken } = useAuth();
   const queryClient = useQueryClient();
   return useMutation(
     async () => {

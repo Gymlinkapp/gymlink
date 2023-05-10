@@ -1,6 +1,6 @@
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { CaretLeft, DotsThree, Flag, MapPin } from "phosphor-react-native";
+import { DotsThree, MapPin } from "phosphor-react-native";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { Image } from "react-native";
 import { Text } from "react-native";

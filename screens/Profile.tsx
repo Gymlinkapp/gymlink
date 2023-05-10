@@ -28,7 +28,6 @@ import { BlurView } from 'expo-blur';
 import { keyboardVerticalOffset } from '../utils/ui';
 import * as Haptics from 'expo-haptics';
 import { User } from '../utils/users';
-import * as Progress from 'react-native-progress';
 import { COLORS } from '../utils/colors';
 import { DisplayGymName } from '../utils/displayGymName';
 import Spinner from '../components/Spinner';
